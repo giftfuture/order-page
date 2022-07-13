@@ -48,6 +48,9 @@ export default {
     handleNodeClick (data) {
       console.log(data)
     },
+    checkboxT (row, rowIndex) {
+      return row.id !== this.user.id
+    },
     search (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
@@ -109,7 +112,7 @@ export default {
     <el-col :xs="15" :sm="18" :md="19" :lg="20" :xl="20">
       <!--工具栏-->
       <div class="head-container">
-    <el-form :model="sendForm" :rules="rules" ref="sendForm" class="login-form">
+    <el-form :model="sendForm" :rules="rules" ref="sendForm" class="login-form"  label-width="66px">
       <el-form-item label="创建人" prop="createBy">
         <!--    <SelectChecked :options="options" :data="SelectCheckedData" @change="changeValue()" @remove-tag="deleteValue" :props="defaultProps" @selectedVal="selectedVal" />-->
         <el-select  v-model="sendForm.createBy" multiple   placeholder="选择创建人" clearable filterable>
@@ -137,15 +140,6 @@ export default {
       <el-select  v-model="sendForm.ticketStatus" multiple  placeholder="选择钱票状态" clearable filterable>
         <el-option v-for="item in ticketStatusDict" :key="item.key" :label="item.value" :value="item.key"> </el-option>
       </el-select></el-form-item>
-      <el-form-item label="备注" prop="remark">
-      <el-input
-                v-model="sendForm.remark"
-                @keyup.native.enter="search('remark')"
-                autocomplete="off"
-                placeholder="备注"
-                prefix-icon="el-icon-goods">
-        <i slot="suffix" class="el-input__icon el-icon-view btn-eye"></i>
-      </el-input></el-form-item>
       <el-form-item v-show="showMsg" style="margin-bottom:0;">
         <span class="text-danger">提示：搜索有异常，请重试！</span>
       </el-form-item>
@@ -157,28 +151,22 @@ export default {
   <!--表格渲染-->
  <el-table ref="table" v-loading="search.loading" :data="search.data" style="width: 100%;" @selection-change="search.selectionChangeHandler">
     <el-table-column :selectable="checkboxT" type="selection" width="55" />
-    <el-table-column :show-overflow-tooltip="true" prop="username" label="工单号" />
-    <el-table-column :show-overflow-tooltip="true" prop="nickName" label="昵称" />
-    <el-table-column prop="gender" label="性别" />
-    <el-table-column :show-overflow-tooltip="true" prop="phone" width="100" label="电话" />
-    <el-table-column :show-overflow-tooltip="true" width="135" prop="email" label="邮箱" />
-    <el-table-column :show-overflow-tooltip="true" prop="dept" label="部门">
-      <template slot-scope="scope">
-        <div>{{ scope.row.dept.name }}</div>
-      </template>
+    <el-table-column :show-overflow-tooltip="true" prop="orderNo" label="工单号" />
+    <el-table-column :show-overflow-tooltip="true" prop="createBy" label="创建人" />
+    <el-table-column :show-overflow-tooltip="true" prop="createTime" label="日期" />
+    <el-table-column :show-overflow-tooltip="true" prop="accountRemark" label="对账备注" />
+    <el-table-column :show-overflow-tooltip="true" prop="updateBy" label="最后修改人" />
+    <el-table-column :show-overflow-tooltip="true" prop="updateTime" label="最后修改日期"/>
+    <el-table-column label="状态" align="center" prop="status">
+<!--      <template slot-scope="scope">
+        <el-form-item label="状态" prop="status">
+          <el-select  v-model="sendForm.status" multiple   placeholder="选择状态" clearable filterable>
+            <el-option v-for="item in statusDict" :key="item.key" :label="item.value" :value="item.key"> </el-option>
+          </el-select>
+        </el-form-item>
+      </template>-->
     </el-table-column>
-    <el-table-column label="状态" align="center" prop="enabled">
-      <template slot-scope="scope">
-        <el-switch
-          v-model="scope.row.enabled"
-          :disabled="user.id === scope.row.id"
-          active-color="#409EFF"
-          inactive-color="#F56C6C"
-          @change="changeEnabled(scope.row, scope.row.enabled)"
-        />
-      </template>
-    </el-table-column>
-    <el-table-column :show-overflow-tooltip="true" prop="createTime" width="135" label="创建日期" />
+<!--    <el-table-column :show-overflow-tooltip="true" prop="createTime" width="135" label="创建日期" />
     <el-table-column
       v-if="checkPer(['admin','user:edit','user:del'])"
       label="操作"
@@ -193,7 +181,7 @@ export default {
           :disabled-dle="scope.row.id === user.id"
         />
       </template>
-    </el-table-column>
+    </el-table-column>-->
   </el-table>
   <pagination />
   <!--分页组件-->

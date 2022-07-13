@@ -199,23 +199,23 @@ import crudOperation from '@crud/CRUD.operation'
 import udOperation from '@crud/UD.operation'
 import pagination from '@crud/Pagination'
 import DateRangePicker from '@/components/DateRangePicker'
-import Treeselect from '@riophae/vue-treeselect'
+import Treeselect, { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
 import { mapGetters } from 'vuex'
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
-import { LOAD_CHILDREN_OPTIONS } from '@riophae/vue-treeselect'
+
 let userRoles = []
 let userJobs = []
 const defaultForm = { id: null, username: null, nickName: null, gender: '男', email: null, enabled: 'false', roles: [], jobs: [], dept: { id: null }, phone: null }
 export default {
   name: 'User',
   components: { Treeselect, crudOperation, rrOperation, udOperation, pagination, DateRangePicker },
-  cruds() {
-    return CRUD({ title: '用户', url: 'api/users', crudMethod: { ...crudUser }})
+  cruds () {
+    return CRUD({ title: '用户', url: 'api/users', crudMethod: { ...crudUser } })
   },
   mixins: [presenter(), header(), form(defaultForm), crud()],
   // 数据字典
   dicts: ['user_status'],
-  data() {
+  data () {
     // 自定义验证
     const validPhone = (rule, value, callback) => {
       if (!value) {
@@ -228,8 +228,14 @@ export default {
     }
     return {
       height: document.documentElement.clientHeight - 180 + 'px;',
-      deptName: '', depts: [], deptDatas: [], jobs: [], level: 3, roles: [],
-      jobDatas: [], roleDatas: [], // 多选时使用
+      deptName: '',
+      depts: [],
+      deptDatas: [],
+      jobs: [],
+      level: 3,
+      roles: [],
+      jobDatas: [],
+      roleDatas: [], // 多选时使用
       defaultProps: { children: 'children', label: 'name', isLeaf: 'leaf' },
       permission: {
         add: ['admin', 'user:add'],
@@ -264,45 +270,45 @@ export default {
       'user'
     ])
   },
-  created() {
+  created () {
     this.crud.msg.add = '新增成功，默认密码：123456'
   },
-  mounted: function() {
+  mounted: function () {
     const that = this
-    window.onresize = function temp() {
+    window.onresize = function temp () {
       that.height = document.documentElement.clientHeight - 180 + 'px;'
     }
   },
   methods: {
     // 禁止输入空格
-    keydown(e) {
+    keydown (e) {
       if (e.keyCode === 32) {
         e.returnValue = false
       }
     },
-    changeRole(value) {
+    changeRole (value) {
       userRoles = []
-      value.forEach(function(data, index) {
+      value.forEach(function (data, index) {
         const role = { id: data }
         userRoles.push(role)
       })
     },
-    changeJob(value) {
+    changeJob (value) {
       userJobs = []
-      value.forEach(function(data, index) {
+      value.forEach(function (data, index) {
         const job = { id: data }
         userJobs.push(job)
       })
     },
-    deleteTag(value) {
-      userRoles.forEach(function(data, index) {
+    deleteTag (value) {
+      userRoles.forEach(function (data, index) {
         if (data.id === value) {
           userRoles.splice(index, value)
         }
       })
     },
     // 新增与编辑前做的操作
-    [CRUD.HOOK.afterToCU](crud, form) {
+    [CRUD.HOOK.afterToCU] (crud, form) {
       this.getRoles()
       if (form.id == null) {
         this.getDepts()
@@ -314,31 +320,31 @@ export default {
       form.enabled = form.enabled.toString()
     },
     // 新增前将多选的值设置为空
-    [CRUD.HOOK.beforeToAdd]() {
+    [CRUD.HOOK.beforeToAdd] () {
       this.jobDatas = []
       this.roleDatas = []
     },
     // 初始化编辑时候的角色与岗位
-    [CRUD.HOOK.beforeToEdit](crud, form) {
+    [CRUD.HOOK.beforeToEdit] (crud, form) {
       this.getJobs(this.form.dept.id)
       this.jobDatas = []
       this.roleDatas = []
       userRoles = []
       userJobs = []
       const _this = this
-      form.roles.forEach(function(role, index) {
+      form.roles.forEach(function (role, index) {
         _this.roleDatas.push(role.id)
         const rol = { id: role.id }
         userRoles.push(rol)
       })
-      form.jobs.forEach(function(job, index) {
+      form.jobs.forEach(function (job, index) {
         _this.jobDatas.push(job.id)
         const data = { id: job.id }
         userJobs.push(data)
       })
     },
     // 提交前做的操作
-    [CRUD.HOOK.afterValidateCU](crud) {
+    [CRUD.HOOK.afterValidateCU] (crud) {
       if (!crud.form.dept.id) {
         this.$message({
           message: '部门不能为空',
@@ -363,7 +369,7 @@ export default {
       return true
     },
     // 获取左侧部门数据
-    getDeptDatas(node, resolve) {
+    getDeptDatas (node, resolve) {
       const sort = 'id,desc'
       const params = { sort: sort }
       if (typeof node !== 'object') {
@@ -383,9 +389,9 @@ export default {
         })
       }, 100)
     },
-    getDepts() {
+    getDepts () {
       getDepts({ enabled: true }).then(res => {
-        this.depts = res.content.map(function(obj) {
+        this.depts = res.content.map(function (obj) {
           if (obj.hasChildren) {
             obj.children = null
           }
@@ -393,14 +399,14 @@ export default {
         })
       })
     },
-    getSupDepts(deptId) {
+    getSupDepts (deptId) {
       getDeptSuperior(deptId).then(res => {
         const date = res.content
         this.buildDepts(date)
         this.depts = date
       })
     },
-    buildDepts(depts) {
+    buildDepts (depts) {
       depts.forEach(data => {
         if (data.children) {
           this.buildDepts(data.children)
@@ -411,10 +417,10 @@ export default {
       })
     },
     // 获取弹窗内部门数据
-    loadDepts({ action, parentNode, callback }) {
+    loadDepts ({ action, parentNode, callback }) {
       if (action === LOAD_CHILDREN_OPTIONS) {
         getDepts({ enabled: true, pid: parentNode.id }).then(res => {
-          parentNode.children = res.content.map(function(obj) {
+          parentNode.children = res.content.map(function (obj) {
             if (obj.hasChildren) {
               obj.children = null
             }
@@ -427,7 +433,7 @@ export default {
       }
     },
     // 切换部门
-    handleNodeClick(data) {
+    handleNodeClick (data) {
       if (data.pid === 0) {
         this.query.deptId = null
       } else {
@@ -436,7 +442,7 @@ export default {
       this.crud.toQuery()
     },
     // 改变状态
-    changeEnabled(data, val) {
+    changeEnabled (data, val) {
       this.$confirm('此操作将 "' + this.dict.label.user_status[val] + '" ' + data.username + ', 是否继续？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -452,24 +458,24 @@ export default {
       })
     },
     // 获取弹窗内角色数据
-    getRoles() {
+    getRoles () {
       getAll().then(res => {
         this.roles = res
       }).catch(() => { })
     },
     // 获取弹窗内岗位数据
-    getJobs() {
+    getJobs () {
       getAllJob().then(res => {
         this.jobs = res.content
       }).catch(() => { })
     },
     // 获取权限级别
-    getRoleLevel() {
+    getRoleLevel () {
       getLevel().then(res => {
         this.level = res.level
       }).catch(() => { })
     },
-    checkboxT(row, rowIndex) {
+    checkboxT (row, rowIndex) {
       return row.id !== this.user.id
     }
   }
