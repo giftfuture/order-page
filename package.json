@@ -10,7 +10,8 @@
   "dependencies": {
     "axios": "^0.18.0",
     "echarts": "^4.2.0-rc.2",
-    "element-ui": "^2.4.11",
+    "element-ui": "^2.15.8",
+    "js-cookie": "^3.0.1",
     "less": "^4.0.0",
     "less-loader": "^7.3.0",
     "node-sass": "^4.14.1",

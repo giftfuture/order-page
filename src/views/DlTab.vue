@@ -74,6 +74,7 @@
 export default {
   data () {
     return {
+      textType: '',
       sendForm: {
 
       },
@@ -85,6 +86,9 @@ export default {
     }
   },
   methods: {
+    changeType () {
+
+    },
     search (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {

@@ -62,13 +62,13 @@ const router = new Router({
           component: Search
         }
       ]
-    },
-    {
-      path: '*',
-      redirect: { path: '/404',
-        component: NotFound
-      }
     }
+    // {
+    //   path: '*',
+    //   redirect: { path: '/404',
+    //     component: NotFound
+    //   }
+    // }
   ]
 })
 
@@ -89,9 +89,11 @@ router.beforeEach((to, from, next) => {
   }
   // 判断是否登录
   if (!staff && url !== LOGINURL && url.indexOf(SYSBACK) < 0) {
-    next({ path: LOGINURL })
+    next()
+    // next({ path: LOGINURL })
   } else if (!sysmanager && url !== sysLOGINURL && url.indexOf(SYSBACK) >= 0) {
-    next({ path: sysLOGINURL })
+    next()
+    // next({ path: sysLOGINURL })
   } else {
     next()
   }

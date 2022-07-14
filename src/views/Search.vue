@@ -1,51 +1,71 @@
 <template>
-<!--  <div class="mpm-container">
-    <div style="width: 100%;overflow:inherit; -webkit-overflow-scrolling:touch;">
-      <tab ref="tabBox" bar-active-color="#149c81" active-color="#149c81" :line-width="4" :custom-bar-width="getBarWidth" v-model="tabD" :style="{width: tabWidth + 'px'}">
-        <tab-item v-for="(item,index) in list" :key="index" @on-item-click="onItemClick(item, index)">{{item}}
-        </tab-item>
-      </tab>
-    </div>
-  </div>-->
-  <div  class="mpm-container" style="width: 100%;overflow:inherit; -webkit-overflow-scrolling:touch;">
-    <tab class ="vux-tab">
-      <tab-item selected @on-item-click="onItemClick">发货组</tab-item>
-      <tab-item @on-item-click="onItemClick">开票与资料组</tab-item>
-      <tab-item @on-item-click="onItemClick">订货组</tab-item>
-      <tab-item @on-item-click="onItemClick">打款组</tab-item>
-      <tab-item @on-item-click="onItemClick">进货组</tab-item>
-      <tab-item @on-item-click="onItemClick">价格组</tab-item>
-      <tab-item @on-item-click="onItemClick">综合搜索</tab-item>
-    </tab>
-    <component :is="currentView"></component>
+  <div  class="mpm-container" style="width: 100%;height: 100%;overflow:hidden; -webkit-overflow-scrolling:touch;">
+    <el-tabs v-model="currentView" @tab-click="handleClick">
+      <el-tab-pane v-for="item in views" :label="item.label" :name="item.name" :key="item.name">
+        <!-- {{ item.component }} -->
+        <component :is="currentView"></component>
+      </el-tab-pane>
+    </el-tabs>
   </div>
 </template>
 
 <script>
-import {
-  Tab, TabItem
-} from 'vux'
-import SendTab from '@/views/SendTab.vue'
+// import {
+//   Tab, TabItem
+// } from 'vux'
 import KpzlTab from '@/views/KpzlTab.vue'
+import DHTab from '@/views/DHTab.vue'
+import SendTab from '@/views/SendTab.vue'
 import DlTab from '@/views/DlTab.vue'
+import JHTab from '@/views/JHTab.vue'
+import JGTab from '@/views/JGTab.vue'
+import ZHSSTab from '@/views/ZHSSTab.vue'
+
 export default {
   data () {
     return {
-      currentView: ''
+      currentView: '',
+      views: [{
+        label: '开票与资料组',
+        name: 'KpzlTab'
+      }, {
+        label: '订货组',
+        name: 'DHTab'
+
+      }, {
+        label: '打款组',
+        name: 'DlTab'
+
+      }, {
+        label: '进货组',
+        name: 'JHTab'
+
+      }, {
+        label: '价格组',
+        name: 'JGTab'
+
+      }, {
+        label: '综合搜索',
+        name: 'ZHSSTab'
+      }]
     }
   },
   components: {
-    Tab,
-    TabItem,
-    SendTab,
+    // Tab,
+    // TabItem,
     KpzlTab,
-    DlTab
+    DHTab,
+    SendTab,
+    DlTab,
+    JHTab,
+    JGTab,
+    ZHSSTab
   },
   mounted () {
     this.currentView = 'SendTab'
   },
   methods: {
-    onItemClick (index) {
+    handleClick (index) {
       if (index === 0) {
         // 发货Tab
         this.currentView = 'SendTab'

@@ -1,23 +1,31 @@
 import axios from 'axios'
-import router from '@/router/routers'
+// import router from '@/router/routers'
 import { Notification } from 'element-ui'
 import store from '../store'
-import { getToken } from '@/utils/auth'
-import Config from '@/settings'
+// import { getToken } from '@/utils/auth'
+// import Config from '@/settings'
 import Cookies from 'js-cookie'
 
+const baseUrl = (env) => {
+  switch (env) {
+    case 'production':
+      return 'https://ximalaya.com'
+    default:
+      return 'http://172.16.3.91:8888'
+  }
+}
 // 创建axios实例
 const service = axios.create({
-  baseURL: process.env.NODE_ENV === 'production' ? process.env.VUE_APP_BASE_API : '/', // api 的 base_url
-  timeout: Config.timeout // 请求超时时间
+  baseURL: baseUrl(process.env.NODE_ENV)
+  // timeout: Config.timeout // 请求超时时间
 })
 
 // request拦截器
 service.interceptors.request.use(
   config => {
-    if (getToken()) {
-      config.headers['Authorization'] = getToken() // 让每个请求携带自定义token 请根据实际情况自行修改
-    }
+    // if (getToken()) {
+    //   config.headers['Authorization'] = getToken() // 让每个请求携带自定义token 请根据实际情况自行修改
+    // }
     config.headers['Content-Type'] = 'application/json'
     return config
   },
@@ -36,7 +44,7 @@ service.interceptors.response.use(
     if (error.response.data instanceof Blob && error.response.data.type.toLowerCase().indexOf('json') !== -1) {
       const reader = new FileReader()
       reader.readAsText(error.response.data, 'utf-8')
-      reader.onload = function(e) {
+      reader.onload = function (e) {
         const errorMsg = JSON.parse(reader.result).message
         Notification.error({
           title: errorMsg,
@@ -65,7 +73,7 @@ service.interceptors.response.use(
             location.reload()
           })
         } else if (code === 403) {
-          router.push({ path: '/401' })
+          // router.push({ path: '/401' })
         } else {
           const errorMsg = error.response.data.message
           if (errorMsg !== undefined) {
