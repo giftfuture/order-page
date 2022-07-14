@@ -24,8 +24,12 @@ import ZHSSTab from '@/views/ZHSSTab.vue'
 export default {
   data () {
     return {
-      currentView: '',
+      currentView: 'SendTab',
       views: [{
+        label: '发货组',
+        name: 'SendTab'
+
+      }, {
         label: '开票与资料组',
         name: 'KpzlTab'
       }, {
