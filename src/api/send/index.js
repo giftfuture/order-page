@@ -27,4 +27,11 @@ export function dhSearch (data) {
   })
 }
 
-
+// 进货组、价格组搜索分页
+export function jhjgSearch (data) {
+  return request({
+    url: '/order/jhjgSearch',
+    method: 'post',
+    data
+  })
+}
