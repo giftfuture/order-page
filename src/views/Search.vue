@@ -24,7 +24,7 @@ import ZHSSTab from '@/views/ZHSSTab.vue'
 export default {
   data () {
     return {
-      currentView: 'SendTab',
+      currentView: 'KpzlTab',
       views: [{
         label: '发货组',
         name: 'SendTab'
