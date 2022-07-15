@@ -44,3 +44,11 @@ export function overallSearch (data) {
     data
   })
 }
+
+// 获取订单和发票资料状态
+export function loadBySort (data) {
+  return request({
+    url: '/dict/loadBySort?sortTag=' + data,
+    method: 'get'
+  })
+}

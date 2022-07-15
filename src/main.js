@@ -22,7 +22,15 @@ Vue.config.productionTip = false
 Vue.use(ElementUI)
 Vue.prototype.$http = axios
 Vue.prototype.Utils = Utils
-
+Vue.filter('handleValue', (keys) => {
+  // const keyArr = keys.split(',')
+  // console.log(this.$store.state.statusDict, 'this.$store.state.statusDict')
+  // const data = keyArr.map(key => {
+  //   return this.$store.state.statusDict[key]
+  // })
+  // console.log(data, 'data====')
+  return keys + '111333'
+})
 new Vue({
   router,
   store,
