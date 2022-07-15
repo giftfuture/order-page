@@ -1,152 +1,337 @@
-<template>
-<div class ="vux-tab-item">
-<el-form :model="sendForm" :rules="rules" ref="sendForm" class="login-form">
-  <el-form-item prop="createBy">
-    <el-input
-      v-model="sendForm.createBy"
-      autocomplete="off"
-      placeholder="创建人"
-      prefix-icon="el-icon-goods">
-    </el-input>
-  </el-form-item>
-  <el-form-item prop="beginTime">
-    <el-input :type="textType"
-              v-model="sendForm.beginTime"
-              @keyup.native.enter="login('beginTime')"
-              autocomplete="off"
-              placeholder="日期"
-              prefix-icon="el-icon-time">
-      <i slot="suffix" class="el-input__icon el-icon-view btn-eye" @click="changeType"></i>
-    </el-input>
-  </el-form-item>
-  <el-form-item prop="endTime">
-    <el-input :type="textType"
-              v-model="sendForm.endTime"
-              @keyup.native.enter="login('endTime')"
-              autocomplete="off"
-              placeholder="日期"
-              prefix-icon="el-icon-time">
-      <i slot="suffix" class="el-input__icon el-icon-view btn-eye" @click="changeType"></i>
-    </el-input>
-  </el-form-item>
-  <el-input :type="textType"
-            v-model="sendForm.sendContent"
-            @keyup.native.enter="login('sendContent')"
-            autocomplete="off"
-            placeholder="发货"
-            prefix-icon="el-icon-goods">
-    <i slot="suffix" class="el-input__icon el-icon-view btn-eye" @click="changeType"></i>
-  </el-input>
-  <el-input :type="textType"
-            v-model="sendForm.status"
-            @keyup.native.enter="login('status')"
-            autocomplete="off"
-            placeholder="状态"
-            prefix-icon="el-icon-goods">
-    <i slot="suffix" class="el-input__icon el-icon-view btn-eye" @click="changeType"></i>
-  </el-input>
-  <el-input :type="textType"
-            v-model="sendForm.ticketStatus"
-            @keyup.native.enter="login('ticketStatus')"
-            autocomplete="off"
-            placeholder="钱票"
-            prefix-icon="el-icon-goods">
-    <i slot="suffix" class="el-input__icon el-icon-view btn-eye" @click="changeType"></i>
-  </el-input>
-  <el-input :type="textType"
-            v-model="sendForm.remark"
-            @keyup.native.enter="login('remark')"
-            autocomplete="off"
-            placeholder="备注"
-            prefix-icon="el-icon-goods">
-    <i slot="suffix" class="el-input__icon el-icon-view btn-eye" @click="changeType"></i>
-  </el-input>
-  <el-form-item v-show="showMsg" style="margin-bottom:0;">
-    <span class="text-danger">提示：用户名或密码错误，请重试！</span>
-  </el-form-item>
-  <el-form-item>
-    <el-button type="primary" @click="login('sendForm')" class="login-btn" v-loading="loading">搜索</el-button>
-  </el-form-item>
-</el-form>
-</div>
-</template>
 <script>
+import { getOrderList, queryAllStaf } from '@/api/send/index'
+const statusDict = {
+  1: { key: 1, value: '已打单', className: 'statusDict1' },
+  2: { key: 2, value: '待发', className: 'statusDict2' },
+  3: { key: 3, value: '缺货', className: 'statusDict3' },
+  4: { key: 4, value: '已作退货', className: 'statusDict4' },
+  5: { key: 5, value: '已调', className: 'statusDict5' },
+  6: { key: 6, value: '重新打速递单', className: 'statusDict6' }
+}
+// const ticketStatusDict = {
+//   1: { key: 1, value: '欠款' },
+//   2: { key: 2, value: '欠票' },
+//   3: { key: 3, value: '只收了部分' },
+//   4: { key: 4, value: '只开了部分' }
+// }
 export default {
+  name: 'sendTab',
+  components: {
+  },
   data () {
     return {
-      textType: '',
+      allStaf: [],
+      pageNo: 0,
+      pageSize: 10,
+      tableData: {
+        currentPage: 1,
+        total: 0,
+        data: []
+      },
+      createTime: '',
       sendForm: {
-
+        createByStr: '',
+        createTimeBegin: '',
+        createTimeEnd: '',
+        searchContent: '',
+        statusStr: '',
+        ticketStatusStr: ''
       },
-      rules: {
-      },
+      selectCheckedData: [
+      ],
+      statusDict: [
+        { key: 1, value: '已打单' },
+        { key: 2, value: '待发' },
+        { key: 3, value: '缺货' },
+        { key: 4, value: '已作退货' },
+        { key: 5, value: '已调' },
+        { key: 6, value: '重新打速递单' }
+      ],
+      ticketStatusDict: [
+        { key: 1, value: '欠款' },
+        { key: 2, value: '欠票' },
+        { key: 3, value: '只收了部分' },
+        { key: 4, value: '只开了部分' }
+      ],
       loading: false,
       showMsg: false
-
+    }
+  },
+  watch: {
+    pageNo (val) {
+      console.log(val)
+      this.handleSearch()
+    },
+    pageSize (val) {
+      console.log(val)
+      this.handleSearch()
     }
   },
   methods: {
-    changeType () {
-
-    },
-    search (formName) {
-      this.$refs[formName].validate((valid) => {
-        if (valid) {
-          this.loading = true
-          this.$http.post('/order/list', this.sendForm).then((res) => {
-            if (res.data.code === 0) {
-              // 延迟两秒，演示登录按钮加载效果
-              setTimeout(() => {
-                this.loading = false
-                // sessionStorage.setItem('staff', JSON.stringify(this.sendForm))
-                this.$router.replace({ path: '/order/list' })
-              }, 2000)
-            } else {
-              this.loading = false
-              this.showMsg = true
-            }
-          })
-        } else {
-          console.log('search failed')
-          return false
+    handleQueryAllStaf () {
+      queryAllStaf().then(res => {
+        console.log(res, 'res')
+        if (res.code === 0) {
+          this.selectCheckedData = res.data
         }
       })
+    },
+    getStatusDict (keys) {
+      console.log(keys, 'keys', statusDict)
+      const keyArr = keys.split(',')
+      const data = keyArr.map(key => {
+        return statusDict[key]
+      })
+      console.log(data, 'data====')
+      return data
+    },
+    handleSearch () {
+      const orderInfoVO = {}
+      Object.keys(this.sendForm).forEach(key => {
+        if (Array.isArray(this.sendForm[key])) {
+          orderInfoVO[key] = this.sendForm[key].join(',')
+        } else {
+          orderInfoVO[key] = this.sendForm[key]
+        }
+      })
+      const params = {
+        orderInfoVO,
+        'pageRequest': { 'page': this.pageNo, 'size': this.pageSize }
+      }
+      getOrderList(params)
+        .then((response) => {
+          console.log(response, '====')
+          if (response.code === 0) {
+            this.tableData.data = response.data.content ? response.data.content : []
+            this.tableData.total = response.data && (response.data.totalElements || 0)
+          } else {
+            this.$message.error(response.data.message)
+          }
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+      return params
+    },
+    handleSizeChange (val) {
+      console.log(`每页 ${val} 条`)
+      this.pageSize = val
+    },
+    handleCurrentChange (val) {
+      this.pageNo = val - 1
+      console.log(`当前页: ${val}`)
+    },
+    handleSelectionChange (val) {
+      this.multipleSelection = val
+    },
+    handleNodeClick (data) {
+      console.log(data)
+    },
+    checkboxT (row, rowIndex) {
+      // return row.id !== this.user.id
+    },
+    search () {
+      console.log(this.sendForm, 'this.sendForm')
+      console.log(this.$refs.sendForm, 'formName====')
+      this.sendForm.createTimeBegin = this.createTime[0]
+      this.sendForm.createTimeEnd = this.createTime[1]
+      this.handleSearch()
     }
+  },
+  created () {
+    this.handleSearch()
+    this.handleQueryAllStaf()
   }
 }
 </script>
+<template>
+  <div class="commonBody">
+    <!-- <h5 class="commonBody_title">订单列表</h5> -->
+    <el-form
+      :inline="true"
+      :model="sendForm"
+      ref="sendForm"
+      class="login-form"
+      label-width="80px"
+    >
+      <el-row>
+        <el-form-item label="创建人" prop="createByStr">
+          <!--    <SelectChecked :options="options" :data="SelectCheckedData" @change="changeValue()" @remove-tag="deleteValue" :props="defaultProps" @selectedVal="selectedVal" />-->
+          <el-select
+            v-model="sendForm.createByStr"
+            multiple
+            placeholder="选择创建人"
+            clearable
+            filterable
+            style="width: 300px"
+          >
+            <el-option
+              v-for="item in selectCheckedData"
+              :key="item.id"
+              :label="item.staffName"
+              :value="item.id"
+            >
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="搜索框" prop="searchContent">
+          <el-input
+            style="width: 300px"
+            v-model="sendForm.searchContent"
+            @keyup.native.enter="search"
+            autocomplete="off"
+            placeholder="工单号、发货文本、备注"
+            prefix-icon="el-icon-goods"
+          >
+            <i
+              slot="suffix"
+              class="el-input__icon el-icon-view btn-eye"
+            ></i> </el-input
+        ></el-form-item>
+        <!-- prop="createTime" -->
+        <el-form-item label="日期" >
+          <el-date-picker
+            v-model="createTime"
+            type="daterange"
+            range-separator="至"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期">
+          </el-date-picker>
+        </el-form-item>
+      </el-row>
+      <el-row>
+        <el-form-item label="状态" prop="statusStr">
+          <el-select
+            style="width: 300px"
+            v-model="sendForm.statusStr"
+            multiple
+            placeholder="选择状态"
+            clearable
+            filterable
+          >
+            <el-option
+              v-for="item in statusDict"
+              :key="item.key"
+              :label="item.value"
+              :value="item.key"
+            >
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="钱票状态" prop="ticketStatusStr">
+          <el-select
+            style="width: 300px"
+            v-model="sendForm.ticketStatusStr"
+            multiple
+            placeholder="选择钱票状态"
+            clearable
+            filterable
+          >
+            <el-option
+              v-for="item in ticketStatusDict"
+              :key="item.key"
+              :label="item.value"
+              :value="item.key"
+            >
+            </el-option> </el-select
+        ></el-form-item>
+        <el-form-item v-show="showMsg" style="margin-bottom: 0">
+          <span class="text-danger">提示：搜索有异常，请重试！</span>
+        </el-form-item>
+        <el-form-item
+         label=" "
+          style="width: 400px;text-aline:right;"
+        >
+          <el-button
+            type="primary"
+            @click="search"
+            class="login-btn"
+            v-loading="loading"
+            >搜索</el-button
+          >
+        </el-form-item>
+      </el-row>
+    </el-form>
+    <!-- </div> -->
+    <!-- </el-col> -->
+    <!--表格渲染-->
+    <el-table
+      ref="table"
+      v-loading="loading"
+      :data="tableData.data"
+      style="width: 100%;overflow: scroll;"
+      @selection-change="handleSelectionChange"
+    >
+      <el-table-column :selectable="checkboxT" type="selection" width="55" />
+      <el-table-column
+        :show-overflow-tooltip="true"
+        prop="orderNo"
+        label="工单号"
+      />
+      <el-table-column
+        :show-overflow-tooltip="true"
+        prop="createBy"
+        label="创建人"
+      />
+      <el-table-column
+        :show-overflow-tooltip="true"
+        prop="createTime"
+        label="日期"
+      />
+      <el-table-column
+        :show-overflow-tooltip="true"
+        prop="accountRemark"
+        label="对账备注"
+      />
+      <el-table-column
+        :show-overflow-tooltip="true"
+        prop="updateBy"
+        label="最后修改人"
+      />
+      <el-table-column
+        :show-overflow-tooltip="true"
+        prop="updateTime"
+        label="最后修改日期"
+      />
+      <el-table-column label="状态" align="center" prop="status">
+        <template slot-scope="scope">
+          <div v-for="item in getStatusDict(scope.row.status)" :key="item.key">
+            <el-tag type="success" v-if="item.key===1" style="margin-top:5px">{{item.value}}</el-tag>
+            <el-tag type="info" v-if="item.key===2" style="margin-top:5px">{{item.value}}</el-tag>
+            <el-tag type="warning" v-if="item.key===3" style="margin-top:5px">{{item.value}}</el-tag>
+            <el-tag type="danger" v-if="item.key===4" style="margin-top:5px">{{item.value}}</el-tag>
+            <el-tag v-if="item.key===5">{{item.value}}</el-tag>
+          </div>
+        </template>
+      </el-table-column>
+    </el-table>
+    <!-- <pagination /> -->
+    <el-pagination
+      style="margin:auto;padding-top:20px;"
+      v-if='tableData.total'
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
+      :current-page="tableData.currentPage"
+      :page-sizes="[10, 20, 30, 40]"
+      :page-size="10"
+      layout="total, sizes, prev, pager, next, jumper"
+      :total="tableData.total">
+    </el-pagination>
+    <!--分页组件-->
+  </div>
+</template>
 
 <style lang="scss" scoped>
-.login-box {
-  width: 100%;
+.commonBody {
   height: 100%;
-  overflow: hidden;
-  background: #20222A;
-  .login-form {
-    border-radius: 5px;
-    background-clip: padding-box;
-    margin: 180px auto;
-    width: 350px;
-    padding: 35px 35px 15px 35px;
-    background: #f5f5f5;
-    border: 1px solid #eaeaea;
-    box-shadow: 0 0 5px #cac6c6;
-    .title {
-      margin: 0px auto 40px auto;
-      text-align: center;
-      color: #505458;
-    }
-    .btn-eye {
-      cursor: pointer;
-    }
-    .text-danger {
-      color: #F56C6C;
-    }
-    .login-btn {
-      margin: 35px 0 10px 0;
-      width: 100%;
-    }
+  display: flex;
+  flex-direction: column;
+  &_title {
+    font-size: 20px;
+    font-weight: 600px;
   }
 }
-
+.statusDict1 {
+  color: red;
+}
 </style>
