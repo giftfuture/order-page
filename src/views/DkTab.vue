@@ -327,7 +327,7 @@ export default {
       />
        <el-table-column
         :show-overflow-tooltip="true"
-        prop="inAmount"
+        prop="pics"
         label="附件"
       />
       <!-- <el-table-column
