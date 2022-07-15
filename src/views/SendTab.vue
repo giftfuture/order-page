@@ -70,6 +70,7 @@ export default {
           orderInfoVO[key] = this.sendForm[key]
         }
       })
+      orderInfoVO.orderTag = 'FH'
       const params = {
         orderInfoVO,
         'pageRequest': { 'page': this.pageNo, 'size': this.pageSize }

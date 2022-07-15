@@ -62,7 +62,7 @@ export default {
       return data
     },
     handleSearch () {
-      const orderInfoVO = {}
+      const orderInfoVO = { 'orderTag': 'DK' }
       Object.keys(this.sendForm).forEach(key => {
         if (Array.isArray(this.sendForm[key])) {
           orderInfoVO[key] = this.sendForm[key].join(',')
