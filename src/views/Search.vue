@@ -25,33 +25,38 @@ import { mapActions } from 'vuex'
 export default {
   data () {
     return {
-      currentView: 'ZHSSTab',
+      currentView: 'DkTab',
+      currentType: 'DK',
       views: [{
         label: '发货组',
-        name: 'SendTab'
-
+        name: 'SendTab',
+        type: 'FH'
       }, {
         label: '开票与资料组',
-        name: 'KpzlTab'
+        name: 'KpzlTab',
+        type: 'KP'
       }, {
         label: '订货组',
-        name: 'DHTab'
-
+        name: 'DHTab',
+        type: 'DH'
       }, {
         label: '打款组',
-        name: 'DkTab'
+        name: 'DkTab',
+        type: 'DK'
 
       }, {
         label: '进货组',
-        name: 'JHTab'
+        name: 'JHTab',
+        type: 'JH'
 
       }, {
         label: '价格组',
-        name: 'JGTab'
-
+        name: 'JGTab',
+        type: 'JG'
       }, {
         label: '综合搜索',
-        name: 'ZHSSTab'
+        name: 'ZHSSTab',
+        type: 'JG' // ??
       }]
     }
   },
@@ -66,16 +71,24 @@ export default {
     JGTab,
     ZHSSTab
   },
+  watch: {
+    currentType (val) {
+      this.handleLoadBySort(val)
+    }
+  },
   created () {
     this.handleQueryAllStaf()
+    this.handleLoadBySort(this.currentType)
   },
   methods: {
     ...mapActions({
-      handleQueryAllStaf: 'handleQueryAllStaf'
+      handleQueryAllStaf: 'handleQueryAllStaf',
+      handleLoadBySort: 'handleLoadBySort'
     }),
     handleClick (event) {
       console.log(event.index, 'index')
       this.currentView = this.views[event.index].name
+      this.currentType = this.views[event.index].type
     }
   }
 }

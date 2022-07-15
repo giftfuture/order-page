@@ -46,9 +46,10 @@ export default {
   methods: {
     getStatusDict (keys) {
       const keyArr = keys.split(',')
-      const data = keyArr.map(key => {
-        return statusDict[key]
-      })
+      const data = this.$store.state.statusDictObj.DH ? this.$store.state.statusDictObj.DH.filter(item => {
+        const key = String(item.key)
+        if (keyArr.indexOf(key) > -1) return item
+      }) : []
       return data
     },
     getTicketStatusDict (keys) {

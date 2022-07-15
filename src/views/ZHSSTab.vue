@@ -52,12 +52,11 @@ export default {
       return data
     },
     getStatusDict (keys) {
-      console.log(keys, 'keys', statusDict)
-      const keyArr = keys ? keys.split(',') : []
-      const data = keyArr.map(key => {
-        return statusDict[key]
-      })
-      console.log(data, 'data====')
+      const keyArr = keys.split(',')
+      const data = this.$store.state.statusDictObj.FH ? this.$store.state.statusDictObj.FH.filter(item => {
+        const key = String(item.key)
+        if (keyArr.indexOf(key) > -1) return item
+      }) : []
       return data
     },
     getTicketStatusDict (keys) {

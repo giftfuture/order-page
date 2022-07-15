@@ -1,13 +1,16 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import { queryAllStaf } from '@/api/send/index'
+import { queryAllStaf, loadBySort } from '@/api/send/index'
 
 Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
     isCollapse: false,
-    allStaf: []
+    allStaf: [],
+    statusDictObj: {},
+    ticketStatusDictObj: [],
+    sortMap: new Map()
   },
   mutations: {
     switchCollapse (state) {
@@ -15,6 +18,14 @@ export default new Vuex.Store({
     },
     SET_All_STAF (state, data) {
       state.allStaf = data || []
+    },
+    SET_SORT (state, data) {
+      try {
+        state.statusDictObj[data.type] = data.data.statusDict ? JSON.parse(data.data.statusDict) : []
+        state.ticketStatusDictObj[data.type] = data.data.ticketStatusDict ? JSON.parse(data.data.ticketStatusDict) : []
+        state.sortMap.set(data.type, state.statusDictObj[data.type])
+      } catch (err) {
+      }
     }
   },
   actions: {
@@ -23,6 +34,16 @@ export default new Vuex.Store({
         console.log(res, 'res handleQueryAllStaf')
         if (res.code === 0) {
           commit('SET_All_STAF', res.data)
+        }
+      })
+    },
+    // 获取订单、发票资料状态类型
+    async handleLoadBySort ({ commit, dispatch, state }, params) {
+      if (state.sortMap.has(params)) return
+      loadBySort(params).then(res => {
+        console.log(res, 'res handleLoadBySort')
+        if (res.code === 0) {
+          commit('SET_SORT', { data: res.data, type: params })
         }
       })
     }

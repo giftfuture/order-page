@@ -1,6 +1,5 @@
 <script>
 import { querySearch } from '@/api/send/index'
-import { statusDict, ticketStatusDict } from '@/common/enum'
 
 export default {
   name: 'sendTab',
@@ -11,8 +10,6 @@ export default {
       colSpan4: 4,
       colSpan2: 2,
       colSpan6: 6,
-      statusDictSelect: Object.keys(statusDict).map(key => statusDict[key]),
-      ticketStatusDictSelect: Object.keys(ticketStatusDict).map(key => ticketStatusDict[key]),
       pageNo: 0,
       pageSize: 10,
       tableData: {
@@ -45,20 +42,11 @@ export default {
   },
   methods: {
     getStatusDict (keys) {
-      console.log(keys, 'keys', statusDict)
       const keyArr = keys.split(',')
-      const data = keyArr.map(key => {
-        return statusDict[key]
-      })
-      console.log(data, 'data====')
-      return data
-    },
-    getTicketStatusDict (keys) {
-      console.log(keys, 'keys', statusDict)
-      const keyArr = keys.split(',')
-      const data = keyArr.map(key => {
-        return ticketStatusDict[key]
-      })
+      const data = this.$store.state.statusDictObj.DK ? this.$store.state.statusDictObj.DK.filter(item => {
+        const key = String(item.key)
+        if (keyArr.indexOf(key) > -1) return item
+      }) : []
       return data
     },
     handleSearch () {
@@ -190,7 +178,7 @@ export default {
             filterable
           >
             <el-option
-              v-for="item in statusDictSelect"
+              v-for="item in $store.state.statusDict"
               :key="item.key"
               :label="item.value"
               :value="item.key"
@@ -210,7 +198,7 @@ export default {
             filterable
           >
             <el-option
-              v-for="item in ticketStatusDictSelect"
+              v-for="item in $store.state.ticketStatusDict"
               :key="item.key"
               :label="item.value"
               :value="item.key"
