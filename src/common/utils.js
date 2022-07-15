@@ -1,3 +1,5 @@
+import { orderSort } from './enum'
+
 export default class Utils {
   // 当前日期
   static todayDate () {
@@ -25,4 +27,12 @@ export default class Utils {
       open && open.call(docElm)
     }
   }
+}
+
+export const getOrderSort = (keys) => {
+  const keyArr = keys.split(',')
+  const data = keyArr.map(key => {
+    return orderSort[key]
+  })
+  return data
 }

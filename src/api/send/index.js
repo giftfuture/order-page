@@ -35,3 +35,12 @@ export function jhjgSearch (data) {
     data
   })
 }
+
+// 综合搜索
+export function overallSearch (data) {
+  return request({
+    url: '/order/overallSearch',
+    method: 'post',
+    data
+  })
+}

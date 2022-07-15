@@ -24,7 +24,7 @@ import ZHSSTab from '@/views/ZHSSTab.vue'
 export default {
   data () {
     return {
-      currentView: 'DkTab',
+      currentView: 'ZHSSTab',
       views: [{
         label: '发货组',
         name: 'SendTab'
@@ -69,20 +69,9 @@ export default {
     this.currentView = 'SendTab'
   },
   methods: {
-    handleClick (index) {
-      this.currentView = this.views[index].name
-      // if (index === 0) {
-      //   // 发货Tab
-      //   this.currentView = 'SendTab'
-      // }
-      // if (index === 1) {
-      //   // 开票与资料Tab
-      //   this.currentView = 'KpzlTab'
-      // }
-      // if (index === 2) {
-      //   // 打款 Tab
-      //   this.currentView = 'DkTab'
-      // }
+    handleClick (event) {
+      console.log(event.index, 'index')
+      this.currentView = this.views[event.index].name
     }
   }
 }
