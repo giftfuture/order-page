@@ -1,5 +1,5 @@
 <script>
-import { getOrderList, queryAllStaf } from '@/api/send/index'
+import { querySearch, queryAllStaf } from '@/api/send/index'
 import { statusDict, ticketStatusDict } from '@/common/enum'
 
 export default {
@@ -85,7 +85,7 @@ export default {
         orderInfoVO,
         'pageRequest': { 'page': this.pageNo, 'size': this.pageSize }
       }
-      getOrderList(params)
+      querySearch(params)
         .then((response) => {
           console.log(response, '====')
           if (response.code === 0) {

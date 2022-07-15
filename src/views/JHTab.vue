@@ -1,5 +1,5 @@
 <script>
-import { getOrderList, queryAllStaf } from '@/api/send/index'
+import { querySearch, queryAllStaf } from '@/api/send/index'
 const statusDict = {
   1: { key: 1, value: '已打单', className: 'statusDict1' },
   2: { key: 2, value: '待发', className: 'statusDict2' },
@@ -98,7 +98,7 @@ export default {
         orderInfoVO,
         'pageRequest': { 'page': this.pageNo, 'size': this.pageSize }
       }
-      getOrderList(params)
+      querySearch(params)
         .then((response) => {
           console.log(response, '====')
           if (response.code === 0) {
