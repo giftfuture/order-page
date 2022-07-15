@@ -158,61 +158,65 @@ export default {
 </script>
 <template>
   <div class="commonBody">
-    <!-- <h5 class="commonBody_title">订单列表</h5> -->
     <el-form
       :inline="true"
       :model="sendForm"
       ref="sendForm"
       class="login-form"
-      label-width="80px"
     >
       <el-row>
-        <el-form-item label="创建人" prop="createByStr">
-          <el-select
-            v-model="sendForm.createByStr"
-            multiple
-            placeholder="选择创建人"
-            clearable
-            filterable
-            style="width: 300px"
-          >
-            <el-option
-              v-for="item in selectCheckedData"
-              :key="item.id"
-              :label="item.staffName"
-              :value="item.id"
+        <el-col span="4">
+          <el-form-item label="创建人" prop="createByStr">
+            <el-select
+              v-model="sendForm.createByStr"
+              multiple
+              placeholder="选择创建人"
+              clearable
+              filterable
+              style="width: 140px"
             >
-            </el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="搜索框" prop="searchContent">
-          <el-input
-            style="width: 300px"
-            v-model="sendForm.searchContent"
-            @keyup.native.enter="search"
-            autocomplete="off"
-            placeholder="工单号、发货文本、备注"
-            prefix-icon="el-icon-goods"
-          >
-            <i
-              slot="suffix"
-              class="el-input__icon el-icon-view btn-eye"
-            ></i> </el-input
-        ></el-form-item>
-        <el-form-item label="日期" >
-          <el-date-picker
-            v-model="createTime"
-            type="daterange"
-            range-separator="至"
-            start-placeholder="开始日期"
-            end-placeholder="结束日期">
-          </el-date-picker>
-        </el-form-item>
-      </el-row>
-      <el-row>
+              <el-option
+                v-for="item in selectCheckedData"
+                :key="item.id"
+                :label="item.staffName"
+                :value="item.id"
+              >
+              </el-option>
+            </el-select>
+          </el-form-item>
+        </el-col>
+        <el-col span="4">
+          <el-form-item label="搜索框" prop="searchContent">
+            <el-input
+              style="width: 140px"
+              v-model="sendForm.searchContent"
+              @keyup.native.enter="search"
+              autocomplete="off"
+              placeholder="工单号、发货文本、备注"
+              prefix-icon="el-icon-goods"
+            >
+              <i
+                slot="suffix"
+                class="el-input__icon el-icon-view btn-eye"
+              ></i> </el-input
+          ></el-form-item>
+        </el-col>
+        <el-col span="6">
+          <el-form-item label="日期">
+            <el-date-picker
+              style="width: 240px"
+              v-model="createTime"
+              type="daterange"
+              range-separator="至"
+              start-placeholder="开始日期"
+              end-placeholder="结束日期">
+            </el-date-picker>
+          </el-form-item>
+        </el-col>
+        <el-col span="4">
         <el-form-item label="状态" prop="statusStr">
           <el-select
-            style="width: 300px"
+            style="width: 140px"
             v-model="sendForm.statusStr"
             multiple
             placeholder="选择状态"
@@ -228,9 +232,11 @@ export default {
             </el-option>
           </el-select>
         </el-form-item>
+        </el-col>
+        <el-col span="4">
         <el-form-item label="钱票状态" prop="ticketStatusStr">
           <el-select
-            style="width: 300px"
+            style="width: 130px"
             v-model="sendForm.ticketStatusStr"
             multiple
             placeholder="选择钱票状态"
@@ -245,9 +251,11 @@ export default {
             >
             </el-option> </el-select
         ></el-form-item>
-        <el-form-item v-show="showMsg" style="margin-bottom: 0">
+        </el-col>
+        <el-col span="2">
+        <!-- <el-form-item v-show="showMsg" style="margin-bottom: 0">
           <span class="text-danger">提示：搜索有异常，请重试！</span>
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item
          label=" "
           style="width: 400px;text-aline:right;"
@@ -260,16 +268,26 @@ export default {
             >搜索</el-button
           >
         </el-form-item>
+        </el-col>
       </el-row>
     </el-form>
-    <!-- </div> -->
-    <!-- </el-col> -->
-    <!--表格渲染-->
     <el-row>
       <el-button type="primary">+创建</el-button>
       <el-button type="primary">批量操作</el-button>
     </el-row>
+    <el-pagination
+      style="margin:auto;padding-bottom:20px;"
+      v-if='tableData.total'
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
+      :current-page="tableData.currentPage"
+      :page-sizes="[10, 20, 30, 40]"
+      :page-size="10"
+      layout="total, sizes, prev, pager, next, jumper"
+      :total="tableData.total">
+    </el-pagination>
     <el-table
+      height="150"
       ref="table"
       v-loading="loading"
       :data="tableData.data"
@@ -277,6 +295,22 @@ export default {
       @selection-change="handleSelectionChange"
     >
       <el-table-column :selectable="checkboxT" type="selection" width="55" />
+      <el-table-column
+        width="250px"
+        prop="createBy"
+        label="其他"
+      >
+        <template slot-scope="scope" style="width:300px">
+          <div >
+            <div>创建人：{{scope.row.creator}}</div>
+            <div>日期：{{scope.row.createTime}}</div>
+            <div>工单编号：{{scope.row.orderNo}}</div>
+            <div>对账备注：{{scope.row.accountRemark}}</div>
+            <div>最后修改人：{{scope.row.updator}}</div>
+            <div>最后修改时间：{{scope.row.updateTime}}</div>
+        </div>
+        </template>
+      </el-table-column>
       <!-- <el-table-column
         :show-overflow-tooltip="true"
         prop="orderNo"
@@ -314,11 +348,11 @@ export default {
           </div>
         </template>
       </el-table-column>
-      <el-table-column
+      <!-- <el-table-column
         :show-overflow-tooltip="true"
         prop="createTime"
         label="日期"
-      />
+      /> -->
       <el-table-column
         :show-overflow-tooltip="true"
         prop="inAmount"
@@ -340,39 +374,11 @@ export default {
         label="最后修改人"
       /> -->
         <!-- :show-overflow-tooltip="true" -->
-       <el-table-column
-        width="250px"
-        prop="createBy"
-        label="其他"
-      >
-        <template slot-scope="scope" style="width:300px">
-          <div >
-            <div>创建人：{{scope.row.creator}}</div>
-            <div>日期：{{scope.row.createTime}}</div>
-            <div>工单编号：{{scope.row.orderNo}}</div>
-            <div>对账备注：{{scope.row.accountRemark}}</div>
-            <div>最后修改人：{{scope.row.updator}}</div>
-            <div>最后修改时间：{{scope.row.updateTime}}</div>
-        </div>
-        </template>
-      </el-table-column>
     </el-table>
-    <!-- <pagination /> -->
-    <el-pagination
-      style="margin:auto;padding-top:20px;"
-      v-if='tableData.total'
-      @size-change="handleSizeChange"
-      @current-change="handleCurrentChange"
-      :current-page="tableData.currentPage"
-      :page-sizes="[10, 20, 30, 40]"
-      :page-size="10"
-      layout="total, sizes, prev, pager, next, jumper"
-      :total="tableData.total">
-    </el-pagination>
-    <!--分页组件-->
   </div>
 </template>
 <style>
+
 .el-tabs {
       height: 100%;
     display: flex;
