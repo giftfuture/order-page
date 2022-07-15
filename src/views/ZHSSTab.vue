@@ -1,5 +1,5 @@
 <script>
-import { overallSearch, queryAllStaf } from '@/api/send/index'
+import { overallSearch } from '@/api/send/index'
 import { statusDict, ticketStatusDict, orderSort } from '@/common/enum'
 
 export default {
@@ -13,7 +13,6 @@ export default {
       colSpan6: 6,
       statusDictSelect: Object.keys(statusDict).map(key => statusDict[key]),
       ticketStatusDictSelect: Object.keys(ticketStatusDict).map(key => ticketStatusDict[key]),
-      allStaf: [],
       pageNo: 0,
       pageSize: 10,
       tableData: {
@@ -30,8 +29,6 @@ export default {
         statusStr: '',
         ticketStatusStr: ''
       },
-      selectCheckedData: [
-      ],
       loading: false,
       showMsg: false
     }
@@ -47,14 +44,6 @@ export default {
     }
   },
   methods: {
-    handleQueryAllStaf () {
-      queryAllStaf().then(res => {
-        console.log(res, 'res')
-        if (res.code === 0) {
-          this.selectCheckedData = res.data
-        }
-      })
-    },
     getOrderSort (keys) {
       const keyArr = keys ? keys.split(',') : []
       const data = keyArr.map(key => {
@@ -137,7 +126,6 @@ export default {
   },
   created () {
     this.handleSearch()
-    this.handleQueryAllStaf()
   }
 }
 </script>
@@ -161,7 +149,7 @@ export default {
               style="width: 140px"
             >
               <el-option
-                v-for="item in selectCheckedData"
+                v-for="item in $store.state.allStaf"
                 :key="item.id"
                 :label="item.staffName"
                 :value="item.id"
@@ -309,9 +297,14 @@ export default {
         prop="content"
         label="文本"
       />
-      <el-table-column label="发货组状态" align="center" prop="stauts">
+      <el-table-column
+        :show-overflow-tooltip="true"
+        prop="inAmount"
+        label="打款输入金额"
+      />
+      <el-table-column label="发货组状态" align="center" prop="status">
         <template slot-scope="scope">
-          <div v-for="item in getStatusDict(scope.row.stauts)" :key="item.key">
+          <div v-for="item in getStatusDict(scope.row.status)" :key="item.key">
             <el-tag type="success" v-if="item.key===1" style="margin-top:5px">{{item.value}}</el-tag>
             <el-tag type="info" v-if="item.key===2" style="margin-top:5px">{{item.value}}</el-tag>
             <el-tag type="warning" v-if="item.key===3" style="margin-top:5px">{{item.value}}</el-tag>
@@ -320,6 +313,11 @@ export default {
           </div>
         </template>
       </el-table-column>
+      <el-table-column
+        :show-overflow-tooltip="true"
+        prop="inAmount"
+        label="发货输入金额"
+      />
       <el-table-column label="发货组钱票状态" align="center" prop="ticketStatus">
         <template slot-scope="scope">
           <div v-for="item in getTicketStatusDict(scope.row.ticketStatus)" :key="item.key">
@@ -338,7 +336,7 @@ export default {
       />
       <el-table-column
         :show-overflow-tooltip="true"
-        prop="sendContent"
+        prop="inAmount"
         label="开票输入金额"
       />
       <el-table-column label="订货组状态" align="center" prop="status">
@@ -354,12 +352,12 @@ export default {
       </el-table-column>
       <el-table-column
         :show-overflow-tooltip="true"
-        prop="sendContent"
+        prop="inAmount"
         label="订货输入金额"
       />
-      <el-table-column label="订货组钱票状态" align="center" prop="status">
+      <el-table-column label="订货组钱票状态" align="center" prop="ticketStatus">
         <template slot-scope="scope">
-          <div v-for="item in getStatusDict(scope.row.status)" :key="item.key">
+          <div v-for="item in getTicketStatusDict(scope.row.ticketStatus)" :key="item.key">
             <el-tag type="success" v-if="item.key===1" style="margin-top:5px">{{item.value}}</el-tag>
             <el-tag type="info" v-if="item.key===2" style="margin-top:5px">{{item.value}}</el-tag>
             <el-tag type="warning" v-if="item.key===3" style="margin-top:5px">{{item.value}}</el-tag>

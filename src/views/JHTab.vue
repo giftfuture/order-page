@@ -1,5 +1,5 @@
 <script>
-import { jhjgSearch, queryAllStaf } from '@/api/send/index'
+import { jhjgSearch } from '@/api/send/index'
 import { statusDict, ticketStatusDict } from '@/common/enum'
 
 export default {
@@ -13,7 +13,6 @@ export default {
       colSpan6: 6,
       statusDictSelect: Object.keys(statusDict).map(key => statusDict[key]),
       ticketStatusDictSelect: Object.keys(ticketStatusDict).map(key => ticketStatusDict[key]),
-      allStaf: [],
       pageNo: 0,
       pageSize: 10,
       tableData: {
@@ -30,8 +29,6 @@ export default {
         statusStr: '',
         ticketStatusStr: ''
       },
-      selectCheckedData: [
-      ],
       loading: false,
       showMsg: false
     }
@@ -47,14 +44,6 @@ export default {
     }
   },
   methods: {
-    handleQueryAllStaf () {
-      queryAllStaf().then(res => {
-        console.log(res, 'res')
-        if (res.code === 0) {
-          this.selectCheckedData = res.data
-        }
-      })
-    },
     getStatusDict (keys) {
       console.log(keys, 'keys', statusDict)
       const keyArr = keys.split(',')
@@ -130,7 +119,6 @@ export default {
   },
   created () {
     this.handleSearch()
-    this.handleQueryAllStaf()
   }
 }
 </script>
@@ -154,7 +142,7 @@ export default {
               style="width: 140px"
             >
               <el-option
-                v-for="item in selectCheckedData"
+                v-for="item in $store.state.allStaf"
                 :key="item.id"
                 :label="item.staffName"
                 :value="item.id"

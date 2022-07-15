@@ -1,5 +1,5 @@
 <script>
-import { querySearch, queryAllStaf } from '@/api/send/index'
+import { querySearch } from '@/api/send/index'
 import { statusDict, ticketStatusDict } from '@/common/enum'
 
 export default {
@@ -12,8 +12,6 @@ export default {
       colSpan2: 2,
       colSpan6: 6,
       statusDictSelect: Object.keys(statusDict).map(key => statusDict[key]),
-      ticketStatusDictSelect: Object.keys(ticketStatusDict).map(key => ticketStatusDict[key]),
-      allStaf: [],
       pageNo: 0,
       pageSize: 10,
       tableData: {
@@ -30,8 +28,6 @@ export default {
         statusStr: '',
         ticketStatusStr: ''
       },
-      selectCheckedData: [
-      ],
       loading: false,
       showMsg: false
     }
@@ -47,28 +43,10 @@ export default {
     }
   },
   methods: {
-    handleQueryAllStaf () {
-      queryAllStaf().then(res => {
-        console.log(res, 'res')
-        if (res.code === 0) {
-          this.selectCheckedData = res.data
-        }
-      })
-    },
     getStatusDict (keys) {
-      console.log(keys, 'keys', statusDict)
       const keyArr = keys.split(',')
       const data = keyArr.map(key => {
         return statusDict[key]
-      })
-      console.log(data, 'data====')
-      return data
-    },
-    getTicketStatusDict (keys) {
-      console.log(keys, 'keys', statusDict)
-      const keyArr = keys.split(',')
-      const data = keyArr.map(key => {
-        return ticketStatusDict[key]
       })
       return data
     },
@@ -130,7 +108,6 @@ export default {
   },
   created () {
     this.handleSearch()
-    this.handleQueryAllStaf()
   }
 }
 </script>
@@ -154,7 +131,7 @@ export default {
               style="width: 140px"
             >
               <el-option
-                v-for="item in selectCheckedData"
+                v-for="item in $store.state.allStaf"
                 :key="item.id"
                 :label="item.staffName"
                 :value="item.id"
@@ -211,29 +188,7 @@ export default {
           </el-select>
         </el-form-item>
         </el-col>
-        <el-col :span="colSpan4">
-        <el-form-item label="钱票状态" prop="ticketStatusStr">
-          <el-select
-            style="width: 130px"
-            v-model="sendForm.ticketStatusStr"
-            multiple
-            placeholder="选择钱票状态"
-            clearable
-            filterable
-          >
-            <el-option
-              v-for="item in ticketStatusDictSelect"
-              :key="item.key"
-              :label="item.value"
-              :value="item.key"
-            >
-            </el-option> </el-select
-        ></el-form-item>
-        </el-col>
         <el-col :span="colSpan2">
-        <!-- <el-form-item v-show="showMsg" style="margin-bottom: 0">
-          <span class="text-danger">提示：搜索有异常，请重试！</span>
-        </el-form-item> -->
         <el-form-item
          label=" "
           style="width: 400px;text-aline:right;"

@@ -3,7 +3,7 @@
     <el-tabs v-model="currentView" @tab-click="handleClick">
       <el-tab-pane v-for="item in views" :label="item.label" :name="item.name" :key="item.name">
         <!-- {{ item.component }} -->
-        <component :is="currentView"></component>
+        <component :is="currentView" allStaf="allStaf"></component>
       </el-tab-pane>
     </el-tabs>
   </div>
@@ -20,6 +20,7 @@ import DkTab from '@/views/DkTab.vue'
 import JHTab from '@/views/JHTab.vue'
 import JGTab from '@/views/JGTab.vue'
 import ZHSSTab from '@/views/ZHSSTab.vue'
+import { mapActions } from 'vuex'
 
 export default {
   data () {
@@ -65,10 +66,13 @@ export default {
     JGTab,
     ZHSSTab
   },
-  mounted () {
-    this.currentView = 'SendTab'
+  created () {
+    this.handleQueryAllStaf()
   },
   methods: {
+    ...mapActions({
+      handleQueryAllStaf: 'handleQueryAllStaf'
+    }),
     handleClick (event) {
       console.log(event.index, 'index')
       this.currentView = this.views[event.index].name
