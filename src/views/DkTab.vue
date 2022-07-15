@@ -1,5 +1,5 @@
 <script>
-import { dhSearch, queryAllStaf } from '@/api/send/index'
+import { querySearch, queryAllStaf } from '@/api/send/index'
 import { statusDict, ticketStatusDict } from '@/common/enum'
 
 export default {
@@ -85,7 +85,7 @@ export default {
         orderInfoVO,
         'pageRequest': { 'page': this.pageNo, 'size': this.pageSize }
       }
-      dhSearch(params)
+      querySearch(params)
         .then((response) => {
           console.log(response, '====')
           if (response.code === 0) {
@@ -313,19 +313,8 @@ export default {
       <el-table-column
         :show-overflow-tooltip="true"
         prop="content"
-        label="订货"
+        label="打款"
       />
-      <el-table-column label="钱票状态" align="center" prop="ticketStatus">
-        <template slot-scope="scope">
-          <div v-for="item in getTicketStatusDict(scope.row.ticketStatus)" :key="item.key">
-            <el-tag type="success" v-if="item.key===1" style="margin-top:5px">{{item.value}}</el-tag>
-            <el-tag type="info" v-if="item.key===2" style="margin-top:5px">{{item.value}}</el-tag>
-            <el-tag type="warning" v-if="item.key===3" style="margin-top:5px">{{item.value}}</el-tag>
-            <el-tag type="danger" v-if="item.key===4" style="margin-top:5px">{{item.value}}</el-tag>
-            <el-tag v-if="item.key===5">{{item.value}}</el-tag>
-          </div>
-        </template>
-      </el-table-column>
       <!-- <el-table-column
         :show-overflow-tooltip="true"
         prop="createTime"
@@ -336,12 +325,11 @@ export default {
         prop="inAmount"
         label="输入金额"
       />
-      <el-table-column
+       <el-table-column
         :show-overflow-tooltip="true"
-        prop="arriveNotice"
-        label="到货通知"
+        prop="inAmount"
+        label="附件"
       />
-
       <!-- <el-table-column
         :show-overflow-tooltip="true"
         prop="accountRemark"

@@ -16,7 +16,7 @@
 import KpzlTab from '@/views/KpzlTab.vue'
 import DHTab from '@/views/DHTab.vue'
 import SendTab from '@/views/SendTab.vue'
-import DlTab from '@/views/DlTab.vue'
+import DkTab from '@/views/DkTab.vue'
 import JHTab from '@/views/JHTab.vue'
 import JGTab from '@/views/JGTab.vue'
 import ZHSSTab from '@/views/ZHSSTab.vue'
@@ -24,7 +24,7 @@ import ZHSSTab from '@/views/ZHSSTab.vue'
 export default {
   data () {
     return {
-      currentView: 'DHTab',
+      currentView: 'DkTab',
       views: [{
         label: '发货组',
         name: 'SendTab'
@@ -38,7 +38,7 @@ export default {
 
       }, {
         label: '打款组',
-        name: 'DlTab'
+        name: 'DkTab'
 
       }, {
         label: '进货组',
@@ -60,7 +60,7 @@ export default {
     KpzlTab,
     DHTab,
     SendTab,
-    DlTab,
+    DkTab,
     JHTab,
     JGTab,
     ZHSSTab
@@ -70,18 +70,19 @@ export default {
   },
   methods: {
     handleClick (index) {
-      if (index === 0) {
-        // 发货Tab
-        this.currentView = 'SendTab'
-      }
-      if (index === 1) {
-        // 开票与资料Tab
-        this.currentView = 'KpzlTab'
-      }
-      if (index === 2) {
-        // 打款 Tab
-        this.currentView = 'DlTab'
-      }
+      this.currentView = this.views[index].name
+      // if (index === 0) {
+      //   // 发货Tab
+      //   this.currentView = 'SendTab'
+      // }
+      // if (index === 1) {
+      //   // 开票与资料Tab
+      //   this.currentView = 'KpzlTab'
+      // }
+      // if (index === 2) {
+      //   // 打款 Tab
+      //   this.currentView = 'DkTab'
+      // }
     }
   }
 }
