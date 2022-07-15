@@ -1,25 +1,18 @@
 <script>
 import { getOrderList, queryAllStaf } from '@/api/send/index'
-const statusDict = {
-  1: { key: 1, value: '已打单', className: 'statusDict1' },
-  2: { key: 2, value: '待发', className: 'statusDict2' },
-  3: { key: 3, value: '缺货', className: 'statusDict3' },
-  4: { key: 4, value: '已作退货', className: 'statusDict4' },
-  5: { key: 5, value: '已调', className: 'statusDict5' },
-  6: { key: 6, value: '重新打速递单', className: 'statusDict6' }
-}
-const ticketStatusDict = {
-  1: { key: 1, value: '欠款' },
-  2: { key: 2, value: '欠票' },
-  3: { key: 3, value: '只收了部分' },
-  4: { key: 4, value: '只开了部分' }
-}
+import { statusDict, ticketStatusDict } from '@/common/enum'
+
 export default {
   name: 'sendTab',
   components: {
   },
   data () {
     return {
+      colSpan4: 4,
+      colSpan2: 2,
+      colSpan6: 6,
+      statusDictSelect: Object.keys(statusDict).map(key => statusDict[key]),
+      ticketStatusDictSelect: Object.keys(ticketStatusDict).map(key => ticketStatusDict[key]),
       allStaf: [],
       pageNo: 0,
       pageSize: 10,
@@ -38,21 +31,6 @@ export default {
         ticketStatusStr: ''
       },
       selectCheckedData: [
-      ],
-      statusDict: [
-        { key: 1, value: '已打单' },
-        { key: 2, value: '待发' },
-        { key: 3, value: '缺货' },
-        { key: 4, value: '已作退货' },
-        { key: 5, value: '已调' },
-        { key: 6, value: '重新打速递单' }
-      ],
-      ticketStatusDict: [
-        { key: 1, value: '欠款' },
-        { key: 2, value: '欠票' },
-        { key: 3, value: '只收了部分' },
-        { key: 4, value: '预开' },
-        { key: 5, value: '只开了部分' }
       ],
       loading: false,
       showMsg: false
@@ -165,7 +143,7 @@ export default {
       class="login-form"
     >
       <el-row>
-        <el-col span="4">
+        <el-col :span="colSpan4">
           <el-form-item label="创建人" prop="createByStr">
             <el-select
               v-model="sendForm.createByStr"
@@ -185,7 +163,7 @@ export default {
             </el-select>
           </el-form-item>
         </el-col>
-        <el-col span="4">
+        <el-col :span="colSpan4">
           <el-form-item label="搜索框" prop="searchContent">
             <el-input
               style="width: 140px"
@@ -201,7 +179,7 @@ export default {
               ></i> </el-input
           ></el-form-item>
         </el-col>
-        <el-col span="6">
+        <el-col :span="colSpan6">
           <el-form-item label="日期">
             <el-date-picker
               style="width: 240px"
@@ -213,7 +191,7 @@ export default {
             </el-date-picker>
           </el-form-item>
         </el-col>
-        <el-col span="4">
+        <el-col :span="colSpan4">
         <el-form-item label="状态" prop="statusStr">
           <el-select
             style="width: 140px"
@@ -224,7 +202,7 @@ export default {
             filterable
           >
             <el-option
-              v-for="item in statusDict"
+              v-for="item in statusDictSelect"
               :key="item.key"
               :label="item.value"
               :value="item.key"
@@ -233,7 +211,7 @@ export default {
           </el-select>
         </el-form-item>
         </el-col>
-        <el-col span="4">
+        <el-col :span="colSpan4">
         <el-form-item label="钱票状态" prop="ticketStatusStr">
           <el-select
             style="width: 130px"
@@ -244,7 +222,7 @@ export default {
             filterable
           >
             <el-option
-              v-for="item in ticketStatusDict"
+              v-for="item in ticketStatusDictSelect"
               :key="item.key"
               :label="item.value"
               :value="item.key"
@@ -252,7 +230,7 @@ export default {
             </el-option> </el-select
         ></el-form-item>
         </el-col>
-        <el-col span="2">
+        <el-col :span="colSpan2">
         <!-- <el-form-item v-show="showMsg" style="margin-bottom: 0">
           <span class="text-danger">提示：搜索有异常，请重试！</span>
         </el-form-item> -->
