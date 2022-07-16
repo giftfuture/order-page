@@ -29,7 +29,7 @@ export default new Vuex.Store({
     },
     SET_SORT (state, data) {
       try {
-        const type = data.type ? data.type : 'ZH'
+        const type = data.type
         state.statusDictObj[type] = data.data.statusDict ? JSON.parse(data.data.statusDict) : []
         state.ticketStatusDictObj[type] = data.data.ticketStatusDict ? JSON.parse(data.data.ticketStatusDict) : []
         state.sortMap.set(type, state.statusDictObj[type])
@@ -50,11 +50,14 @@ export default new Vuex.Store({
     // 获取订单、发票资料状态类型
     async handleLoadBySort ({ commit, dispatch, state }, params) {
       if (state.sortMap.has(params)) return
-      loadBySort(params).then(res => {
+
+      loadBySort(params === 'ZH' ? '' : params).then(res => {
         console.log(res, 'res handleLoadBySort')
         if (res.code === 0) {
           commit('SET_SORT', { data: res.data, type: params })
         }
+      }).catch(err => {
+        console.log(err, 'err')
       })
     }
   },

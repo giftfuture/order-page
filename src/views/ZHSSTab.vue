@@ -198,7 +198,7 @@ export default {
         </el-form-item>
         </el-col>
         <el-col :span="colSpan4">
-        <el-form-item label="钱票状态" prop="ticketStatusStr">
+        <!-- <el-form-item label="钱票状态" prop="ticketStatusStr">
           <el-select
             style="width: 130px"
             v-model="sendForm.ticketStatusStr"
@@ -214,7 +214,7 @@ export default {
               :value="item.key"
             >
             </el-option> </el-select
-        ></el-form-item>
+        ></el-form-item> -->
         </el-col>
         <el-col :span="colSpan2">
         <el-form-item
