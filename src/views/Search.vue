@@ -64,7 +64,7 @@ export default {
       }, {
         label: '综合搜索',
         name: 'ZHSSTab',
-        type: '' // ??
+        type: 'ZH' // ??
       }]
     }
   },
