@@ -14,4 +14,7 @@ export default {
   width: 100%;
   height: 100%;
 }
+.commonDelete {
+  text-decoration:line-through;
+}
 </style>
