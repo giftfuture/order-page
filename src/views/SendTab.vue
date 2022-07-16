@@ -260,8 +260,8 @@ export default {
           <div >
             <div>创建人：{{scope.row.creator}}</div>
             <div>日期：{{scope.row.createTime}}</div>
-            <div>工单编号：{{scope.row.orderNo}}</div>
-            <div>对账备注：{{scope.row.remark}}</div>
+            <div :class="scope.row.deleted===1?'commonDelete':''">工单编号：{{scope.row.orderNo}}</div>
+            <div>对账备注：{{scope.row.accountRemark}}</div>
             <div>最后修改人：{{scope.row.updator}}</div>
             <div>最后修改时间：{{scope.row.updateTime}}</div>
         </div>
@@ -292,7 +292,11 @@ export default {
         :show-overflow-tooltip="true"
         prop="sendContent"
         label="发货"
-      />
+      >
+      <template slot-scope="scope">
+        <div :class="scope.row.deleted===1?'commonDelete':''">{{scope.row.sendContent}}</div>
+      </template>
+      </el-table-column>
       <el-table-column label="钱票状态" align="center" prop="ticketStatus">
         <template slot-scope="scope">
           <div v-for="item in getStatusDict(scope.row.ticketStatus, 'ticketStatusDictObj')" :key="item.key">
