@@ -260,7 +260,7 @@ export default {
             <div>创建人：{{scope.row.creator}}</div>
             <div>日期：{{scope.row.createTime}}</div>
             <div>工单编号：{{scope.row.orderNo}}</div>
-            <div>对账备注：{{scope.row.accountRemark}}</div>
+            <div>对账备注：{{scope.row.remark}}</div>
             <div>最后修改人：{{scope.row.updator}}</div>
             <div>最后修改时间：{{scope.row.updateTime}}</div>
         </div>
@@ -313,22 +313,15 @@ export default {
         prop="inAmount"
         label="输入金额"
       />
-      <!-- <el-table-column
-        :show-overflow-tooltip="true"
-        prop="accountRemark"
-        label="备注"
-      /> -->
-      <!-- <el-table-column
-        :show-overflow-tooltip="true"
-        prop="updateTime"
-        label="最后修改日期"
-      /> -->
-      <!-- <el-table-column
-        :show-overflow-tooltip="true"
-        prop="updator"
-        label="最后修改人"
-      /> -->
-        <!-- :show-overflow-tooltip="true" -->
+      <el-table-column
+      fixed="right"
+      label="操作"
+      width="100">
+        <template slot-scope="scope">
+          <el-button type="text" size="small" @click="$emit('handleAction',scope.row,'edit', handleSearch)">编辑</el-button>
+          <el-button @click="$emit('handleAction',scope.row,'del', handleSearch)" type="text" size="small">删除</el-button>
+        </template>
+      </el-table-column>
     </el-table>
   </div>
 </template>

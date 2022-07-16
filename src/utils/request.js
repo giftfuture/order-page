@@ -6,10 +6,10 @@ import store from '../store'
 // import Config from '@/settings'
 import Cookies from 'js-cookie'
 
-const baseUrl = (env) => {
+export const baseUrl = (env) => {
   switch (env) {
     case 'production':
-      return 'https://ximalaya.com'
+      return 'http://172.16.3.91:8888'
     default:
       return 'http://172.16.3.91:8888'
   }

@@ -20,48 +20,194 @@ export const orderSort = {
     key: 'Fh',
     value: '发货组',
     editForm: {
-      status: true,
-      ticketStatus: true
+      content: {
+        isShow: true,
+        label: '发货',
+        key: 'sendContent',
+        placeholder: '请输入发货文本',
+        require: true
+      },
+      inAmount: {
+        isShow: true,
+        label: '输入金额',
+        key: 'inAmount',
+        require: true
+      },
+      remark: {
+        isShow: true,
+        label: '备注',
+        key: 'remark',
+        require: false
+      },
+      status: {
+        isShow: true,
+        label: '状态',
+        key: 'status'
+      },
+      ticketStatus: {
+        isShow: true,
+        label: '发票和资料状态',
+        key: 'ticketStatus',
+        require: true
+      }
     }
   },
   'KP': {
     key: 'KP',
     value: '开票和资料组',
     editForm: {
-      status: true,
-      ticketStatus: false
+      content: {
+        isShow: true,
+        label: '开票和资料',
+        key: 'content',
+        placeholder: '请输入开票和资料',
+        require: true
+      },
+      status: {
+        isShow: true,
+        label: '状态',
+        key: 'status'
+      },
+      ticketStatus: {
+        isShow: false,
+        label: '发票和资料状态',
+        key: 'ticketStatus',
+        require: true
+      }
     }
   },
   'DH': {
     key: 'DH',
     value: '订货组',
     editForm: {
-      status: true,
-      ticketStatus: true
+      content: {
+        isShow: true,
+        label: '定货',
+        key: 'content',
+        placeholder: '请输入定货文本',
+        require: true
+      },
+      inAmount: {
+        isShow: true,
+        label: '输入金额',
+        key: 'inAmount',
+        require: true
+      },
+      remark: {
+        isShow: true,
+        label: '备注',
+        key: 'remark',
+        require: false
+      },
+      arriveNotice: {
+        isShow: true,
+        label: '到货通知',
+        key: 'arriveNotice',
+        require: false
+      },
+      status: {
+        isShow: true,
+        label: '状态',
+        key: 'status'
+      },
+      ticketStatus: {
+        isShow: true,
+        label: '发票和资料状态',
+        key: 'ticketStatus',
+        require: true
+      }
     }
   },
   'DK': {
     key: 'DK',
     value: '打款组',
     editForm: {
-      status: true,
-      ticketStatus: false
+      content: {
+        isShow: true,
+        label: '打款',
+        key: 'sendContent',
+        placeholder: '请输入打款文本',
+        require: true
+      },
+      inAmount: {
+        isShow: true,
+        label: '输入金额',
+        key: 'inAmount',
+        require: true
+      },
+      remark: {
+        isShow: true,
+        label: '备注',
+        key: 'remark',
+        require: false
+      },
+      status: {
+        isShow: true,
+        label: '状态',
+        key: 'status'
+      },
+      pics: {
+        isShow: true,
+        label: '截图',
+        key: 'pics',
+        require: false,
+        placeholder: '请输入截图'
+      }
     }
   },
   'JH': {
     key: 'JH',
     value: '进货组',
     editForm: {
-      status: true,
-      ticketStatus: false
+      content: {
+        isShow: true,
+        label: '进货',
+        key: 'content',
+        placeholder: '请输入进货文本',
+        require: true
+      },
+      remark: {
+        isShow: true,
+        label: '备注',
+        key: 'remark',
+        require: false
+      },
+      status: {
+        isShow: true,
+        label: '状态',
+        key: 'status'
+      },
+      pics: {
+        isShow: true,
+        label: '附件',
+        key: 'pics',
+        require: false,
+        placeholder: '请输入附件'
+      }
     }
   },
   'JG': {
     key: 'JG',
     value: '价格组',
     editForm: {
-      status: true,
-      ticketStatus: false
+      content: {
+        isShow: true,
+        label: '价格',
+        key: 'content',
+        placeholder: '请输入价格文本',
+        require: true
+      },
+      remark: {
+        isShow: true,
+        label: '备注',
+        key: 'remark',
+        require: false
+      },
+      status: {
+        isShow: true,
+        label: '状态',
+        key: 'status'
+      }
     }
   },
   'ZH': {
@@ -69,7 +215,9 @@ export const orderSort = {
     value: '综合搜索组',
     editForm: {
       status: true,
-      ticketStatus: false
+      ticketStatus: false,
+      sendContent: true,
+      inAmount: true
     }
   }
 }
