@@ -27,7 +27,8 @@ export default {
         ticketStatusStr: ''
       },
       loading: false,
-      showMsg: false
+      showMsg: false,
+      multipleSelection: []
     }
   },
   watch: {
