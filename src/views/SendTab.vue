@@ -1,12 +1,13 @@
 <script>
 import { querySearch } from '@/api/send/index'
-
+import { editOrder } from '@/api/send'
 export default {
   name: 'sendTab',
   components: {
   },
   data () {
     return {
+      addForm: {},
       multipleSelection: [],
       colSpan4: 4,
       colSpan2: 2,
@@ -43,6 +44,7 @@ export default {
   },
   methods: {
     getStatusDict (keys, type) {
+      if (!keys && typeof keys === 'object') return []
       const keyArr = keys.split(',')
       const data = this.$store.state[type].FH ? this.$store.state[type].FH.filter(item => {
         const key = String(item.key)
@@ -89,6 +91,10 @@ export default {
     handleSelectionChange (val) {
       this.multipleSelection = val
     },
+    handleAdd () {
+      this.addForm = { id: null, isShowInput: true, status: [], statusStr: [], ticketStatusStr: [], ticketStatus: [] }
+      this.tableData.data.push(this.addForm)
+    },
     handleOptions () {
       this.$emit('handleOptions', { multipleSelection: this.multipleSelection, callBack: this.handleSearch })
     },
@@ -104,6 +110,31 @@ export default {
       this.sendForm.createTimeBegin = this.createTime[0]
       this.sendForm.createTimeEnd = this.createTime[1]
       this.handleSearch()
+    },
+    // 创建方法
+    handleBlur (key, row) {
+      const params = {
+        [key]: key === 'status' ? row[key].join(',') : row[key]
+      }
+      // Object.keys(row).forEach(key=> {
+      //   if(this.addForm[key]&& key!=='isShowInput') {
+      //     params[key] = key === 'status' ? row[key].join(',') : row[key]
+      //   }
+      // })
+      if (row.id) {
+        // 编辑
+        params.id = row.id
+      }
+      editOrder(params).then(res => {
+        console.log(res, 'editOrder')
+        if (res.code === 0) {
+          // this.$message({
+          //   message: '操作成功',
+          //   type: 'success'
+          // })
+          this.addForm.id = res.data.id
+        }
+      })
     }
   },
   created () {
@@ -117,7 +148,6 @@ export default {
       :inline="true"
       :model="sendForm"
       ref="sendForm"
-      class="login-form"
     >
       <el-row>
         <el-col :span="colSpan4">
@@ -179,7 +209,7 @@ export default {
             filterable
           >
             <el-option
-              v-for="item in this.$store.state.statusDictObj.FH"
+              v-for="item in $store.state.statusDictObj.FH"
               :key="item.key"
               :label="item.value"
               :value="item.key"
@@ -199,7 +229,7 @@ export default {
             filterable
           >
             <el-option
-              v-for="item in this.$store.state.ticketStatusDictObj.FH"
+              v-for="item in $store.state.ticketStatusDictObj.FH"
               :key="item.key"
               :label="item.value"
               :value="item.key"
@@ -227,7 +257,7 @@ export default {
       </el-row>
     </el-form>
     <el-row>
-      <el-button type="primary">+创建</el-button>
+      <el-button type="primary" @click="handleAdd">+创建</el-button>
       <el-button type="primary" @click="handleOptions">批量操作</el-button>
     </el-row>
     <el-pagination
@@ -256,29 +286,38 @@ export default {
         label="其他"
       >
         <template slot-scope="scope" style="width:300px">
-          <div >
+          <el-input v-if="scope.row.isShowInput" v-model="scope.row.accountRemark" placeholder="请输入对账备注" @blur="handleBlur('accountRemark', scope.row)"/>
+          <div v-else >
             <div>创建人：{{scope.row.creator}}</div>
             <div>日期：{{scope.row.createTime}}</div>
             <div :class="scope.row.deleted===1?'commonDelete':''">工单编号：{{scope.row.orderNo}}</div>
             <div>对账备注：{{scope.row.accountRemark}}</div>
             <div>最后修改人：{{scope.row.updator}}</div>
             <div>最后修改时间：{{scope.row.updateTime}}</div>
-        </div>
+          </div>
         </template>
       </el-table-column>
-      <!-- <el-table-column
-        :show-overflow-tooltip="true"
-        prop="orderNo"
-        label="工单号"
-      /> -->
-      <!-- <el-table-column
-        :show-overflow-tooltip="true"
-        prop="createBy"
-        label="创建人"
-      /> -->
       <el-table-column label="状态" align="center" prop="status">
         <template slot-scope="scope">
-          <div v-for="item in getStatusDict(scope.row.status, 'statusDictObj')" :key="item.key">
+          <el-select
+            v-if="scope.row.isShowInput"
+            style="width: 140px"
+            v-model="scope.row.status"
+            multiple
+            placeholder="选择状态"
+            clearable
+            filterable
+            @blur="handleBlur('status', scope.row)"
+          >
+            <el-option
+              v-for="item in $store.state.statusDictObj.FH"
+              :key="item.key"
+              :label="item.value"
+              :value="item.key"
+            >
+            </el-option>
+          </el-select>
+          <div v-else v-for="item in getStatusDict(scope.row.status, 'statusDictObj')" :key="item.key">
             <el-tag type="success" v-if="item.key===1" style="margin-top:5px">{{item.value}}</el-tag>
             <el-tag type="info" v-if="item.key===2" style="margin-top:5px">{{item.value}}</el-tag>
             <el-tag type="warning" v-if="item.key===3" style="margin-top:5px">{{item.value}}</el-tag>
@@ -293,12 +332,30 @@ export default {
         label="发货"
       >
       <template slot-scope="scope">
-        <div :class="scope.row.deleted===1?'commonDelete':''">{{scope.row.sendContent}}</div>
+        <el-input v-if="scope.row.isShowInput" v-model="scope.row.sendContent" placeholder="请输入发货文本" @blur="handleBlur('sendContent', scope.row)"/>
+        <div v-else :class="scope.row.deleted===1?'commonDelete':''">{{scope.row.sendContent}}</div>
       </template>
       </el-table-column>
       <el-table-column label="钱票状态" align="center" prop="ticketStatus">
         <template slot-scope="scope">
-          <div v-for="item in getStatusDict(scope.row.ticketStatus, 'ticketStatusDictObj')" :key="item.key">
+          <el-select
+            v-if="scope.row.isShowInput"
+            style="width: 130px"
+            v-model="scope.row.ticketStatus"
+            multiple
+            placeholder="选择钱票状态"
+            clearable
+            filterable
+          >
+            <el-option
+              v-for="item in $store.state.ticketStatusDictObj.FH"
+              :key="item.key"
+              :label="item.value"
+              :value="item.key"
+            >
+            </el-option> </el-select
+          >
+          <div v-else v-for="item in getStatusDict(scope.row.ticketStatus, 'ticketStatusDictObj')" :key="item.key">
             <el-tag type="success" v-if="item.key===1" style="margin-top:5px">{{item.value}}</el-tag>
             <el-tag type="info" v-if="item.key===2" style="margin-top:5px">{{item.value}}</el-tag>
             <el-tag type="warning" v-if="item.key===3" style="margin-top:5px">{{item.value}}</el-tag>
@@ -316,14 +373,22 @@ export default {
         :show-overflow-tooltip="true"
         prop="inAmount"
         label="输入金额"
-      />
+      >
+        <template slot-scope="scope">
+          <el-input v-if="scope.row.isShowInput" v-model="scope.row.inAmount" placeholder="请输入金额" @blur="handleBlur('inAmount', scope.row)"/>
+          <div v-else >{{scope.row.inAmout}}</div>
+        </template>
+      </el-table-column>
       <el-table-column
       fixed="right"
       label="操作"
       width="100">
         <template slot-scope="scope">
+          <div v-if="!scope.row.isShowInput">
           <el-button type="text" size="small" @click="$emit('handleAction',scope.row,'edit', handleSearch)">编辑</el-button>
           <el-button @click="$emit('handleAction',scope.row,'del', handleSearch)" type="text" size="small">删除</el-button>
+          </div>
+          <span v-else>--</span>
         </template>
       </el-table-column>
     </el-table>
