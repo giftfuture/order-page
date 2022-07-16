@@ -103,8 +103,15 @@ export default {
       this.sendForm.createTimeBegin = this.createTime[0]
       this.sendForm.createTimeEnd = this.createTime[1]
       this.handleSearch()
+    },
+    handleOptions () {
+      this.$emit('handleOptions', { multipleSelection: this.multipleSelection, callBack: this.handleSearch })
+    },
+    handleAdd () {
+      this.$emit('handleAdd', 'FH', this.handleSearch)
     }
   },
+
   created () {
     this.handleSearch()
   }
@@ -188,28 +195,8 @@ export default {
         </el-form-item>
         </el-col>
         <el-col :span="colSpan4">
-        <!-- <el-form-item label="钱票状态" prop="ticketStatusStr">
-          <el-select
-            style="width: 130px"
-            v-model="sendForm.ticketStatusStr"
-            multiple
-            placeholder="选择钱票状态"
-            clearable
-            filterable
-          >
-            <el-option
-              v-for="item in this.$store.state.ticketStatusDictObj.DK"
-              :key="item.key"
-              :label="item.value"
-              :value="item.key"
-            >
-            </el-option> </el-select
-        ></el-form-item> -->
         </el-col>
         <el-col :span="colSpan2">
-        <!-- <el-form-item v-show="showMsg" style="margin-bottom: 0">
-          <span class="text-danger">提示：搜索有异常，请重试！</span>
-        </el-form-item> -->
         <el-form-item
          label=" "
           style="width: 400px;text-aline:right;"
@@ -226,8 +213,8 @@ export default {
       </el-row>
     </el-form>
     <el-row>
-      <el-button type="primary">+创建</el-button>
-      <el-button type="primary">批量操作</el-button>
+      <el-button type="primary" @click="handleAdd">创建</el-button>
+      <el-button type="primary" @click="handleOptions">批量操作</el-button>
     </el-row>
     <el-pagination
       style="margin:auto;padding-bottom:20px;"
@@ -265,16 +252,6 @@ export default {
         </div>
         </template>
       </el-table-column>
-      <!-- <el-table-column
-        :show-overflow-tooltip="true"
-        prop="orderNo"
-        label="工单号"
-      /> -->
-      <!-- <el-table-column
-        :show-overflow-tooltip="true"
-        prop="createBy"
-        label="创建人"
-      /> -->
       <el-table-column label="状态" align="center" prop="status">
         <template slot-scope="scope">
           <div v-for="item in getStatusDict(scope.row.status, 'statusDictObj')" :key="item.key">
@@ -295,11 +272,6 @@ export default {
         <div :class="scope.row.deleted===1?'commonDelete':''">{{scope.row.sendContent}}</div>
       </template>
       </el-table-column>
-      <!-- <el-table-column
-        :show-overflow-tooltip="true"
-        prop="createTime"
-        label="日期"
-      /> -->
       <el-table-column
         :show-overflow-tooltip="true"
         prop="inAmount"
@@ -310,22 +282,15 @@ export default {
         prop="pics"
         label="附件"
       />
-      <!-- <el-table-column
-        :show-overflow-tooltip="true"
-        prop="remark"
-        label="备注"
-      /> -->
-      <!-- <el-table-column
-        :show-overflow-tooltip="true"
-        prop="updateTime"
-        label="最后修改日期"
-      /> -->
-      <!-- <el-table-column
-        :show-overflow-tooltip="true"
-        prop="updator"
-        label="最后修改人"
-      /> -->
-        <!-- :show-overflow-tooltip="true" -->
+      <el-table-column
+      fixed="right"
+      label="操作"
+      width="100">
+        <template slot-scope="scope">
+          <el-button type="text" size="small" @click="$emit('handleAction',scope.row,'edit', handleSearch)">编辑</el-button>
+          <el-button @click="$emit('handleAction',scope.row,'del', handleSearch)" type="text" size="small">删除</el-button>
+        </template>
+      </el-table-column>
     </el-table>
   </div>
 </template>

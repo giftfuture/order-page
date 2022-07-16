@@ -1,16 +1,27 @@
 <template>
-  <div  class="mpm-container" style="width: 100%;height: 100%;overflow:hidden; -webkit-overflow-scrolling:touch;">
-    <el-tabs v-model="currentView" @tab-click="handleClick">
+  <div  class="mpm-container" style="position: relative; width: 100%;height: 100%;overflow:hidden; -webkit-overflow-scrolling:touch;">
+    <el-tabs v-model="currentView" @tab-click="handleClick" style="padding-bottom: 40px;">
       <el-tab-pane v-for="item in views" :label="item.label" :name="item.name" :key="item.name">
-        <KpzlTab v-if="item.type==='KP'" @handleOptions="handleOptions" @handleAction="handleAction" />
-        <DHTab v-if="item.type==='DH'" @handleOptions="handleOptions" @handleAction="handleAction" />
-        <ZHSSTab v-if="item.type==='ZH'" @handleOptions="handleOptions" @handleAction="handleAction" />
-        <SendTab v-if="item.type==='FH'" @handleOptions="handleOptions" @handleAction="handleAction" />
-        <DkTab v-if="item.type==='DK'" @handleOptions="handleOptions" @handleAction="handleAction" />
-        <JHTab v-if="item.type==='JH'" @handleOptions="handleOptions" @handleAction="handleAction" />
-        <JGTab v-if="item.type==='JG'" @handleOptions="handleOptions" @handleAction="handleAction" />
+        <KpzlTab v-if="item.type==='KP'" @handleOptions="handleOptions" @handleAction="handleAction" @handleAdd="handleAdd" />
+        <DHTab v-if="item.type==='DH'" @handleOptions="handleOptions" @handleAction="handleAction" @handleAdd="handleAdd" />
+        <ZHSSTab v-if="item.type==='ZH'" @handleOptions="handleOptions" @handleAction="handleAction" @handleAdd="handleAdd" />
+        <SendTab v-if="item.type==='FH'" @handleOptions="handleOptions" @handleAction="handleAction" @handleAdd="handleAdd" />
+        <DkTab v-if="item.type==='DK'" @handleOptions="handleOptions" @handleAction="handleAction" @handleAdd="handleAdd" />
+        <JHTab v-if="item.type==='JH'" @handleOptions="handleOptions" @handleAction="handleAction" @handleAdd="handleAdd" />
+        <JGTab v-if="item.type==='JG'" @handleOptions="handleOptions" @handleAction="handleAction" @handleAdd="handleAdd" />
       </el-tab-pane>
     </el-tabs>
+    <div class="addInput" v-if="addForm.isShow">
+      <el-row>
+        <el-col :span=18>
+          <el-input ref="addInput" v-focus autofocus v-if="addInput" v-model="addForm.content" placeholder="请输入文本" />
+        </el-col>
+        <el-col :span=6>
+          <el-button type="primary" style="margin-left: 15px;" @click="handleAddSure">保存</el-button>
+          <el-button  style="margin-left: 15px;" @click="cancleAdd">取消</el-button>
+        </el-col>
+      </el-row>
+    </div>
     <EditDialog :showTypeObj="showTypeObj" :tabType="currentType" @handleClose="handleClose"  />
     <EditInfosDialog :showEditInfo="showEditInfo" :tabType="currentType" @handleEdit="handleEdit"  />
   </div>
@@ -27,12 +38,19 @@ import ZHSSTab from '@/views/ZHSSTab.vue'
 import { mapActions } from 'vuex'
 import EditDialog from '@/components/EditDialog'
 import EditInfosDialog from '@/components/EditInfosDialog'
-import { editListOrder, editOrder, delOrder } from '@/api/send'
+import { editListOrder, editOrder, delOrder, createOrder } from '@/api/send'
 import { orderSort } from '@/common/enum'
 
 export default {
   data () {
     return {
+      addInput: true,
+      addForm: {
+        isShow: false,
+        addType: '',
+        content: '',
+        callBack: null
+      },
       options: [],
       callBack: null,
       showTypeObj: {
@@ -155,6 +173,50 @@ export default {
         console.log(params)
       }
     },
+    // 新建
+    handleAdd (addType, querySearchCallBack) {
+      console.log(addType, querySearchCallBack, '====handleAdd')
+      this.addForm.addType = addType
+      this.addForm.isShow = true
+      this.addForm.callBack = querySearchCallBack
+      this.addForm.content = ''
+    },
+    // 创建方法
+    handleAddSure () {
+      console.log('handleAddSure')
+      const params = {}
+      if (this.addForm.addType === 'FH') {
+        params.sendContent = this.addForm.content
+      } else {
+        params.content = this.addForm.content
+      }
+      params.orderTag = this.addForm.addType
+      createOrder(params).then(res => {
+        console.log(res, 'createOrder')
+        if (res.code === 0) {
+          this.$message({
+            message: '新建成功',
+            type: 'success'
+          })
+          this.addForm.callBack && this.addForm.callBack()
+          this.addForm = {
+            isShow: false,
+            addType: '',
+            content: '',
+            callBack: null
+          }
+        }
+      })
+    },
+    // 取消创建
+    cancleAdd () {
+      this.addForm = {
+        isShow: false,
+        addType: '',
+        content: '',
+        callBack: null
+      }
+    },
     // 单个删除或者编辑
     handleAction (data, actionType, callBack) {
       console.log(data, actionType, '====data, actionType')
@@ -195,9 +257,9 @@ export default {
         // 发送修改接口
         const params = {
           id: data.form.id,
-          status: data.form.status.join(','),
-          ticketStatus: data.form.ticketStatus.join(',')
+          status: data.form.status.join(',')
         }
+        data.form.ticketStatus.isShow && (params.ticketStatus = data.form.ticketStatus.join(','))
         const formModal = orderSort[this.currentType].editForm
         Object.keys(formModal).forEach(key => {
           if (formModal[key] && !params[key]) {
@@ -229,6 +291,12 @@ export default {
 </script>
 
 <style scoped lang="less">
+.addInput {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  z-index: 1000;
+}
 /*改变原来tabBox的flex布局*/
 .mpm-container .vux-tab .vux-tab-item {
   display: inline-block;

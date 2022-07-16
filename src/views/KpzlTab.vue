@@ -103,6 +103,12 @@ export default {
       this.sendForm.createTimeBegin = this.createTime[0]
       this.sendForm.createTimeEnd = this.createTime[1]
       this.handleSearch()
+    },
+    handleOptions () {
+      this.$emit('handleOptions', { multipleSelection: this.multipleSelection, callBack: this.handleSearch })
+    },
+    handleAdd () {
+      this.$emit('handleAdd', 'FH', this.handleSearch)
     }
   },
   created () {
@@ -204,8 +210,8 @@ export default {
       </el-row>
     </el-form>
     <el-row>
-      <el-button type="primary">+创建</el-button>
-      <el-button type="primary">批量操作</el-button>
+      <el-button type="primary" @click="handleAdd">+创建</el-button>
+      <el-button type="primary" @click="handleOptions">批量操作</el-button>
     </el-row>
     <el-pagination
       style="margin:auto;padding-bottom:20px;"
@@ -283,22 +289,15 @@ export default {
         prop="inAmount"
         label="输入金额"
       />
-      <!-- <el-table-column
-        :show-overflow-tooltip="true"
-        prop="remark"
-        label="备注"
-      /> -->
-      <!-- <el-table-column
-        :show-overflow-tooltip="true"
-        prop="updateTime"
-        label="最后修改日期"
-      /> -->
-      <!-- <el-table-column
-        :show-overflow-tooltip="true"
-        prop="updator"
-        label="最后修改人"
-      /> -->
-        <!-- :show-overflow-tooltip="true" -->
+      <el-table-column
+      fixed="right"
+      label="操作"
+      width="100">
+        <template slot-scope="scope">
+          <el-button type="text" size="small" @click="$emit('handleAction',scope.row,'edit', handleSearch)">编辑</el-button>
+          <el-button @click="$emit('handleAction',scope.row,'del', handleSearch)" type="text" size="small">删除</el-button>
+        </template>
+      </el-table-column>
     </el-table>
   </div>
 </template>
