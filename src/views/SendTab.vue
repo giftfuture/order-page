@@ -7,6 +7,7 @@ export default {
   },
   data () {
     return {
+      multipleSelection: [],
       colSpan4: 4,
       colSpan2: 2,
       colSpan6: 6,
@@ -89,11 +90,8 @@ export default {
     handleSelectionChange (val) {
       this.multipleSelection = val
     },
-    handleNodeClick (data) {
-      console.log(data)
-    },
     handleOptions () {
-      console.log(this.multipleSelection, 'handleOptions')
+      this.$emit('handleOptions', { multipleSelection: this.multipleSelection, callBack: this.handleSearch })
     },
     checkboxT (row, rowIndex) {
       console.log(row, 'row====')

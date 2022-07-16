@@ -2,25 +2,20 @@
   <div  class="mpm-container" style="width: 100%;height: 100%;overflow:hidden; -webkit-overflow-scrolling:touch;">
     <el-tabs v-model="currentView" @tab-click="handleClick">
       <el-tab-pane v-for="item in views" :label="item.label" :name="item.name" :key="item.name">
-        <KpzlTab v-if="item.type==='KP'"/>
-        <DHTab v-if="item.type==='DH'"/>
-        <ZHSSTab v-if="item.type==='ZH'"/>
-        <SendTab v-if="item.type==='FH'"/>
-        <DkTab v-if="item.type==='DK'"/>
-        <JHTab v-if="item.type==='JH'"/>
-        <JGTab v-if="item.type==='JG'"/>
-        <!-- {{ item.component }} -->
-        <!-- <item.name /> -->
-        <!-- <component :is="currentView" allStaf="allStaf"></component> -->
+        <KpzlTab v-if="item.type==='KP'" @handleOptions="handleOptions" />
+        <DHTab v-if="item.type==='DH'" @handleOptions="handleOptions" />
+        <ZHSSTab v-if="item.type==='ZH'" @handleOptions="handleOptions" />
+        <SendTab v-if="item.type==='FH'" @handleOptions="handleOptions" />
+        <DkTab v-if="item.type==='DK'" @handleOptions="handleOptions" />
+        <JHTab v-if="item.type==='JH'" @handleOptions="handleOptions" />
+        <JGTab v-if="item.type==='JG'" @handleOptions="handleOptions" />
       </el-tab-pane>
     </el-tabs>
+    <EditDialog :showTypeObj="showTypeObj" :tabType="currentType" @handleClose="handleClose"  />
   </div>
 </template>
 
 <script>
-// import {
-//   Tab, TabItem
-// } from 'vux'
 import KpzlTab from '@/views/KpzlTab.vue'
 import DHTab from '@/views/DHTab.vue'
 import SendTab from '@/views/SendTab.vue'
@@ -29,10 +24,19 @@ import JHTab from '@/views/JHTab.vue'
 import JGTab from '@/views/JGTab.vue'
 import ZHSSTab from '@/views/ZHSSTab.vue'
 import { mapActions } from 'vuex'
-
+import EditDialog from '@/components/EditDialog'
+import { editOrder } from '@/api/send'
 export default {
   data () {
     return {
+      options: [],
+      callBack: null,
+      showTypeObj: {
+        title: '',
+        isShow: false,
+        status: true,
+        ticketStatus: true
+      },
       currentView: 'SendTab',
       currentType: 'FH',
       views: [{
@@ -69,8 +73,7 @@ export default {
     }
   },
   components: {
-    // Tab,
-    // TabItem,
+    EditDialog,
     KpzlTab,
     DHTab,
     SendTab,
@@ -97,76 +100,53 @@ export default {
       console.log(event.index, 'index')
       this.currentView = this.views[event.index].name
       this.currentType = this.views[event.index].type
+    },
+    // 批量操作
+    handleOptions  (data) {
+      console.log(data, 'handleOptions')
+      if (!data || !data.multipleSelection.length) {
+        this.$message({
+          message: '请先选择',
+          type: 'warning'
+        })
+        return
+      }
+      this.options = data.multipleSelection || []
+      this.callBack = data.callBack
+      this.showTypeObj = {
+        title: '批量操作',
+        isShow: true,
+        status: true,
+        ticketStatus: true
+      }
+    },
+    handleClose (data) {
+      console.log(data, this.options, 'handleClose')
+      if (data.actionType === 0) {
+        this.showTypeObj.isShow = false
+      } else {
+        // 发送修改接口
+        const params = {
+          idList: this.options.map(item => item.id).join(','),
+          status: data.form.statusStr.join(','),
+          ticketStatus: data.form.ticketStatusStr.join(',')
+        }
+        editOrder(params).then(res => {
+          console.log(res, 'editOrder')
+          if (res.code === 0) {
+            this.showTypeObj.isShow = false
+            this.$message({
+              message: '操作成功',
+              type: 'success'
+            })
+            this.callBack && this.callBack()
+          }
+        })
+        console.log(params)
+      }
     }
   }
 }
-
-/* export default {
-  data () {
-    return {
-      list: ['发货组', '开票和资料组', '订货组', '打款组', '进货组', '价格组', '综合搜索'],
-      tabD: 0,
-      // tab标签div长度
-      tabWidth: document.body.clientWidth
-    }
-  }, */
-
-//   mounted () {
-//     setTimeout(() => {
-//       this.$refs.tabBox.$children[0].onItemClick()
-//     }, 200)
-//     this.setTabWidth()
-//   },
-//   methods: {
-//     setTabWidth () {
-//       // 页面完成刷新之后
-//       this.$nextTick(() => {
-//         var realW = 0; var offW = 0
-//         // realW为每一个tab-item的长度总和,因为tab-item的父级为flex布局,而tab-item的flex: none，所以初始化的时候，tab-item会根据自己的字体长度，自动扩张宽度。
-//         for (let i = 0; i < this.$refs.tabBox.$children.length; i++) {
-//           realW += this.$refs.tabBox.$children[i].$el.offsetWidth
-//         }
-//         // 同样是计算初始化的时候，每一个tab-item的总宽度，但当tab-item总长度大于tab的总长度时，立马退出程序
-//         for (let i = 0; i < this.$refs.tabBox.$children.length; i++) {
-//           offW += this.$refs.tabBox.$children[i].$el.offsetWidth
-//           if (offW > (document.body.clientWidth)) break
-//         }
-//         // 假如tab-item的总宽度小于显示tabwidth，则评分tab的剩余空间，加到每一个tab-item中
-//         if (offW < (document.body.clientWidth)) {
-//           var offD = (document.body.clientWidth) - offW
-//           for (let i = 0; i < this.$refs.tabBox.$children.length; i++) {
-//             this.$refs.tabBox.$children[i].$el.style.width = (this.$refs.tabBox.$children[i].$el.clientWidth + offD) / this.$refs.tabBox.$children.length + 'px'
-//           }
-//         } else {
-//           this.tabWidth = realW
-//         }
-//       })
-//     },
-//     getBarWidth () {
-//       // 函数控制tab-bar的宽度,如果tab标签页数量为1，则隐藏tab-bar
-//       if (this.list && this.list.length === 1) {
-//         return '0px'
-//       }
-//       return '30px'
-//     },
-//     onItemClick (keyword, index) {
-//       let barLeft = 0
-//       document.getElementsByClassName('vux-tab-ink-bar')[0].style.right = '100%'
-//       for (let i = 0; i < this.list.length; i++) {
-//         if (document.getElementsByClassName('vux-tab-item')[i].innerText === keyword) {
-//           barLeft += document.getElementsByClassName('vux-tab-item')[i].offsetWidth / 2
-//           // 为什么是15？因为底部bar长度为30px，这样做可以让bar的中心对齐tab-item的中心
-//           barLeft -= 15
-//           break
-//         }
-//         barLeft += document.getElementsByClassName('vux-tab-item')[i].offsetWidth
-//       }
-//       document.getElementsByClassName('vux-tab-ink-bar')[0].style.left = (barLeft + 'px')
-//       // $('#sendTab').css('display: block')
-//     }
-//
-//   }
-// }
 
 </script>
 

@@ -52,3 +52,12 @@ export function loadBySort (data) {
     method: 'get'
   })
 }
+
+// 编辑订单状态
+export function editOrder (data) {
+  return request({
+    url: '/order/edit',
+    method: 'post',
+    data
+  })
+}

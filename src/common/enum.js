@@ -18,26 +18,58 @@ export const ticketStatusDict = {
 export const orderSort = {
   'FH': {
     key: 'Fh',
-    value: '发货组'
+    value: '发货组',
+    editForm: {
+      status: true,
+      ticketStatus: true
+    }
   },
   'KP': {
     key: 'KP',
-    value: '开票和资料组'
+    value: '开票和资料组',
+    editForm: {
+      status: true,
+      ticketStatus: false
+    }
   },
   'DH': {
     key: 'DH',
-    value: '订货组'
+    value: '订货组',
+    editForm: {
+      status: true,
+      ticketStatus: true
+    }
   },
   'DK': {
     key: 'DK',
-    value: '打款组'
+    value: '打款组',
+    editForm: {
+      status: true,
+      ticketStatus: false
+    }
   },
   'JH': {
     key: 'JH',
-    value: '进货组'
+    value: '进货组',
+    editForm: {
+      status: true,
+      ticketStatus: false
+    }
   },
   'JG': {
     key: 'JG',
-    value: '价格组'
+    value: '价格组',
+    editForm: {
+      status: true,
+      ticketStatus: false
+    }
+  },
+  'ZH': {
+    key: 'ZH',
+    value: '综合搜索组',
+    editForm: {
+      status: true,
+      ticketStatus: false
+    }
   }
 }
