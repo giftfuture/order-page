@@ -2,8 +2,16 @@
   <div  class="mpm-container" style="width: 100%;height: 100%;overflow:hidden; -webkit-overflow-scrolling:touch;">
     <el-tabs v-model="currentView" @tab-click="handleClick">
       <el-tab-pane v-for="item in views" :label="item.label" :name="item.name" :key="item.name">
+        <KpzlTab v-if="item.type==='KP'"/>
+        <DHTab v-if="item.type==='DH'"/>
+        <ZHSSTab v-if="item.type==='ZH'"/>
+        <SendTab v-if="item.type==='FH'"/>
+        <DkTab v-if="item.type==='DK'"/>
+        <JHTab v-if="item.type==='JH'"/>
+        <JGTab v-if="item.type==='JG'"/>
         <!-- {{ item.component }} -->
-        <component :is="currentView" allStaf="allStaf"></component>
+        <!-- <item.name /> -->
+        <!-- <component :is="currentView" allStaf="allStaf"></component> -->
       </el-tab-pane>
     </el-tabs>
   </div>
@@ -25,8 +33,8 @@ import { mapActions } from 'vuex'
 export default {
   data () {
     return {
-      currentView: 'DkTab',
-      currentType: 'DK',
+      currentView: 'SendTab',
+      currentType: 'FH',
       views: [{
         label: '发货组',
         name: 'SendTab',
@@ -56,7 +64,7 @@ export default {
       }, {
         label: '综合搜索',
         name: 'ZHSSTab',
-        type: 'JG' // ??
+        type: '' // ??
       }]
     }
   },

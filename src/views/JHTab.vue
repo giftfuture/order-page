@@ -44,20 +44,12 @@ export default {
     }
   },
   methods: {
-    getStatusDict (keys) {
+    getStatusDict (keys, type, orderSort) {
       const keyArr = keys.split(',')
-      const data = this.$store.state.statusDictObj.JH ? this.$store.state.statusDictObj.JH.filter(item => {
+      const data = this.$store.state[type][orderSort] ? this.$store.state[type][orderSort].filter(item => {
         const key = String(item.key)
         if (keyArr.indexOf(key) > -1) return item
       }) : []
-      return data
-    },
-    getTicketStatusDict (keys) {
-      console.log(keys, 'keys', statusDict)
-      const keyArr = keys.split(',')
-      const data = keyArr.map(key => {
-        return ticketStatusDict[key]
-      })
       return data
     },
     handleSearch () {
@@ -189,7 +181,7 @@ export default {
             filterable
           >
             <el-option
-              v-for="item in statusDictSelect"
+              v-for="item in this.$store.state.statusDictObj.JH"
               :key="item.key"
               :label="item.value"
               :value="item.key"
@@ -209,7 +201,7 @@ export default {
             filterable
           >
             <el-option
-              v-for="item in ticketStatusDictSelect"
+              v-for="item in this.$store.state.ticketStatusDictObj.JH"
               :key="item.key"
               :label="item.value"
               :value="item.key"
@@ -288,7 +280,7 @@ export default {
       /> -->
       <el-table-column label="状态" align="center" prop="status">
         <template slot-scope="scope">
-          <div v-for="item in getStatusDict(scope.row.status)" :key="item.key">
+          <div v-for="item in getStatusDict(scope.row.status, 'statusDictObj', 'JH')" :key="item.key">
             <el-tag type="success" v-if="item.key===1" style="margin-top:5px">{{item.value}}</el-tag>
             <el-tag type="info" v-if="item.key===2" style="margin-top:5px">{{item.value}}</el-tag>
             <el-tag type="warning" v-if="item.key===3" style="margin-top:5px">{{item.value}}</el-tag>

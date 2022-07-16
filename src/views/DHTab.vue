@@ -1,6 +1,5 @@
 <script>
 import { dhSearch } from '@/api/send/index'
-import { statusDict, ticketStatusDict } from '@/common/enum'
 
 export default {
   name: 'sendTab',
@@ -11,8 +10,6 @@ export default {
       colSpan4: 4,
       colSpan2: 2,
       colSpan6: 6,
-      statusDictSelect: Object.keys(statusDict).map(key => statusDict[key]),
-      ticketStatusDictSelect: Object.keys(ticketStatusDict).map(key => ticketStatusDict[key]),
       pageNo: 0,
       pageSize: 10,
       tableData: {
@@ -44,19 +41,12 @@ export default {
     }
   },
   methods: {
-    getStatusDict (keys) {
+    getStatusDict (keys, type) {
       const keyArr = keys.split(',')
-      const data = this.$store.state.statusDictObj.DH ? this.$store.state.statusDictObj.DH.filter(item => {
+      const data = this.$store.state[type].DH ? this.$store.state[type].DH.filter(item => {
         const key = String(item.key)
         if (keyArr.indexOf(key) > -1) return item
       }) : []
-      return data
-    },
-    getTicketStatusDict (keys) {
-      const keyArr = keys.split(',')
-      const data = keyArr.map(key => {
-        return ticketStatusDict[key]
-      })
       return data
     },
     handleSearch () {
@@ -188,7 +178,7 @@ export default {
             filterable
           >
             <el-option
-              v-for="item in statusDictSelect"
+              v-for="item in this.$store.state.statusDictObj.DH"
               :key="item.key"
               :label="item.value"
               :value="item.key"
@@ -208,7 +198,7 @@ export default {
             filterable
           >
             <el-option
-              v-for="item in ticketStatusDictSelect"
+              v-for="item in this.$store.state.ticketStatusDictObj.DH"
               :key="item.key"
               :label="item.value"
               :value="item.key"
@@ -287,7 +277,7 @@ export default {
       /> -->
       <el-table-column label="状态" align="center" prop="status">
         <template slot-scope="scope">
-          <div v-for="item in getStatusDict(scope.row.status)" :key="item.key">
+          <div v-for="item in getStatusDict(scope.row.status, 'statusDictObj')" :key="item.key">
             <el-tag type="success" v-if="item.key===1" style="margin-top:5px">{{item.value}}</el-tag>
             <el-tag type="info" v-if="item.key===2" style="margin-top:5px">{{item.value}}</el-tag>
             <el-tag type="warning" v-if="item.key===3" style="margin-top:5px">{{item.value}}</el-tag>
@@ -303,7 +293,7 @@ export default {
       />
       <el-table-column label="钱票状态" align="center" prop="ticketStatus">
         <template slot-scope="scope">
-          <div v-for="item in getTicketStatusDict(scope.row.ticketStatus)" :key="item.key">
+          <div v-for="item in getStatusDict(scope.row.ticketStatus, 'ticketStatusDictObj')" :key="item.key">
             <el-tag type="success" v-if="item.key===1" style="margin-top:5px">{{item.value}}</el-tag>
             <el-tag type="info" v-if="item.key===2" style="margin-top:5px">{{item.value}}</el-tag>
             <el-tag type="warning" v-if="item.key===3" style="margin-top:5px">{{item.value}}</el-tag>
