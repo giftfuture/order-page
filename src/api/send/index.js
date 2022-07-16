@@ -53,11 +53,29 @@ export function loadBySort (data) {
   })
 }
 
-// 编辑订单状态
+// 批量编辑订单状态
+export function editListOrder (data) {
+  return request({
+    url: '/order/editList',
+    method: 'post',
+    data
+  })
+}
+
+// 单个编辑订单
 export function editOrder (data) {
   return request({
     url: '/order/edit',
     method: 'post',
     data
+  })
+}
+
+// 删除订单
+export function delOrder (data) {
+  return request({
+    url: '/order/del',
+    method: 'delete',
+    data: { id: data }
   })
 }

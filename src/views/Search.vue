@@ -2,16 +2,17 @@
   <div  class="mpm-container" style="width: 100%;height: 100%;overflow:hidden; -webkit-overflow-scrolling:touch;">
     <el-tabs v-model="currentView" @tab-click="handleClick">
       <el-tab-pane v-for="item in views" :label="item.label" :name="item.name" :key="item.name">
-        <KpzlTab v-if="item.type==='KP'" @handleOptions="handleOptions" />
-        <DHTab v-if="item.type==='DH'" @handleOptions="handleOptions" />
-        <ZHSSTab v-if="item.type==='ZH'" @handleOptions="handleOptions" />
-        <SendTab v-if="item.type==='FH'" @handleOptions="handleOptions" />
-        <DkTab v-if="item.type==='DK'" @handleOptions="handleOptions" />
-        <JHTab v-if="item.type==='JH'" @handleOptions="handleOptions" />
-        <JGTab v-if="item.type==='JG'" @handleOptions="handleOptions" />
+        <KpzlTab v-if="item.type==='KP'" @handleOptions="handleOptions" @handleAction="handleAction" />
+        <DHTab v-if="item.type==='DH'" @handleOptions="handleOptions" @handleAction="handleAction" />
+        <ZHSSTab v-if="item.type==='ZH'" @handleOptions="handleOptions" @handleAction="handleAction" />
+        <SendTab v-if="item.type==='FH'" @handleOptions="handleOptions" @handleAction="handleAction" />
+        <DkTab v-if="item.type==='DK'" @handleOptions="handleOptions" @handleAction="handleAction" />
+        <JHTab v-if="item.type==='JH'" @handleOptions="handleOptions" @handleAction="handleAction" />
+        <JGTab v-if="item.type==='JG'" @handleOptions="handleOptions" @handleAction="handleAction" />
       </el-tab-pane>
     </el-tabs>
     <EditDialog :showTypeObj="showTypeObj" :tabType="currentType" @handleClose="handleClose"  />
+    <EditInfosDialog :showEditInfo="showEditInfo" :tabType="currentType" @handleEdit="handleEdit"  />
   </div>
 </template>
 
@@ -25,17 +26,24 @@ import JGTab from '@/views/JGTab.vue'
 import ZHSSTab from '@/views/ZHSSTab.vue'
 import { mapActions } from 'vuex'
 import EditDialog from '@/components/EditDialog'
-import { editOrder } from '@/api/send'
+import EditInfosDialog from '@/components/EditInfosDialog'
+import { editListOrder, editOrder, delOrder } from '@/api/send'
+import { orderSort } from '@/common/enum'
+
 export default {
   data () {
     return {
       options: [],
       callBack: null,
       showTypeObj: {
-        title: '',
+        title: '批量操作',
         isShow: false,
         status: true,
         ticketStatus: true
+      },
+      showEditInfo: {
+        title: '编辑',
+        isShow: false
       },
       currentView: 'SendTab',
       currentType: 'FH',
@@ -74,6 +82,7 @@ export default {
   },
   components: {
     EditDialog,
+    EditInfosDialog,
     KpzlTab,
     DHTab,
     SendTab,
@@ -120,6 +129,7 @@ export default {
         ticketStatus: true
       }
     },
+    // 关闭弹窗或者确定批量操作
     handleClose (data) {
       console.log(data, this.options, 'handleClose')
       if (data.actionType === 0) {
@@ -131,10 +141,78 @@ export default {
           status: data.form.statusStr.join(','),
           ticketStatus: data.form.ticketStatusStr.join(',')
         }
-        editOrder(params).then(res => {
+        editListOrder(params).then(res => {
           console.log(res, 'editOrder')
           if (res.code === 0) {
             this.showTypeObj.isShow = false
+            this.$message({
+              message: '操作成功',
+              type: 'success'
+            })
+            this.callBack && this.callBack()
+          }
+        })
+        console.log(params)
+      }
+    },
+    // 单个删除或者编辑
+    handleAction (data, actionType, callBack) {
+      console.log(data, actionType, '====data, actionType')
+      switch (actionType) {
+        case 'del':
+          this.$confirm('确认删除该订单吗？')
+            .then(_ => {
+              delOrder(data.id).then(res => {
+                if (res.code === 0) {
+                  this.$message({
+                    message: '删除成功',
+                    type: 'success'
+                  })
+                  callBack()
+                }
+              })
+            })
+            .catch(_ => {})
+          break
+        case 'edit':
+          this.callBack = callBack
+          this.showEditInfo = {
+            isShow: true,
+            title: '编辑',
+            form: { ...data, status: data.status.split(',').map(item => parseInt(item)), ticketStatus: data.ticketStatus.split(',').map(item => parseInt(item)) },
+            ...orderSort[this.currentType].editForm
+          }
+          console.log(this.showEditInfo.form, '====showEditInfo')
+          break
+      }
+    },
+    // 单个编辑
+    handleEdit (data) {
+      console.log(data, this.options, 'handleEdit')
+      if (data.actionType === 0) {
+        this.showEditInfo.isShow = false
+      } else {
+        // 发送修改接口
+        const params = {
+          id: data.form.id,
+          status: data.form.status.join(','),
+          ticketStatus: data.form.ticketStatus.join(',')
+        }
+        const formModal = orderSort[this.currentType].editForm
+        Object.keys(formModal).forEach(key => {
+          if (formModal[key] && !params[key]) {
+            if (key === 'inAmount') {
+              console.log('inAmount')
+              params[formModal[key].key] = parseFloat(data.form[formModal[key].key])
+            } else {
+              params[formModal[key].key] = data.form[formModal[key].key]
+            }
+          }
+        })
+        editOrder(params).then(res => {
+          console.log(res, 'editOrder')
+          if (res.code === 0) {
+            this.showEditInfo.isShow = false
             this.$message({
               message: '操作成功',
               type: 'success'
