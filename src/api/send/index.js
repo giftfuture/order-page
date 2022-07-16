@@ -71,6 +71,15 @@ export function editOrder (data) {
   })
 }
 
+// 创建订单
+export function createOrder (data) {
+  return request({
+    url: '/order/create',
+    method: 'put',
+    data
+  })
+}
+
 // 删除订单
 export function delOrder (data) {
   return request({

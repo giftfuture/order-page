@@ -22,6 +22,10 @@ Vue.config.productionTip = false
 Vue.use(ElementUI)
 Vue.prototype.$http = axios
 Vue.prototype.Utils = Utils
+Vue.directive('focus', function (el) {
+  el.focus()
+  el.children[0].focus()
+})
 Vue.filter('handleValue', (keys) => {
   // const keyArr = keys.split(',')
   // console.log(this.$store.state.statusDict, 'this.$store.state.statusDict')
