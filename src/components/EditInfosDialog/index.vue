@@ -10,7 +10,7 @@
       :model="showEditInfo.form"
       ref="form"
       class="login-form"
-      label-width="80px"
+      label-width="100px"
     >
       <el-row v-if="showEditInfo.content && showEditInfo.content.isShow">
         <el-form-item :label="showEditInfo.content.label" :prop="showEditInfo.content.key">

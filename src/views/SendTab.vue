@@ -91,9 +91,7 @@ export default {
       this.multipleSelection = val
     },
     handleAdd () {
-      // this.addForm = { id: null, isShowInput: true, status: [], statusStr: [], ticketStatusStr: [], ticketStatus: [] }
-      this.tableData.data.push({ id: null, isShowInput: true })
-      // this.$ref.editInput.focus()
+      this.$emit('handleAdd', 'FH', this.handleSearch)
     },
     handleOptions () {
       this.$emit('handleOptions', { multipleSelection: this.multipleSelection, callBack: this.handleSearch })
@@ -110,35 +108,6 @@ export default {
       this.sendForm.createTimeBegin = this.createTime[0]
       this.sendForm.createTimeEnd = this.createTime[1]
       this.handleSearch()
-    },
-    // 合并列
-    arraySpanMethod ({ row, columnIndex }) {
-      if (row.isShowInput) {
-        if (columnIndex === 1) {
-          return [1, 5]
-        }
-      }
-    },
-    // 创建方法
-    handleBlur (key, row) {
-      const params = {
-        [key]: row[key],
-        orderTag: 'FH'
-      }
-      if (row.id) {
-        // 编辑
-        params.id = row.id
-      }
-      createOrder(params).then(res => {
-        console.log(res, 'createOrder')
-        if (res.code === 0) {
-          this.$message({
-            message: '新建成功',
-            type: 'success'
-          })
-          this.handleSearch()
-        }
-      })
     }
   },
   created () {
@@ -282,7 +251,6 @@ export default {
       :data="tableData.data"
       style="width: 100%;overflow: scroll;"
       @selection-change="handleSelectionChange"
-      :span-method="arraySpanMethod"
     >
       <el-table-column :selectable="checkboxT" type="selection" width="55" />
       <el-table-column
@@ -291,9 +259,9 @@ export default {
         label="其他"
       >
         <template slot-scope="scope" style="width:300px">
-          <el-input ref="editInput" v-focus autofocus v-if="scope.row.isShowInput" v-model="scope.row.sendContent" placeholder="请输入发货文本" @blur="handleBlur('sendContent', scope.row)"/>
+          <!-- <el-input ref="editInput" v-focus autofocus v-if="scope.row.isShowInput" v-model="scope.row.sendContent" placeholder="请输入发货文本" @blur="handleBlur('sendContent', scope.row)"/> -->
           <!-- <el-input v-if="scope.row.isShowInput" v-model="scope.row.accountRemark" placeholder="请输入对账备注" @blur="handleBlur('accountRemark', scope.row)"/> -->
-          <div v-else>
+          <div>
             <div>创建人：{{scope.row.creator}}</div>
             <div>日期：{{scope.row.createTime}}</div>
             <div :class="scope.row.deleted===1?'commonDelete':''">工单编号：{{scope.row.orderNo}}</div>
