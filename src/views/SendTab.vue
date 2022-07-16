@@ -92,6 +92,9 @@ export default {
     handleNodeClick (data) {
       console.log(data)
     },
+    handleOptions () {
+      console.log(this.multipleSelection, 'handleOptions')
+    },
     checkboxT (row, rowIndex) {
       console.log(row, 'row====')
       // return row.id !== this.user.id
@@ -228,7 +231,7 @@ export default {
     </el-form>
     <el-row>
       <el-button type="primary">+创建</el-button>
-      <el-button type="primary">批量操作</el-button>
+      <el-button type="primary" @click="handleOptions">批量操作</el-button>
     </el-row>
     <el-pagination
       style="margin:auto;padding-bottom:20px;"

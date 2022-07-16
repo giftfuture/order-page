@@ -8,7 +8,15 @@ export default new Vuex.Store({
   state: {
     isCollapse: false,
     allStaf: [],
-    statusDictObj: {},
+    statusDictObj: {
+      'FH': [],
+      'KP': [],
+      'DH': [],
+      'DK': [],
+      'JH': [],
+      'JG': [],
+      'zh': []
+    },
     ticketStatusDictObj: [],
     sortMap: new Map()
   },
@@ -21,9 +29,11 @@ export default new Vuex.Store({
     },
     SET_SORT (state, data) {
       try {
-        state.statusDictObj[data.type] = data.data.statusDict ? JSON.parse(data.data.statusDict) : []
-        state.ticketStatusDictObj[data.type] = data.data.ticketStatusDict ? JSON.parse(data.data.ticketStatusDict) : []
-        state.sortMap.set(data.type, state.statusDictObj[data.type])
+        const type = data.type ? data.type : 'ZH'
+        state.statusDictObj[type] = data.data.statusDict ? JSON.parse(data.data.statusDict) : []
+        state.ticketStatusDictObj[type] = data.data.ticketStatusDict ? JSON.parse(data.data.ticketStatusDict) : []
+        state.sortMap.set(type, state.statusDictObj[type])
+        console.log(state.statusDictObj, state.statusDictObj[type], type, '9999')
       } catch (err) {
       }
     }

@@ -41,9 +41,9 @@ export default {
     }
   },
   methods: {
-    getStatusDict (keys) {
+    getStatusDict (keys, type) {
       const keyArr = keys.split(',')
-      const data = this.$store.state.statusDictObj.DK ? this.$store.state.statusDictObj.DK.filter(item => {
+      const data = this.$store.state[type].DK ? this.$store.state[type].DK.filter(item => {
         const key = String(item.key)
         if (keyArr.indexOf(key) > -1) return item
       }) : []
@@ -178,7 +178,7 @@ export default {
             filterable
           >
             <el-option
-              v-for="item in $store.state.statusDict"
+              v-for="item in this.$store.state.statusDictObj.DK"
               :key="item.key"
               :label="item.value"
               :value="item.key"
@@ -198,7 +198,7 @@ export default {
             filterable
           >
             <el-option
-              v-for="item in $store.state.ticketStatusDict"
+              v-for="item in this.$store.state.ticketStatusDictObj.DK"
               :key="item.key"
               :label="item.value"
               :value="item.key"
@@ -277,7 +277,7 @@ export default {
       /> -->
       <el-table-column label="状态" align="center" prop="status">
         <template slot-scope="scope">
-          <div v-for="item in getStatusDict(scope.row.status)" :key="item.key">
+          <div v-for="item in getStatusDict(scope.row.status, 'statusDictObj')" :key="item.key">
             <el-tag type="success" v-if="item.key===1" style="margin-top:5px">{{item.value}}</el-tag>
             <el-tag type="info" v-if="item.key===2" style="margin-top:5px">{{item.value}}</el-tag>
             <el-tag type="warning" v-if="item.key===3" style="margin-top:5px">{{item.value}}</el-tag>
