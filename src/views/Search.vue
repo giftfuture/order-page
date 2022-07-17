@@ -261,7 +261,7 @@ export default {
           id: data.form.id,
           status: data.form.status.join(',')
         }
-        data.form.ticketStatus.isShow && (params.ticketStatus = data.form.ticketStatus.join(','))
+        this.showEditInfo.ticketStatus.isShow && (params.ticketStatus = data.form.ticketStatus.join(','))
         const formModal = orderSort[this.currentType].editForm
         Object.keys(formModal).forEach(key => {
           if (formModal[key] && !params[key]) {
