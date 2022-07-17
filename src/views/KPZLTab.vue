@@ -1,5 +1,6 @@
 <script>
 import { querySearch } from '@/api/index.js'
+import dayjs from 'dayjs'
 
 export default {
   name: 'KpzlTab',
@@ -102,8 +103,9 @@ export default {
     search () {
       console.log(this.KPForm, 'this.KPForm')
       console.log(this.$refs.KPForm, 'formName====')
-      this.KPForm.createTimeBegin = this.createTime[0]
-      this.KPForm.createTimeEnd = this.createTime[1]
+      this.DHForm.createTimeBegin = dayjs(this.createTime[0]).format('YYYY-MM-DD HH:mm:ss')
+      this.DHForm.createTimeEnd = dayjs(this.createTime[1]).format('YYYY-MM-DD HH:mm:ss')
+      console.log(this.DHForm.createTimeBegin, 'this.DHForm.createTimeBegin')
       this.handleSearch()
     },
     handleOptions () {

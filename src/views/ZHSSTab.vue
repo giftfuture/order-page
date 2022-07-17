@@ -1,6 +1,7 @@
 <script>
 import { overallSearch, fetchAllSort } from '@/api/index.js'
 import { statusDict, ticketStatusDict } from '@/common/enum'
+import dayjs from 'dayjs'
 
 export default {
   name: 'ZHSSTab',
@@ -118,8 +119,9 @@ export default {
     search () {
       console.log(this.ZHSSForm, 'this.ZHSSForm')
       console.log(this.$refs.ZHSSForm, 'formName====')
-      this.ZHSSForm.createTimeBegin = this.createTime ? this.createTime[0] : ''
-      this.ZHSSForm.createTimeEnd = this.createTime ? this.createTime[1] : ''
+      this.DHForm.createTimeBegin = dayjs(this.createTime[0]).format('YYYY-MM-DD HH:mm:ss')
+      this.DHForm.createTimeEnd = dayjs(this.createTime[1]).format('YYYY-MM-DD HH:mm:ss')
+      console.log(this.DHForm.createTimeBegin, 'this.DHForm.createTimeBegin')
       this.handleSearch()
     },
     handleOptions () {

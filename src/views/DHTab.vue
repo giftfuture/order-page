@@ -1,5 +1,6 @@
 <script>
 import { querySearch } from '@/api/index.js'
+import dayjs from 'dayjs'
 
 export default {
   name: 'DHTab',
@@ -100,8 +101,9 @@ export default {
     search () {
       console.log(this.DHForm, 'this.DHForm')
       console.log(this.$refs.DHForm, 'formName====')
-      this.DHForm.createTimeBegin = this.createTime[0]
-      this.DHForm.createTimeEnd = this.createTime[1]
+      this.DHForm.createTimeBegin = dayjs(this.createTime[0]).format('YYYY-MM-DD HH:mm:ss')
+      this.DHForm.createTimeEnd = dayjs(this.createTime[1]).format('YYYY-MM-DD HH:mm:ss')
+      console.log(this.DHForm.createTimeBegin, 'this.DHForm.createTimeBegin')
       this.handleSearch()
     },
     handleOptions () {
@@ -166,12 +168,22 @@ export default {
             <el-date-picker
               style="width: 240px"
               v-model="createTime"
-              type="daterange"
+              type="datetimerange"
               range-separator="至"
               start-placeholder="开始日期"
               end-placeholder="结束日期">
             </el-date-picker>
           </el-form-item>
+          <!-- <el-form-item label="日期">
+            <el-date-picker
+              style="width: 240px"
+              v-model="createTime"
+              type="daterange"
+              range-separator="至"
+              start-placeholder="开始日期"
+              end-placeholder="结束日期">
+            </el-date-picker>
+          </el-form-item> -->
         </el-col>
         <el-col :span="colSpan4">
         <el-form-item label="状态" prop="statusStr">

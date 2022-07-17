@@ -1,5 +1,6 @@
 <script>
-import { querySearch, createOrder } from '@/api/index.js'
+import { querySearch } from '@/api/index.js'
+import dayjs from 'dayjs'
 
 export default {
   name: 'sendTab',
@@ -106,8 +107,9 @@ export default {
     search () {
       console.log(this.sendForm, 'this.sendForm')
       console.log(this.$refs.sendForm, 'formName====')
-      this.sendForm.createTimeBegin = this.createTime[0]
-      this.sendForm.createTimeEnd = this.createTime[1]
+      this.DHForm.createTimeBegin = dayjs(this.createTime[0]).format('YYYY-MM-DD HH:mm:ss')
+      this.DHForm.createTimeEnd = dayjs(this.createTime[1]).format('YYYY-MM-DD HH:mm:ss')
+      console.log(this.DHForm.createTimeBegin, 'this.DHForm.createTimeBegin')
       this.handleSearch()
     }
   },

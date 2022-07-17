@@ -1,6 +1,7 @@
 <script>
 import { querySearch } from '@/api/index.js'
 import { statusDict, ticketStatusDict } from '@/common/enum'
+import dayjs from 'dayjs'
 
 export default {
   name: 'JGTab',
@@ -111,8 +112,9 @@ export default {
     search () {
       console.log(this.JGForm, 'this.JGForm')
       console.log(this.$refs.JGForm, 'formName====')
-      this.JGForm.createTimeBegin = this.createTime[0]
-      this.JGForm.createTimeEnd = this.createTime[1]
+      this.DHForm.createTimeBegin = dayjs(this.createTime[0]).format('YYYY-MM-DD HH:mm:ss')
+      this.DHForm.createTimeEnd = dayjs(this.createTime[1]).format('YYYY-MM-DD HH:mm:ss')
+      console.log(this.DHForm.createTimeBegin, 'this.DHForm.createTimeBegin')
       this.handleSearch()
     },
     handleOptions () {
