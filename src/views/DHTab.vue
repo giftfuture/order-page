@@ -339,7 +339,7 @@ export default {
       label="操作"
       width="100">
       <template slot-scope="scope">
-        <div v-if="scope.row.deleted===0">
+        <div v-if="scope.row.deleted!==1">
           <el-button type="text" size="small" @click="$emit('handleAction',scope.row,'edit', handleSearch)">编辑</el-button>
           <el-button @click="$emit('handleAction',scope.row,'del', handleSearch)" type="text" size="small">删除</el-button>
         </div>

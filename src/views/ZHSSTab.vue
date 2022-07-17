@@ -206,7 +206,7 @@ export default {
         </el-form-item>
         </el-col>
         <el-col :span="colSpan4">
-        <!-- <el-form-item label="钱票状态" prop="ticketStatusStr">
+        <el-form-item label="钱票状态" prop="ticketStatusStr">
           <el-select
             style="width: 130px"
             v-model="ZHSSForm.ticketStatusStr"
@@ -222,7 +222,7 @@ export default {
               :value="item.key"
             >
             </el-option> </el-select
-        ></el-form-item> -->
+        ></el-form-item>
         </el-col>
         <el-col :span="colSpan2">
         <el-form-item
@@ -374,7 +374,7 @@ export default {
       label="操作"
       width="100">
         <template slot-scope="scope">
-          <div v-if="scope.row.deleted===0">
+          <div v-if="scope.row.deleted!==1">
             <el-button type="text" size="small" @click="$emit('handleAction',scope.row,'edit', handleSearch)">编辑</el-button>
             <el-button @click="$emit('handleAction',scope.row,'del', handleSearch)" type="text" size="small">删除</el-button>
           </div>

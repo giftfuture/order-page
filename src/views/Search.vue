@@ -243,7 +243,7 @@ export default {
           this.showEditInfo = {
             isShow: true,
             title: '编辑',
-            form: { ...data, status: data.status.split(',').map(item => parseInt(item)), ticketStatus: data.ticketStatus.split(',').map(item => parseInt(item)) },
+            form: { ...data, status: data.status?data.status.split(',').map(item => parseInt(item)):[], ticketStatus: data.ticketStatus ? data.ticketStatus.split(',').map(item => parseInt(item)) : [] },
             ...orderSort[this.currentType].editForm
           }
           console.log(this.showEditInfo.form, '====showEditInfo')
