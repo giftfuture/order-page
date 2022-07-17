@@ -1,9 +1,9 @@
 <script>
-import { overallSearch } from '@/api/send/index'
+import { overallSearch } from '@/api/index.js'
 import { statusDict, ticketStatusDict, orderSort } from '@/common/enum'
 
 export default {
-  name: 'sendTab',
+  name: 'ZHSSTab',
   components: {
   },
   data () {
@@ -21,7 +21,7 @@ export default {
         data: []
       },
       createTime: '',
-      sendForm: {
+      ZHSSForm: {
         createByStr: '',
         createTimeBegin: '',
         createTimeEnd: '',
@@ -62,11 +62,11 @@ export default {
     },
     handleSearch () {
       const orderInfoVO = { }
-      Object.keys(this.sendForm).forEach(key => {
-        if (Array.isArray(this.sendForm[key])) {
-          orderInfoVO[key] = this.sendForm[key].join(',')
+      Object.keys(this.ZHSSForm).forEach(key => {
+        if (Array.isArray(this.ZHSSForm[key])) {
+          orderInfoVO[key] = this.ZHSSForm[key].join(',')
         } else {
-          orderInfoVO[key] = this.sendForm[key]
+          orderInfoVO[key] = this.ZHSSForm[key]
         }
       })
       const params = {
@@ -109,10 +109,10 @@ export default {
       return row.id
     },
     search () {
-      console.log(this.sendForm, 'this.sendForm')
-      console.log(this.$refs.sendForm, 'formName====')
-      this.sendForm.createTimeBegin = this.createTime[0]
-      this.sendForm.createTimeEnd = this.createTime[1]
+      console.log(this.ZHSSForm, 'this.ZHSSForm')
+      console.log(this.$refs.ZHSSForm, 'formName====')
+      this.ZHSSForm.createTimeBegin = this.createTime[0]
+      this.ZHSSForm.createTimeEnd = this.createTime[1]
       this.handleSearch()
     },
     handleOptions () {
@@ -131,15 +131,15 @@ export default {
   <div class="commonBody">
     <el-form
       :inline="true"
-      :model="sendForm"
-      ref="sendForm"
+      :model="ZHSSForm"
+      ref="ZHSSForm"
       class="login-form"
     >
       <el-row>
         <el-col :span="colSpan4">
           <el-form-item label="创建人" prop="createByStr">
             <el-select
-              v-model="sendForm.createByStr"
+              v-model="ZHSSForm.createByStr"
               multiple
               placeholder="选择创建人"
               clearable
@@ -160,7 +160,7 @@ export default {
           <el-form-item label="搜索框" prop="searchContent">
             <el-input
               style="width: 140px"
-              v-model="sendForm.searchContent"
+              v-model="ZHSSForm.searchContent"
               @keyup.native.enter="search"
               autocomplete="off"
               placeholder="工单号、发货文本、备注"
@@ -188,7 +188,7 @@ export default {
         <el-form-item label="状态" prop="statusStr">
           <el-select
             style="width: 140px"
-            v-model="sendForm.statusStr"
+            v-model="ZHSSForm.statusStr"
             multiple
             placeholder="选择状态"
             clearable
@@ -208,7 +208,7 @@ export default {
         <!-- <el-form-item label="钱票状态" prop="ticketStatusStr">
           <el-select
             style="width: 130px"
-            v-model="sendForm.ticketStatusStr"
+            v-model="ZHSSForm.ticketStatusStr"
             multiple
             placeholder="选择钱票状态"
             clearable
@@ -272,22 +272,16 @@ export default {
           <div >
             <div>创建人：{{scope.row.creator}}</div>
             <div>日期：{{scope.row.createTime}}</div>
-            <div :class="scope.row.deleted===1?'commonDelete':''">工单编号：{{scope.row.orderNo}}</div>
+            <div>工单编号：<span :class="scope.row.deleted===1?'commonDelete':''">{{scope.row.orderNo}}</span></div>
             <div>对账备注：{{scope.row.accountRemark}}</div>
             <div>最后修改人：{{scope.row.updator}}</div>
             <div>最后修改时间：{{scope.row.updateTime}}</div>
         </div>
         </template>
       </el-table-column>
-      <el-table-column label="组别" align="center" prop="orderSortStr">
+      <el-table-column label="组别" align="center" prop="sortName">
         <template slot-scope="scope">
-          <div v-for="item in getOrderSort(scope.row.orderSortStr)" :key="item.key">
-            <el-tag type="success" v-if="item.key===1" style="margin-top:5px">{{item.value}}</el-tag>
-            <el-tag type="info" v-if="item.key===2" style="margin-top:5px">{{item.value}}</el-tag>
-            <el-tag type="warning" v-if="item.key===3" style="margin-top:5px">{{item.value}}</el-tag>
-            <el-tag type="danger" v-if="item.key===4" style="margin-top:5px">{{item.value}}</el-tag>
-            <el-tag v-if="item.key===5">{{item.value}}</el-tag>
-          </div>
+          <div>{{scope.row.sortName}}</div>
         </template>
       </el-table-column>
        <el-table-column
@@ -378,8 +372,13 @@ export default {
       label="操作"
       width="100">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="$emit('handleAction',scope.row,'edit', handleSearch)">编辑</el-button>
-          <el-button @click="$emit('handleAction',scope.row,'del', handleSearch)" type="text" size="small">删除</el-button>
+          <div v-if="scope.row.deleted===0">
+            <el-button type="text" size="small" @click="$emit('handleAction',scope.row,'edit', handleSearch)">编辑</el-button>
+            <el-button @click="$emit('handleAction',scope.row,'del', handleSearch)" type="text" size="small">删除</el-button>
+          </div>
+          <div v-if="scope.row.deleted===1">
+            <el-button type="text" size="small" @click="$emit('handleAction',scope.row,'edit', handleSearch)">生成新的</el-button>
+          </div>
         </template>
       </el-table-column>
     </el-table>

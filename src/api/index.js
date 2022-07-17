@@ -80,11 +80,10 @@ export function createOrder (data) {
   })
 }
 
-// 删除订单
-export function delOrder (data) {
+// 删除工单
+export function delOrder (id) {
   return request({
-    url: '/order/del',
-    method: 'delete',
-    data: { id: data }
+    url: '/order/del?id=' + id,
+    method: 'delete'
   })
 }

@@ -1,8 +1,8 @@
 <script>
-import { querySearch } from '@/api/send/index'
+import { querySearch } from '@/api/index.js'
 
 export default {
-  name: 'sendTab',
+  name: 'DkTab',
   components: {
   },
   data () {
@@ -18,7 +18,7 @@ export default {
         data: []
       },
       createTime: '',
-      sendForm: {
+      DKForm: {
         createByStr: '',
         createTimeBegin: '',
         createTimeEnd: '',
@@ -44,19 +44,19 @@ export default {
   methods: {
     getStatusDict (keys, type) {
       const keyArr = keys.split(',')
-      const data = this.$store.state[type].KP ? this.$store.state[type].KP.filter(item => {
+      const data = this.$store.state[type].DK ? this.$store.state[type].DK.filter(item => {
         const key = String(item.key)
         if (keyArr.indexOf(key) > -1) return item
       }) : []
       return data
     },
     handleSearch () {
-      const orderInfoVO = { 'orderTag': 'KP' }
-      Object.keys(this.sendForm).forEach(key => {
-        if (Array.isArray(this.sendForm[key])) {
-          orderInfoVO[key] = this.sendForm[key].join(',')
+      const orderInfoVO = { 'orderTag': 'DK' }
+      Object.keys(this.DKForm).forEach(key => {
+        if (Array.isArray(this.DKForm[key])) {
+          orderInfoVO[key] = this.DKForm[key].join(',')
         } else {
-          orderInfoVO[key] = this.sendForm[key]
+          orderInfoVO[key] = this.DKForm[key]
         }
       })
       const params = {
@@ -99,19 +99,20 @@ export default {
       return row.id
     },
     search () {
-      console.log(this.sendForm, 'this.sendForm')
-      console.log(this.$refs.sendForm, 'formName====')
-      this.sendForm.createTimeBegin = this.createTime[0]
-      this.sendForm.createTimeEnd = this.createTime[1]
+      console.log(this.DKForm, 'this.DKForm')
+      console.log(this.$refs.DKForm, 'formName====')
+      this.DKForm.createTimeBegin = this.createTime[0]
+      this.DKForm.createTimeEnd = this.createTime[1]
       this.handleSearch()
     },
     handleOptions () {
       this.$emit('handleOptions', { multipleSelection: this.multipleSelection, callBack: this.handleSearch })
     },
     handleAdd () {
-      this.$emit('handleAdd', 'FH', this.handleSearch)
+      this.$emit('handleAdd', 'DK', this.handleSearch)
     }
   },
+
   created () {
     this.handleSearch()
   }
@@ -121,15 +122,15 @@ export default {
   <div class="commonBody">
     <el-form
       :inline="true"
-      :model="sendForm"
-      ref="sendForm"
+      :model="DKForm"
+      ref="DKForm"
       class="login-form"
     >
       <el-row>
         <el-col :span="colSpan4">
           <el-form-item label="创建人" prop="createByStr">
             <el-select
-              v-model="sendForm.createByStr"
+              v-model="DKForm.createByStr"
               multiple
               placeholder="选择创建人"
               clearable
@@ -150,7 +151,7 @@ export default {
           <el-form-item label="搜索框" prop="searchContent">
             <el-input
               style="width: 140px"
-              v-model="sendForm.searchContent"
+              v-model="DKForm.searchContent"
               @keyup.native.enter="search"
               autocomplete="off"
               placeholder="工单号、发货文本、备注"
@@ -178,14 +179,14 @@ export default {
         <el-form-item label="状态" prop="statusStr">
           <el-select
             style="width: 140px"
-            v-model="sendForm.statusStr"
+            v-model="DKForm.statusStr"
             multiple
             placeholder="选择状态"
             clearable
             filterable
           >
             <el-option
-              v-for="item in this.$store.state.statusDictObj.KP"
+              v-for="item in this.$store.state.statusDictObj.DK"
               :key="item.key"
               :label="item.value"
               :value="item.key"
@@ -193,6 +194,8 @@ export default {
             </el-option>
           </el-select>
         </el-form-item>
+        </el-col>
+        <el-col :span="colSpan4">
         </el-col>
         <el-col :span="colSpan2">
         <el-form-item
@@ -211,7 +214,7 @@ export default {
       </el-row>
     </el-form>
     <el-row>
-      <el-button type="primary" @click="handleAdd">+创建</el-button>
+      <el-button type="primary" @click="handleAdd">创建</el-button>
       <el-button type="primary" @click="handleOptions">批量操作</el-button>
     </el-row>
     <el-pagination
@@ -243,23 +246,13 @@ export default {
           <div >
             <div>创建人：{{scope.row.creator}}</div>
             <div>日期：{{scope.row.createTime}}</div>
-            <div :class="scope.row.deleted===1?'commonDelete':''">工单编号：{{scope.row.orderNo}}</div>
+            <div>工单编号：<span :class="scope.row.deleted===1?'commonDelete':''">{{scope.row.orderNo}}</span></div>
             <div>对账备注：{{scope.row.accountRemark}}</div>
             <div>最后修改人：{{scope.row.updator}}</div>
             <div>最后修改时间：{{scope.row.updateTime}}</div>
         </div>
         </template>
       </el-table-column>
-      <!-- <el-table-column
-        :show-overflow-tooltip="true"
-        prop="orderNo"
-        label="工单号"
-      /> -->
-      <!-- <el-table-column
-        :show-overflow-tooltip="true"
-        prop="createBy"
-        label="创建人"
-      /> -->
       <el-table-column label="状态" align="center" prop="status">
         <template slot-scope="scope">
           <div v-for="item in getStatusDict(scope.row.status, 'statusDictObj')" :key="item.key">
@@ -271,38 +264,44 @@ export default {
           </div>
         </template>
       </el-table-column>
-       <el-table-column
+      <el-table-column
         :show-overflow-tooltip="true"
         prop="content"
-        label="开票和资料"
+        label="打款"
       >
       <template slot-scope="scope">
         <div :class="scope.row.deleted===1?'commonDelete':''">{{scope.row.sendContent}}</div>
       </template>
       </el-table-column>
-      <!-- <el-table-column
-        :show-overflow-tooltip="true"
-        prop="createTime"
-        label="日期"
-      /> -->
       <el-table-column
         :show-overflow-tooltip="true"
         prop="inAmount"
         label="输入金额"
+      />
+       <el-table-column
+        :show-overflow-tooltip="true"
+        prop="pics"
+        label="附件"
       />
       <el-table-column
       fixed="right"
       label="操作"
       width="100">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="$emit('handleAction',scope.row,'edit', handleSearch)">编辑</el-button>
-          <el-button @click="$emit('handleAction',scope.row,'del', handleSearch)" type="text" size="small">删除</el-button>
+          <div v-if="scope.row.deleted===0">
+            <el-button type="text" size="small" @click="$emit('handleAction',scope.row,'edit', handleSearch)">编辑</el-button>
+            <el-button @click="$emit('handleAction',scope.row,'del', handleSearch)" type="text" size="small">删除</el-button>
+          </div>
+          <div v-if="scope.row.deleted===1">
+            <el-button type="text" size="small" @click="$emit('handleAction',scope.row,'edit', handleSearch)">生成新的</el-button>
+          </div>
         </template>
       </el-table-column>
     </el-table>
   </div>
 </template>
 <style>
+
 .el-tabs {
       height: 100%;
     display: flex;

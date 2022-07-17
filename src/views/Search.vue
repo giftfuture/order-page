@@ -28,17 +28,17 @@
 </template>
 
 <script>
-import KpzlTab from '@/views/KpzlTab.vue'
+import KpzlTab from '@/views/KPZLTab.vue'
 import DHTab from '@/views/DHTab.vue'
 import SendTab from '@/views/SendTab.vue'
-import DkTab from '@/views/DkTab.vue'
+import DkTab from '@/views/DKTab.vue'
 import JHTab from '@/views/JHTab.vue'
 import JGTab from '@/views/JGTab.vue'
 import ZHSSTab from '@/views/ZHSSTab.vue'
 import { mapActions } from 'vuex'
 import EditDialog from '@/components/EditDialog'
 import EditInfosDialog from '@/components/EditInfosDialog'
-import { editListOrder, editOrder, delOrder, createOrder } from '@/api/send'
+import { editListOrder, editOrder, delOrder, createOrder } from '@/api/index.js'
 import { orderSort } from '@/common/enum'
 
 export default {
@@ -71,7 +71,7 @@ export default {
         type: 'FH'
       }, {
         label: '开票与资料组',
-        name: 'KpzlTab',
+        name: 'KPZLTab',
         type: 'KP'
       }, {
         label: '订货组',
@@ -79,7 +79,7 @@ export default {
         type: 'DH'
       }, {
         label: '打款组',
-        name: 'DkTab',
+        name: 'DKTab',
         type: 'DK'
 
       }, {
@@ -111,7 +111,9 @@ export default {
   },
   watch: {
     currentType (val) {
-      this.handleLoadBySort(val)
+      if (val !== 'ZH') {
+        this.handleLoadBySort(val)
+      }
     }
   },
   created () {
@@ -195,7 +197,7 @@ export default {
         console.log(res, 'createOrder')
         if (res.code === 0) {
           this.$message({
-            message: '新建成功',
+            message: '工单创建成功！',
             type: 'success'
           })
           this.addForm.callBack && this.addForm.callBack()
@@ -222,7 +224,7 @@ export default {
       console.log(data, actionType, '====data, actionType')
       switch (actionType) {
         case 'del':
-          this.$confirm('确认删除该订单吗？')
+          this.$confirm('确认删除该工单吗？')
             .then(_ => {
               delOrder(data.id).then(res => {
                 if (res.code === 0) {

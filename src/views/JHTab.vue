@@ -1,9 +1,9 @@
 <script>
-import { jhjgSearch } from '@/api/send/index'
+import { jhjgSearch } from '@/api/index.js'
 import { statusDict, ticketStatusDict } from '@/common/enum'
 
 export default {
-  name: 'sendTab',
+  name: 'JHTab',
   components: {
   },
   data () {
@@ -21,7 +21,7 @@ export default {
         data: []
       },
       createTime: '',
-      sendForm: {
+      JHForm: {
         createByStr: '',
         createTimeBegin: '',
         createTimeEnd: '',
@@ -55,11 +55,11 @@ export default {
     },
     handleSearch () {
       const orderInfoVO = { 'orderTag': 'JH' }
-      Object.keys(this.sendForm).forEach(key => {
-        if (Array.isArray(this.sendForm[key])) {
-          orderInfoVO[key] = this.sendForm[key].join(',')
+      Object.keys(this.JHForm).forEach(key => {
+        if (Array.isArray(this.JHForm[key])) {
+          orderInfoVO[key] = this.JHForm[key].join(',')
         } else {
-          orderInfoVO[key] = this.sendForm[key]
+          orderInfoVO[key] = this.JHForm[key]
         }
       })
       const params = {
@@ -102,17 +102,17 @@ export default {
       return row.id
     },
     search () {
-      console.log(this.sendForm, 'this.sendForm')
-      console.log(this.$refs.sendForm, 'formName====')
-      this.sendForm.createTimeBegin = this.createTime[0]
-      this.sendForm.createTimeEnd = this.createTime[1]
+      console.log(this.JHForm, 'this.JHForm')
+      console.log(this.$refs.JHForm, 'formName====')
+      this.JHForm.createTimeBegin = this.createTime[0]
+      this.JHForm.createTimeEnd = this.createTime[1]
       this.handleSearch()
     },
     handleOptions () {
       this.$emit('handleOptions', { multipleSelection: this.multipleSelection, callBack: this.handleSearch })
     },
     handleAdd () {
-      this.$emit('handleAdd', 'FH', this.handleSearch)
+      this.$emit('handleAdd', 'JH', this.handleSearch)
     }
   },
   created () {
@@ -124,15 +124,15 @@ export default {
   <div class="commonBody">
     <el-form
       :inline="true"
-      :model="sendForm"
-      ref="sendForm"
+      :model="JHForm"
+      ref="JHForm"
       class="login-form"
     >
       <el-row>
         <el-col :span="colSpan4">
           <el-form-item label="创建人" prop="createByStr">
             <el-select
-              v-model="sendForm.createByStr"
+              v-model="JHForm.createByStr"
               multiple
               placeholder="选择创建人"
               clearable
@@ -153,7 +153,7 @@ export default {
           <el-form-item label="搜索框" prop="searchContent">
             <el-input
               style="width: 140px"
-              v-model="sendForm.searchContent"
+              v-model="JHForm.searchContent"
               @keyup.native.enter="search"
               autocomplete="off"
               placeholder="工单号、发货文本、备注"
@@ -181,7 +181,7 @@ export default {
         <el-form-item label="状态" prop="statusStr">
           <el-select
             style="width: 140px"
-            v-model="sendForm.statusStr"
+            v-model="JHForm.statusStr"
             multiple
             placeholder="选择状态"
             clearable
@@ -201,7 +201,7 @@ export default {
         <!-- <el-form-item label="钱票状态" prop="ticketStatusStr">
           <el-select
             style="width: 130px"
-            v-model="sendForm.ticketStatusStr"
+            v-model="JHForm.ticketStatusStr"
             multiple
             placeholder="选择钱票状态"
             clearable
@@ -268,7 +268,7 @@ export default {
           <div >
             <div>创建人：{{scope.row.creator}}</div>
             <div>日期：{{scope.row.createTime}}</div>
-            <div :class="scope.row.deleted===1?'commonDelete':''">工单编号：{{scope.row.orderNo}}</div>
+            <div>工单编号：<span :class="scope.row.deleted===1?'commonDelete':''">{{scope.row.orderNo}}</span></div>
             <div>对账备注：{{scope.row.accountRemark}}</div>
             <div>最后修改人：{{scope.row.updator}}</div>
             <div>最后修改时间：{{scope.row.updateTime}}</div>
@@ -315,8 +315,13 @@ export default {
       label="操作"
       width="100">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="$emit('handleAction',scope.row,'edit', handleSearch)">编辑</el-button>
-          <el-button @click="$emit('handleAction',scope.row,'del', handleSearch)" type="text" size="small">删除</el-button>
+          <div v-if="scope.row.deleted===0">
+            <el-button type="text" size="small" @click="$emit('handleAction',scope.row,'edit', handleSearch)">编辑</el-button>
+            <el-button @click="$emit('handleAction',scope.row,'del', handleSearch)" type="text" size="small">删除</el-button>
+          </div>
+          <div v-if="scope.row.deleted===1">
+            <el-button type="text" size="small" @click="$emit('handleAction',scope.row,'edit', handleSearch)">生成新的</el-button>
+          </div>
         </template>
       </el-table-column>
     </el-table>
