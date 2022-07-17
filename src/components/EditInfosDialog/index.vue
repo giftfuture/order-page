@@ -88,7 +88,7 @@
               :on-remove="handleRemove">
               <i class="el-icon-plus"></i>
             </el-upload>
-          ></el-form-item>
+        </el-form-item>
       </el-row>
       <el-row v-if="showEditInfo.remark && showEditInfo.remark.isShow">
         <el-form-item label="备注" prop="remark">
