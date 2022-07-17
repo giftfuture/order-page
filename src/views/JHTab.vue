@@ -46,6 +46,7 @@ export default {
   },
   methods: {
     getStatusDict (keys, type, orderSort) {
+      if (!keys && typeof keys !== 'string') return []
       const keyArr = keys.split(',')
       const data = this.$store.state[type][orderSort] ? this.$store.state[type][orderSort].filter(item => {
         const key = String(item.key)
