@@ -11,7 +11,7 @@
         <JGTab v-if="item.type==='JG'" @handleOptions="handleOptions" @handleAction="handleAction" @handleAdd="handleAdd" />
       </el-tab-pane>
     </el-tabs>
-    <div class="addInput" v-if="addForm.isShow">
+    <div class="addInput">
       <el-row>
         <el-col :span=18>
           <el-input ref="addInput" v-focus autofocus v-if="addInput" v-model="addForm.content" placeholder="请输入文本" />
@@ -51,7 +51,7 @@ export default {
       addInput: true,
       addForm: {
         isShow: false,
-        addType: '',
+        addType: 'SendTab',
         content: '',
         callBack: null
       },
@@ -116,9 +116,13 @@ export default {
   },
   watch: {
     currentType (val) {
-      if (val !== 'ZH') {
-        this.handleLoadBySort(val)
+      this.addForm.addType = val
+      if (val === 'ZH') {
+        this.handleLoadBySort('DH')
+        this.handleLoadBySort('FH')
+        return
       }
+      this.handleLoadBySort(val)
     }
   },
   created () {
@@ -252,7 +256,7 @@ export default {
           this.showEditInfo = {
             isShow: true,
             title: '编辑',
-            form: { ...data, status: data.status?data.status.split(',').map(item => parseInt(item)):[], ticketStatus: data.ticketStatus ? data.ticketStatus.split(',').map(item => parseInt(item)) : [] },
+            form: { ...data, status: data.status ? data.status.split(',').map(item => parseInt(item)) : [], ticketStatus: data.ticketStatus ? data.ticketStatus.split(',').map(item => parseInt(item)) : [] },
             ...orderSort[this.currentType].editForm
           }
           console.log(this.showEditInfo.form, '====showEditInfo')

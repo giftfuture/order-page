@@ -1,6 +1,6 @@
 <script>
-import { overallSearch } from '@/api/index.js'
-import { statusDict, ticketStatusDict, orderSort } from '@/common/enum'
+import { overallSearch, fetchAllSort } from '@/api/index.js'
+import { statusDict, ticketStatusDict } from '@/common/enum'
 
 export default {
   name: 'ZHSSTab',
@@ -8,6 +8,7 @@ export default {
   },
   data () {
     return {
+      orderSortSelect: [],
       colSpan4: 4,
       colSpan2: 2,
       colSpan6: 6,
@@ -25,9 +26,14 @@ export default {
         createByStr: '',
         createTimeBegin: '',
         createTimeEnd: '',
+        dingRemark: '',
+        dingStatus: '',
+        dingTicketStatus: '',
         searchContent: '',
-        statusStr: '',
-        ticketStatusStr: ''
+        sendRemark: '',
+        sendStatus: '',
+        sendTicketStatus: '',
+        sortName: ''
       },
       loading: false,
       showMsg: false,
@@ -45,13 +51,13 @@ export default {
     }
   },
   methods: {
-    getOrderSort (keys) {
-      const keyArr = keys ? keys.split(',') : []
-      const data = keyArr.map(key => {
-        return orderSort[key]
-      })
-      return data
-    },
+    // getOrderSort (keys) {
+    //   const keyArr = keys ? keys.split(',') : []
+    //   const data = keyArr.map(key => {
+    //     return orderSort[key]
+    //   })
+    //   return data
+    // },
     getStatusDict (keys, type, orderSort) {
       if (!keys && typeof keys !== 'string') return []
       const keyArr = keys.split(',')
@@ -112,8 +118,8 @@ export default {
     search () {
       console.log(this.ZHSSForm, 'this.ZHSSForm')
       console.log(this.$refs.ZHSSForm, 'formName====')
-      this.ZHSSForm.createTimeBegin = this.createTime[0]
-      this.ZHSSForm.createTimeEnd = this.createTime[1]
+      this.ZHSSForm.createTimeBegin = this.createTime ? this.createTime[0] : ''
+      this.ZHSSForm.createTimeEnd = this.createTime ? this.createTime[1] : ''
       this.handleSearch()
     },
     handleOptions () {
@@ -125,6 +131,11 @@ export default {
   },
   created () {
     this.handleSearch()
+    fetchAllSort().then(res => {
+      if (res.code === 0) {
+        this.orderSortSelect = res.data
+      }
+    })
   }
 }
 </script>
@@ -137,7 +148,7 @@ export default {
       class="login-form"
     >
       <el-row>
-        <el-col :span="colSpan4">
+        <el-col :span="colSpan6">
           <el-form-item label="创建人" prop="createByStr">
             <el-select
               v-model="ZHSSForm.createByStr"
@@ -145,7 +156,6 @@ export default {
               placeholder="选择创建人"
               clearable
               filterable
-              style="width: 140px"
             >
               <el-option
                 v-for="item in $store.state.allStaf"
@@ -157,10 +167,9 @@ export default {
             </el-select>
           </el-form-item>
         </el-col>
-        <el-col :span="colSpan4">
+        <el-col :span="colSpan6">
           <el-form-item label="搜索框" prop="searchContent">
             <el-input
-              style="width: 140px"
               v-model="ZHSSForm.searchContent"
               @keyup.native.enter="search"
               autocomplete="off"
@@ -185,62 +194,7 @@ export default {
             </el-date-picker>
           </el-form-item>
         </el-col>
-        <el-col :span="colSpan4">
-        <el-form-item label="状态" prop="statusStr">
-          <el-select
-            style="width: 140px"
-            v-model="ZHSSForm.statusStr"
-            multiple
-            placeholder="选择状态"
-            clearable
-            filterable
-          >
-            <el-option
-              v-for="item in this.$store.state.statusDictObj.ZH"
-              :key="item.key"
-              :label="item.value"
-              :value="item.key"
-            >
-            </el-option>
-          </el-select>
-        </el-form-item>
-        </el-col>
-        <el-col :span="colSpan4">
-        <el-form-item label="钱票状态" prop="ticketStatusStr">
-          <el-select
-            style="width: 130px"
-            v-model="ZHSSForm.ticketStatusStr"
-            multiple
-            placeholder="选择钱票状态"
-            clearable
-            filterable
-          >
-            <el-option
-              v-for="item in this.$store.state.ticketStatusDictObj.ZH"
-              :key="item.key"
-              :label="item.value"
-              :value="item.key"
-            >
-            </el-option> </el-select
-        ></el-form-item>
-        </el-col>
-        <el-col :span="colSpan2">
-        <el-form-item
-         label=" "
-          style="width: 400px;text-aline:right;"
-        >
-          <el-button
-            type="primary"
-            @click="search"
-            class="login-btn"
-            v-loading="loading"
-            >搜索</el-button
-          >
-        </el-form-item>
-        </el-col>
-      </el-row>
-      <el-row>
-        <el-col :span="colSpan4">
+        <el-col :span="colSpan6">
           <el-form-item label="组别" prop="sortName">
             <el-select
               v-model="ZHSSForm.sortName"
@@ -248,58 +202,30 @@ export default {
               placeholder="选择组别"
               clearable
               filterable
-              style="width: 140px"
             >
               <el-option
-                v-for="item in $store.state.allStaf"
+                v-for="item in orderSortSelect"
                 :key="item.id"
-                :label="item.staffName"
+                :label="item.sortName"
                 :value="item.id"
               >
               </el-option>
             </el-select>
           </el-form-item>
         </el-col>
-        <el-col :span="colSpan4">
-          <el-form-item label="搜索框" prop="searchContent">
-            <el-input
-              style="width: 140px"
-              v-model="ZHSSForm.searchContent"
-              @keyup.native.enter="search"
-              autocomplete="off"
-              placeholder="工单号、文本、备注"
-              prefix-icon="el-icon-goods"
-            >
-              <i
-                slot="suffix"
-                class="el-input__icon el-icon-view btn-eye"
-              ></i> </el-input
-          ></el-form-item>
-        </el-col>
+      </el-row>
+      <el-row>
         <el-col :span="colSpan6">
-          <el-form-item label="日期">
-            <el-date-picker
-              style="width: 240px"
-              v-model="createTime"
-              type="daterange"
-              range-separator="至"
-              start-placeholder="开始日期"
-              end-placeholder="结束日期">
-            </el-date-picker>
-          </el-form-item>
-        </el-col>
-        <el-col :span="colSpan4">
-        <el-form-item label="状态" prop="statusStr">
+        <el-form-item label="发货组状态" prop="sendStatus">
           <el-select
-            style="width: 140px"
-            v-model="ZHSSForm.statusStr"
+            v-model="ZHSSForm.sendStatus"
             multiple
-            placeholder="选择状态"
+            placeholder="选择发货组状态"
             clearable
             filterable
           >
             <el-option
-              v-for="item in this.$store.state.statusDictObj.ZH"
+              v-for="item in this.$store.state.statusDictObj.FH"
               :key="item.key"
               :label="item.value"
               :value="item.key"
@@ -308,24 +234,84 @@ export default {
           </el-select>
         </el-form-item>
         </el-col>
-        <el-col :span="colSpan4">
-        <el-form-item label="钱票状态" prop="ticketStatusStr">
+        <el-col :span="colSpan6">
+        <el-form-item label="发货组钱票状态" prop="sendTicketStatus">
           <el-select
-            style="width: 130px"
-            v-model="ZHSSForm.ticketStatusStr"
+            v-model="ZHSSForm.sendTicketStatus"
             multiple
-            placeholder="选择钱票状态"
+            placeholder="选择发货钱票状态"
             clearable
             filterable
           >
             <el-option
-              v-for="item in this.$store.state.ticketStatusDictObj.ZH"
+              v-for="item in this.$store.state.ticketStatusDictObj.FH"
               :key="item.key"
               :label="item.value"
               :value="item.key"
             >
             </el-option> </el-select
         ></el-form-item>
+        </el-col>
+        <el-col :span="colSpan6">
+        <el-form-item label="订货组状态" prop="dingStatus">
+          <el-select
+            v-model="ZHSSForm.dingStatus"
+            multiple
+            placeholder="选择订货组状态"
+            clearable
+            filterable
+          >
+            <el-option
+              v-for="item in this.$store.state.statusDictObj.DH"
+              :key="item.key"
+              :label="item.value"
+              :value="item.key"
+            >
+            </el-option>
+          </el-select>
+        </el-form-item>
+        </el-col>
+        <el-col :span="colSpan6">
+        <el-form-item label="订货组钱票状态" prop="dingTicketStatus">
+          <el-select
+            v-model="ZHSSForm.dingTicketStatus"
+            multiple
+            placeholder="选择订货组钱票状态"
+            clearable
+            filterable
+          >
+            <el-option
+              v-for="item in this.$store.state.ticketStatusDictObj.DH"
+              :key="item.key"
+              :label="item.value"
+              :value="item.key"
+            >
+            </el-option> </el-select
+        ></el-form-item>
+        </el-col>
+      </el-row>
+      <el-row>
+        <el-col :span="colSpan6">
+          <el-form-item label="发货组备注" prop="sendRemark">
+            <el-input
+              v-model="ZHSSForm.sendRemark"
+              @keyup.native.enter="search"
+              autocomplete="off"
+              placeholder="发货组备注"
+            >
+              </el-input
+          ></el-form-item>
+        </el-col>
+        <el-col :span="colSpan6">
+          <el-form-item label="定货组备注" prop="dingRemark">
+            <el-input
+              v-model="ZHSSForm.dingRemark"
+              @keyup.native.enter="search"
+              autocomplete="off"
+              placeholder="定货组备注"
+            >
+              </el-input
+          ></el-form-item>
         </el-col>
         <el-col :span="colSpan2">
         <el-form-item
@@ -344,7 +330,7 @@ export default {
       </el-row>
     </el-form>
     <el-row>
-      <el-button type="primary" @click="handleAdd">+创建</el-button>
+      <!-- <el-button type="primary" @click="handleAdd">+创建</el-button> -->
       <el-button type="primary" @click="handleOptions">批量操作</el-button>
     </el-row>
     <el-pagination

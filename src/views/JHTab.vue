@@ -237,7 +237,7 @@ export default {
       </el-row>
     </el-form>
     <el-row>
-      <el-button type="primary" @click="handleAdd">+创建</el-button>
+      <!-- <el-button type="primary" @click="handleAdd">+创建</el-button> -->
       <el-button type="primary" @click="handleOptions">批量操作</el-button>
     </el-row>
     <el-pagination

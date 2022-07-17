@@ -69,3 +69,11 @@ export function delOrder (id) {
     method: 'delete'
   })
 }
+
+// 工单分类
+export function fetchAllSort () {
+  return request({
+    url: '/sort/fetchAll',
+    method: 'get'
+  })
+}

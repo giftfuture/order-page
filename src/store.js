@@ -50,7 +50,6 @@ export default new Vuex.Store({
     // 获取订单、发票资料状态类型
     async handleLoadBySort ({ commit, dispatch, state }, params) {
       if (state.sortMap.has(params)) return
-
       loadBySort(params === 'ZH' ? '' : params).then(res => {
         console.log(res, 'res handleLoadBySort')
         if (res.code === 0) {
