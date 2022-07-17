@@ -372,11 +372,11 @@ export default {
           <div >{{scope.row.accountRemark}}</div>
         </template>
       </el-table-column>
-      <el-table-column
+      <!-- <el-table-column
         :show-overflow-tooltip="true"
         prop="pics"
         label="图片"
-      />
+      /> -->
       <el-table-column
       fixed="right"
       label="操作"

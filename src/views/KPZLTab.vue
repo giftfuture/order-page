@@ -305,13 +305,17 @@ export default {
         prop="accountRemark"
         label="对账备注"
       >
-        <el-table-column
-          :show-overflow-tooltip="true"
-          prop="pics"
-          label="图片"
-        />
         <template slot-scope="scope">
           <div >{{scope.row.accountRemark}}</div>
+        </template>
+      </el-table-column>
+      <el-table-column
+        :show-overflow-tooltip="true"
+        prop="pics"
+        label="图片"
+      >
+        <template slot-scope="scope" v-if="scope.row.imgList&&scope.row.imgList.length">
+          <el-button type="text" size="small" @click="$emit('handleAction',scope.row.imgList, 'previewImage')">查看</el-button>
         </template>
       </el-table-column>
       <el-table-column

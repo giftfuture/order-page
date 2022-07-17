@@ -239,6 +239,109 @@ export default {
         </el-form-item>
         </el-col>
       </el-row>
+      <el-row>
+        <el-col :span="colSpan4">
+          <el-form-item label="组别" prop="sortName">
+            <el-select
+              v-model="ZHSSForm.sortName"
+              multiple
+              placeholder="选择组别"
+              clearable
+              filterable
+              style="width: 140px"
+            >
+              <el-option
+                v-for="item in $store.state.allStaf"
+                :key="item.id"
+                :label="item.staffName"
+                :value="item.id"
+              >
+              </el-option>
+            </el-select>
+          </el-form-item>
+        </el-col>
+        <el-col :span="colSpan4">
+          <el-form-item label="搜索框" prop="searchContent">
+            <el-input
+              style="width: 140px"
+              v-model="ZHSSForm.searchContent"
+              @keyup.native.enter="search"
+              autocomplete="off"
+              placeholder="工单号、文本、备注"
+              prefix-icon="el-icon-goods"
+            >
+              <i
+                slot="suffix"
+                class="el-input__icon el-icon-view btn-eye"
+              ></i> </el-input
+          ></el-form-item>
+        </el-col>
+        <el-col :span="colSpan6">
+          <el-form-item label="日期">
+            <el-date-picker
+              style="width: 240px"
+              v-model="createTime"
+              type="daterange"
+              range-separator="至"
+              start-placeholder="开始日期"
+              end-placeholder="结束日期">
+            </el-date-picker>
+          </el-form-item>
+        </el-col>
+        <el-col :span="colSpan4">
+        <el-form-item label="状态" prop="statusStr">
+          <el-select
+            style="width: 140px"
+            v-model="ZHSSForm.statusStr"
+            multiple
+            placeholder="选择状态"
+            clearable
+            filterable
+          >
+            <el-option
+              v-for="item in this.$store.state.statusDictObj.ZH"
+              :key="item.key"
+              :label="item.value"
+              :value="item.key"
+            >
+            </el-option>
+          </el-select>
+        </el-form-item>
+        </el-col>
+        <el-col :span="colSpan4">
+        <el-form-item label="钱票状态" prop="ticketStatusStr">
+          <el-select
+            style="width: 130px"
+            v-model="ZHSSForm.ticketStatusStr"
+            multiple
+            placeholder="选择钱票状态"
+            clearable
+            filterable
+          >
+            <el-option
+              v-for="item in this.$store.state.ticketStatusDictObj.ZH"
+              :key="item.key"
+              :label="item.value"
+              :value="item.key"
+            >
+            </el-option> </el-select
+        ></el-form-item>
+        </el-col>
+        <el-col :span="colSpan2">
+        <el-form-item
+         label=" "
+          style="width: 400px;text-aline:right;"
+        >
+          <el-button
+            type="primary"
+            @click="search"
+            class="login-btn"
+            v-loading="loading"
+            >搜索</el-button
+          >
+        </el-form-item>
+        </el-col>
+      </el-row>
     </el-form>
     <el-row>
       <el-button type="primary" @click="handleAdd">+创建</el-button>

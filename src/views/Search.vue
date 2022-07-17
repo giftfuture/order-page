@@ -24,6 +24,7 @@
     </div>
     <EditDialog :showTypeObj="showTypeObj" :tabType="currentType" @handleClose="handleClose"  />
     <EditInfosDialog :showEditInfo="showEditInfo" :tabType="currentType" @handleEdit="handleEdit"  />
+    <PreviewImage :imgViewerVisible="imgViewerVisible" :imgList="imgList"/>
   </div>
 </template>
 
@@ -40,10 +41,13 @@ import EditDialog from '@/components/EditDialog'
 import EditInfosDialog from '@/components/EditInfosDialog'
 import { editListOrder, editOrder, delOrder, createOrder } from '@/api/index.js'
 import { orderSort } from '@/common/enum'
+import PreviewImage from '@/components/previewImage'
 
 export default {
   data () {
     return {
+      imgViewerVisible: false,
+      imgList: [],
       addInput: true,
       addForm: {
         isShow: false,
@@ -99,6 +103,7 @@ export default {
     }
   },
   components: {
+    PreviewImage,
     EditDialog,
     EditInfosDialog,
     KpzlTab,
@@ -223,6 +228,10 @@ export default {
     handleAction (data, actionType, callBack) {
       console.log(data, actionType, '====data, actionType')
       switch (actionType) {
+        case 'previewImage':
+          this.imgViewerVisible = true
+          this.imgList = data || []
+          break
         case 'del':
           this.$confirm('确认删除该工单吗？')
             .then(_ => {
