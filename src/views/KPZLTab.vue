@@ -277,7 +277,7 @@ export default {
         label="开票和资料"
       >
       <template slot-scope="scope">
-        <div :class="scope.row.deleted===1?'commonDelete':''">{{scope.row.sendContent}}</div>
+        <div :class="scope.row.deleted===1?'commonDelete':''">{{scope.row.content}}</div>
       </template>
       </el-table-column>
       <!-- <el-table-column
@@ -290,6 +290,29 @@ export default {
         prop="inAmount"
         label="输入金额"
       />
+      <el-table-column
+        :show-overflow-tooltip="true"
+        prop="remark"
+        label="备注"
+      >
+        <template slot-scope="scope">
+          <div >{{scope.row.remark}}</div>
+        </template>
+      </el-table-column>
+      <el-table-column
+        :show-overflow-tooltip="true"
+        prop="accountRemark"
+        label="对账备注"
+      >
+        <el-table-column
+          :show-overflow-tooltip="true"
+          prop="pics"
+          label="图片"
+        />
+        <template slot-scope="scope">
+          <div >{{scope.row.accountRemark}}</div>
+        </template>
+      </el-table-column>
       <el-table-column
       fixed="right"
       label="操作"

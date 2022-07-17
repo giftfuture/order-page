@@ -240,7 +240,7 @@ export default {
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
       :current-page="tableData.currentPage"
-      :page-sizes="[10, 20, 30, 40]"
+      :page-sizes="[10, 20, 30, 40,50]"
       :page-size="10"
       layout="total, sizes, prev, pager, next, jumper"
       :total="tableData.total">
@@ -354,6 +354,29 @@ export default {
           <div >{{scope.row.inAmout}}</div>
         </template>
       </el-table-column>
+      <el-table-column
+        :show-overflow-tooltip="true"
+        prop="remark"
+        label="备注"
+      >
+        <template slot-scope="scope">
+          <div >{{scope.row.remark}}</div>
+        </template>
+      </el-table-column>
+      <el-table-column
+        :show-overflow-tooltip="true"
+        prop="accountRemark"
+        label="对账备注"
+      >
+        <template slot-scope="scope">
+          <div >{{scope.row.accountRemark}}</div>
+        </template>
+      </el-table-column>
+      <el-table-column
+        :show-overflow-tooltip="true"
+        prop="pics"
+        label="图片"
+      />
       <el-table-column
       fixed="right"
       label="操作"

@@ -290,7 +290,8 @@ export default {
         label="文本"
       >
       <template slot-scope="scope">
-        <div :class="scope.row.deleted===1?'commonDelete':''">{{scope.row.sendContent}}</div>
+        <div :class="scope.row.deleted===1 && scope.row.orderTag=='FH'?'commonDelete':''">{{scope.row.sendContent}}</div>
+        <div :class="scope.row.deleted===1 && scope.row.orderTag !=='FH'?'commonDelete':''">{{scope.row.content}}</div>
       </template>
       </el-table-column>
       <el-table-column

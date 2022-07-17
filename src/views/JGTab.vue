@@ -1,5 +1,5 @@
 <script>
-import { jhjgSearch } from '@/api/index.js'
+import { querySearch } from '@/api/index.js'
 import { statusDict, ticketStatusDict } from '@/common/enum'
 
 export default {
@@ -74,7 +74,7 @@ export default {
         orderInfoVO,
         'pageRequest': { 'page': this.pageNo, 'size': this.pageSize }
       }
-      jhjgSearch(params)
+      querySearch(params)
         .then((response) => {
           console.log(response, '====')
           if (response.code === 0) {
@@ -278,13 +278,31 @@ export default {
         label="价格"
       >
       <template slot-scope="scope">
-        <div :class="scope.row.deleted===1?'commonDelete':''">{{scope.row.sendContent}}</div>
+        <div :class="scope.row.deleted===1?'commonDelete':''">{{scope.row.content}}</div>
       </template>
       </el-table-column>
       <el-table-column
         :show-overflow-tooltip="true"
+        prop="remark"
+        label="备注"
+      >
+        <template slot-scope="scope">
+          <div >{{scope.row.remark}}</div>
+        </template>
+      </el-table-column>
+      <el-table-column
+        :show-overflow-tooltip="true"
+        prop="accountRemark"
+        label="对账备注"
+      >
+        <template slot-scope="scope">
+          <div >{{scope.row.accountRemark}}</div>
+        </template>
+      </el-table-column>
+      <el-table-column
+        :show-overflow-tooltip="true"
         prop="pics"
-        label="附件"
+        label="图片"
       />
       <el-table-column
       fixed="right"
