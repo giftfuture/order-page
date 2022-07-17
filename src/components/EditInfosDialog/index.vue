@@ -15,7 +15,7 @@
       <el-row v-if="showEditInfo.content && showEditInfo.content.isShow">
         <el-form-item :label="showEditInfo.content.label" :prop="showEditInfo.content.key">
             <el-input
-              v-model="showEditInfo.form.sendContent"
+              v-model="showEditInfo.form[showEditInfo.content.key]"
               autocomplete="off"
               :placeholder="showEditInfo.content.placeholder"
             ></el-input

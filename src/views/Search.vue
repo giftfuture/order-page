@@ -252,7 +252,7 @@ export default {
     },
     // 单个编辑
     handleEdit (data) {
-      console.log(data, this.options, 'handleEdit')
+      console.log(data, this.options, this.showEditInfo, 'handleEdit')
       if (data.actionType === 0) {
         this.showEditInfo.isShow = false
       } else {
@@ -263,8 +263,9 @@ export default {
         }
         this.showEditInfo.ticketStatus.isShow && (params.ticketStatus = data.form.ticketStatus.join(','))
         const formModal = orderSort[this.currentType].editForm
+        console.log(formModal, this.showEditInfo, 'this.showEditInfo====')
         Object.keys(formModal).forEach(key => {
-          if (formModal[key] && !params[key]) {
+          if (formModal[key] && formModal[key].isShow && !params[key]) {
             if (key === 'inAmount') {
               console.log('inAmount')
               params[formModal[key].key] = parseFloat(data.form[formModal[key].key])
