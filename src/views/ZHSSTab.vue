@@ -10,9 +10,12 @@ export default {
   data () {
     return {
       orderSortSelect: [],
-      colSpan4: 4,
-      colSpan2: 2,
+      colSpan7: 7,
       colSpan6: 6,
+      colSpan5: 5,
+      colSpan4: 4,
+      colSpan3: 3,
+      colSpan2: 2,
       statusDictSelect: Object.keys(statusDict).map(key => statusDict[key]),
       ticketStatusDictSelect: Object.keys(ticketStatusDict).map(key => ticketStatusDict[key]),
       pageNo: 0,
@@ -111,17 +114,17 @@ export default {
       console.log(data)
     },
     checkboxT (row, rowIndex) {
-      console.log(row, 'row====')
+      // console.log(row, 'row====')
       // return row.id !== this.user.id
       // checkboxList()
       return row.id
     },
     search () {
-      console.log(this.ZHSSForm, 'this.ZHSSForm')
-      console.log(this.$refs.ZHSSForm, 'formName====')
-      this.DHForm.createTimeBegin = dayjs(this.createTime[0]).format('YYYY-MM-DD HH:mm:ss')
-      this.DHForm.createTimeEnd = dayjs(this.createTime[1]).format('YYYY-MM-DD HH:mm:ss')
-      console.log(this.DHForm.createTimeBegin, 'this.DHForm.createTimeBegin')
+      // console.log(this.ZHSSForm, 'this.ZHSSForm')
+      // console.log(this.$refs.ZHSSForm, 'formName====')
+      this.ZHSSForm.createTimeBegin = this.createTime[0] ? dayjs(this.createTime[0]).format('YYYY-MM-DD HH:mm:ss') : ''
+      this.ZHSSForm.createTimeEnd = this.createTime[1] ? dayjs(this.createTime[1]).format('YYYY-MM-DD HH:mm:ss') : ''
+      // console.log(this.ZHSSForm.createTimeBegin, 'this.ZHSSForm.createTimeBegin')
       this.handleSearch()
     },
     handleOptions () {
@@ -129,13 +132,41 @@ export default {
     },
     handleAdd () {
       this.$emit('handleAdd', 'FH', this.handleSearch)
+    },
+    defaultCheckStatus () {
+      // 发货组状态默认全选
+      this.ZHSSForm.sendStatus = []
+      this.$store.state.statusDictObj.FH.map((item) => {
+        this.ZHSSForm.sendStatus.push(item.key)
+      })
+      // 发货组钱票状态默认全选
+      this.ZHSSForm.sendTicketStatus = []
+      this.$store.state.ticketStatusDictObj.FH.map((item) => {
+        this.ZHSSForm.sendTicketStatus.push(item.key)
+      })
+      // 订货组钱票状态默认全选
+      this.ZHSSForm.dingStatus = []
+      this.$store.state.statusDictObj.DH.map((item) => {
+        this.ZHSSForm.dingStatus.push(item.key)
+      })
+      // 订货组钱票状态默认全选
+      this.ZHSSForm.dingTicketStatus = []
+      this.$store.state.ticketStatusDictObj.DH.map((item) => {
+        this.ZHSSForm.dingTicketStatus.push(item.key)
+      })
     }
+
   },
   created () {
     this.handleSearch()
+    this.defaultCheckStatus()
     fetchAllSort().then(res => {
       if (res.code === 0) {
         this.orderSortSelect = res.data
+        this.ZHSSForm.orderTag = []
+        this.orderSortSelect.map((item) => {
+          this.ZHSSForm.orderTag.push(item.sortTag)
+        })
       }
     })
   }
@@ -150,14 +181,15 @@ export default {
       class="login-form"
     >
       <el-row>
-        <el-col :span="colSpan6">
+        <el-col :span="colSpan3">
           <el-form-item label="创建人" prop="createByStr">
             <el-select
               v-model="ZHSSForm.createByStr"
               multiple
-              placeholder="选择创建人"
+              placeholder="创建人"
               clearable
               filterable
+              style="width: 90px"
             >
               <el-option
                 v-for="item in $store.state.allStaf"
@@ -169,92 +201,122 @@ export default {
             </el-select>
           </el-form-item>
         </el-col>
-        <el-col :span="colSpan6">
+        <el-col :span="colSpan7">
           <el-form-item label="搜索框" prop="searchContent">
             <el-input
               v-model="ZHSSForm.searchContent"
               @keyup.native.enter="search"
               autocomplete="off"
-              placeholder="工单号、发货文本、备注"
+              placeholder="工单号、文本、金额、备注、对账备注"
               prefix-icon="el-icon-goods"
-            >
+              style="width: 300px">
               <i
                 slot="suffix"
                 class="el-input__icon el-icon-view btn-eye"
               ></i> </el-input
           ></el-form-item>
         </el-col>
-        <el-col :span="colSpan6">
+        <el-col :span="colSpan5">
           <el-form-item label="日期">
             <el-date-picker
-              style="width: 240px"
+              style="width: 225px"
               v-model="createTime"
               type="daterange"
+              format="yyyy-MM-dd HH:mm:ss"
+              :default-time="['00:00:00', '23:59:59']"
               range-separator="至"
               start-placeholder="开始日期"
               end-placeholder="结束日期">
             </el-date-picker>
           </el-form-item>
         </el-col>
-        <el-col :span="colSpan6">
-          <el-form-item label="组别" prop="sortName">
+        <el-col :span="colSpan4">
+          <el-form-item label="订货组备注" prop="dingRemark">
+            <el-input
+              v-model="ZHSSForm.dingRemark"
+              @keyup.native.enter="search"
+              autocomplete="off"
+              placeholder="订货组备注"
+              style="width: 120px"
+            >
+            </el-input
+            ></el-form-item>
+        </el-col>
+        <el-col :span="colSpan4">
+          <el-form-item label="发货组备注" prop="sendRemark">
+            <el-input
+              v-model="ZHSSForm.sendRemark"
+              @keyup.native.enter="search"
+              autocomplete="off"
+              style="width: 120px"
+              placeholder="发货组备注">
+            </el-input>
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <el-row>
+        <el-col :span="colSpan3">
+          <el-form-item label="组别" prop="orderTag">
             <el-select
-              v-model="ZHSSForm.sortName"
+              v-model="ZHSSForm.orderTag"
               multiple
               placeholder="选择组别"
               clearable
               filterable
+              size="small"
+              value-key="sortTag"
+              style="width: 110px"
             >
               <el-option
                 v-for="item in orderSortSelect"
-                :key="item.id"
+                :key="item.sortTag"
                 :label="item.sortName"
-                :value="item.id"
+                :value="item.sortTag"
               >
               </el-option>
             </el-select>
           </el-form-item>
         </el-col>
-      </el-row>
-      <el-row>
-        <el-col :span="colSpan6">
-        <el-form-item label="发货组状态" prop="sendStatus">
-          <el-select
-            v-model="ZHSSForm.sendStatus"
-            multiple
-            placeholder="选择发货组状态"
-            clearable
-            filterable
-          >
-            <el-option
-              v-for="item in this.$store.state.statusDictObj.FH"
-              :key="item.key"
-              :label="item.value"
-              :value="item.key"
+        <el-col :span="colSpan4">
+          <el-form-item label="发货组状态" prop="sendStatus">
+            <el-select
+              v-model="ZHSSForm.sendStatus"
+              multiple
+              size="small"
+              placeholder="发货组状态"
+              clearable
+              filterable
+              style="width:135px"
             >
-            </el-option>
-          </el-select>
-        </el-form-item>
+              <el-option
+                v-for="item in this.$store.state.statusDictObj.FH"
+                :key="item.key"
+                :label="item.value"
+                :value="item.key"
+              >
+              </el-option>
+            </el-select>
+          </el-form-item>
         </el-col>
-        <el-col :span="colSpan6">
+        <el-col :span="colSpan4">
         <el-form-item label="发货组钱票状态" prop="sendTicketStatus">
           <el-select
             v-model="ZHSSForm.sendTicketStatus"
             multiple
             placeholder="选择发货钱票状态"
             clearable
+            size="small"
             filterable
-          >
+            style="width:180px">
             <el-option
               v-for="item in this.$store.state.ticketStatusDictObj.FH"
               :key="item.key"
               :label="item.value"
-              :value="item.key"
-            >
-            </el-option> </el-select
-        ></el-form-item>
+              :value="item.key">
+            </el-option> </el-select></el-form-item>
         </el-col>
-        <el-col :span="colSpan6">
+
+        <el-col :span="colSpan4">
         <el-form-item label="订货组状态" prop="dingStatus">
           <el-select
             v-model="ZHSSForm.dingStatus"
@@ -262,90 +324,61 @@ export default {
             placeholder="选择订货组状态"
             clearable
             filterable
-          >
+            size="small"
+            style="width:180px;" class="selsectbox">
             <el-option
               v-for="item in this.$store.state.statusDictObj.DH"
               :key="item.key"
               :label="item.value"
-              :value="item.key"
-            >
+              :value="item.key">
             </el-option>
           </el-select>
         </el-form-item>
         </el-col>
-        <el-col :span="colSpan6">
+        <el-col :span="colSpan4">
         <el-form-item label="订货组钱票状态" prop="dingTicketStatus">
           <el-select
             v-model="ZHSSForm.dingTicketStatus"
             multiple
+            size="small"
             placeholder="选择订货组钱票状态"
             clearable
             filterable
-          >
+            style="width:180px">
             <el-option
               v-for="item in this.$store.state.ticketStatusDictObj.DH"
               :key="item.key"
               :label="item.value"
-              :value="item.key"
-            >
-            </el-option> </el-select
-        ></el-form-item>
+              :value="item.key">
+            </el-option> </el-select></el-form-item>
         </el-col>
-      </el-row>
-      <el-row>
-        <el-col :span="colSpan6">
-          <el-form-item label="发货组备注" prop="sendRemark">
-            <el-input
-              v-model="ZHSSForm.sendRemark"
-              @keyup.native.enter="search"
-              autocomplete="off"
-              placeholder="发货组备注"
-            >
-              </el-input
-          ></el-form-item>
-        </el-col>
-        <el-col :span="colSpan6">
-          <el-form-item label="定货组备注" prop="dingRemark">
-            <el-input
-              v-model="ZHSSForm.dingRemark"
-              @keyup.native.enter="search"
-              autocomplete="off"
-              placeholder="定货组备注"
-            >
-              </el-input
-          ></el-form-item>
-        </el-col>
-        <el-col :span="colSpan2">
+
+        <el-col :span="colSpan2" style="position:relative; bottom:-35px;float:bottom;">
         <el-form-item
-         label=" "
-          style="width: 400px;text-aline:right;"
-        >
+         label=" ">
           <el-button
             type="primary"
             @click="search"
             class="login-btn"
             v-loading="loading"
-            >搜索</el-button
+          >搜索</el-button
           >
         </el-form-item>
         </el-col>
       </el-row>
     </el-form>
-    <el-row>
-      <!-- <el-button type="primary" @click="handleAdd">+创建</el-button> -->
-      <el-button type="primary" @click="handleOptions">批量操作</el-button>
-    </el-row>
+    <el-row><el-col :span=6 ><el-button type="primary" @click="handleOptions">批量操作</el-button></el-col><el-col :span=18 >
     <el-pagination
       style="margin:auto;padding-bottom:20px;"
       v-if='tableData.total'
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
       :current-page="tableData.currentPage"
-      :page-sizes="[10, 20, 30, 40]"
+      :page-sizes="[5,10, 20, 30, 40,50]"
       :page-size="10"
       layout="total, sizes, prev, pager, next, jumper"
       :total="tableData.total">
-    </el-pagination>
+    </el-pagination></el-col></el-row>
     <el-table
       height="150"
       ref="table"
@@ -461,6 +494,11 @@ export default {
         label="订货组备注"
       />
       <el-table-column
+        :show-overflow-tooltip="true"
+        prop="pics"
+        label="图片"
+      />
+      <el-table-column
       fixed="right"
       label="操作"
       width="100">
@@ -501,23 +539,16 @@ export default {
     font-weight: 600px;
   }
 }
+
+/*/deep/   .el-select-dropdown__wrap .el-scrollbar__wrap{
+  height:1200px;
+  border-radius: 5px;
+}*/
+/*/deep/ .selsectbox .el-input--small input::-webkit-input-placeholder {
+  font-size: 20px;
+  font-weight: 550;
+}*/
 .statusDict1 {
   color: red;
 }
-// .commonBody{
-//   :global {
-//     .el-tabs {
-//       height: 100%;
-//     display: flex;
-//     flex-direction: column;
-//     }
-//     .el-tab-pane {
-//       height: 100%;
-//     }
-//     .el-tabs__content {
-//       flex: 1;
-//     }
-//   }
-// }
-
 </style>

@@ -1,4 +1,4 @@
-// 状态（发货状态）
+// 发货组状态
 export const statusDict = {
   1: { key: 1, value: '已打单', className: 'statusDict1' },
   2: { key: 2, value: '待发', className: 'statusDict2' },
@@ -7,14 +7,21 @@ export const statusDict = {
   5: { key: 5, value: '已调', className: 'statusDict5' },
   6: { key: 6, value: '重新打速递单', className: 'statusDict6' }
 }
-// 发票和资料状态
+// 发货组钱票状态
 export const ticketStatusDict = {
   1: { key: 1, value: '欠款' },
   2: { key: 2, value: '欠票' },
   3: { key: 3, value: '只收了部分' },
   4: { key: 4, value: '只开了部分' }
 }
-
+export const sortList = [
+  'FH',
+  'KP',
+  'DH',
+  'DK',
+  'JH',
+  'JG'
+]
 export const orderSort = {
   'FH': {
     key: 'Fh',
@@ -49,6 +56,13 @@ export const orderSort = {
         label: '发票和资料状态',
         key: 'ticketStatus',
         require: true
+      },
+      pics: {
+        isShow: true,
+        label: '图片',
+        key: 'pics',
+        require: false,
+        placeholder: '请输入图片'
       }
     }
   },
@@ -73,6 +87,13 @@ export const orderSort = {
         label: '发票和资料状态',
         key: 'ticketStatus',
         require: true
+      },
+      pics: {
+        isShow: true,
+        label: '图片',
+        key: 'pics',
+        require: false,
+        placeholder: '请输入图片'
       }
     }
   },
@@ -82,7 +103,7 @@ export const orderSort = {
     editForm: {
       content: {
         isShow: true,
-        label: '定货',
+        label: '订货',
         key: 'content',
         placeholder: '请输入定货文本',
         require: true
@@ -115,6 +136,13 @@ export const orderSort = {
         label: '发票和资料状态',
         key: 'ticketStatus',
         require: true
+      },
+      pics: {
+        isShow: true,
+        label: '图片',
+        key: 'pics',
+        require: false,
+        placeholder: '请输入图片'
       }
     }
   },
@@ -148,10 +176,10 @@ export const orderSort = {
       },
       pics: {
         isShow: true,
-        label: '截图',
+        label: '图片',
         key: 'pics',
         require: false,
-        placeholder: '请输入截图'
+        placeholder: '请输入图片'
       }
     }
   },
@@ -179,10 +207,10 @@ export const orderSort = {
       },
       pics: {
         isShow: true,
-        label: '附件',
+        label: '图片',
         key: 'pics',
         require: false,
-        placeholder: '请输入附件'
+        placeholder: '请输入图片'
       }
     }
   },
@@ -207,6 +235,13 @@ export const orderSort = {
         isShow: true,
         label: '状态',
         key: 'status'
+      },
+      pics: {
+        isShow: true,
+        label: '图片',
+        key: 'pics',
+        require: false,
+        placeholder: '请输入图片'
       }
     }
   },

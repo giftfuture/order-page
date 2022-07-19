@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import { queryAllStaf, loadBySort } from '@/api'
+import { queryAllStaf, loadBySort } from '@/api/index.js'
 
 Vue.use(Vuex)
 

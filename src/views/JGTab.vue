@@ -106,15 +106,15 @@ export default {
       console.log(data)
     },
     checkboxT (row, rowIndex) {
-      console.log(row, 'row====')
+      // console.log(row, 'row====')
       return row.id
     },
     search () {
-      console.log(this.JGForm, 'this.JGForm')
-      console.log(this.$refs.JGForm, 'formName====')
-      this.DHForm.createTimeBegin = dayjs(this.createTime[0]).format('YYYY-MM-DD HH:mm:ss')
-      this.DHForm.createTimeEnd = dayjs(this.createTime[1]).format('YYYY-MM-DD HH:mm:ss')
-      console.log(this.DHForm.createTimeBegin, 'this.DHForm.createTimeBegin')
+      // console.log(this.JGForm, 'this.JGForm')
+      // console.log(this.$refs.JGForm, 'formName====')
+      this.JGForm.createTimeBegin = this.createTime[0] ? dayjs(this.createTime[0]).format('YYYY-MM-DD HH:mm:ss') : ''
+      this.JGForm.createTimeEnd = this.createTime[1] ? dayjs(this.createTime[1]).format('YYYY-MM-DD HH:mm:ss') : ''
+      // console.log(this.JGForm.createTimeBegin, 'this.JGForm.createTimeBegin')
       this.handleSearch()
     },
     handleOptions () {
@@ -143,7 +143,7 @@ export default {
             <el-select
               v-model="JGForm.createByStr"
               multiple
-              placeholder="选择创建人"
+              placeholder="创建人"
               clearable
               filterable
               style="width: 140px"
@@ -158,14 +158,14 @@ export default {
             </el-select>
           </el-form-item>
         </el-col>
-        <el-col :span="colSpan4">
+        <el-col :span="colSpan6">
           <el-form-item label="搜索框" prop="searchContent">
             <el-input
-              style="width: 140px"
+              style="width: 260px"
               v-model="JGForm.searchContent"
               @keyup.native.enter="search"
               autocomplete="off"
-              placeholder="工单号、发货文本、备注"
+              placeholder="工单号、价格文本、备注"
               prefix-icon="el-icon-goods"
             >
               <i
@@ -179,6 +179,8 @@ export default {
             <el-date-picker
               style="width: 240px"
               v-model="createTime"
+              format="yyyy-MM-dd HH:mm:ss"
+              :default-time="['00:00:00', '23:59:59']"
               type="daterange"
               range-separator="至"
               start-placeholder="开始日期"
@@ -224,21 +226,18 @@ export default {
         </el-col>
       </el-row>
     </el-form>
-    <el-row>
-      <!-- <el-button type="primary" @click="handleAdd">+创建</el-button> -->
-      <el-button type="primary" @click="handleOptions">批量操作</el-button>
-    </el-row>
+    <el-row><el-col :span=6 ><el-button type="primary" @click="handleOptions">批量操作</el-button></el-col><el-col :span=18 >
     <el-pagination
       style="margin:auto;padding-bottom:20px;"
       v-if='tableData.total'
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
       :current-page="tableData.currentPage"
-      :page-sizes="[10, 20, 30, 40]"
+      :page-sizes="[5,10, 20, 30, 40,50]"
       :page-size="10"
       layout="total, sizes, prev, pager, next, jumper"
       :total="tableData.total">
-    </el-pagination>
+    </el-pagination></el-col></el-row>
     <el-table
       height="150"
       ref="table"

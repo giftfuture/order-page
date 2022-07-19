@@ -1,6 +1,6 @@
 <template>
   <div  class="mpm-container" style="position: relative; width: 100%;height: 100%;overflow:hidden; -webkit-overflow-scrolling:touch;">
-    <el-tabs v-model="currentView" @tab-click="handleClick" style="padding-bottom: 40px;">
+    <el-tabs v-model="currentView" @tab-click="handleClick" style="padding-bottom: 10px;">
       <el-tab-pane v-for="item in views" :label="item.label" :name="item.name" :key="item.name">
         <KpzlTab v-if="item.type==='KP'" @handleOptions="handleOptions" @handleAction="handleAction" @handleAdd="handleAdd" />
         <DHTab v-if="item.type==='DH'" @handleOptions="handleOptions" @handleAction="handleAction" @handleAdd="handleAdd" />
@@ -13,12 +13,12 @@
     </el-tabs>
     <div class="addInput">
       <el-row>
-        <el-col :span=18>
-          <el-input ref="addInput" v-focus autofocus v-if="addInput" v-model="addForm.content" placeholder="请输入文本" />
+        <el-col :span=21>
+          <el-input ref="addInput" type="textarea" :rows="4"  v-focus autofocus v-if="addInput" v-model="addForm.content" placeholder="请输入工单文本" />
         </el-col>
-        <el-col :span=6>
-          <el-button type="primary" style="margin-left: 15px;" @click="handleAddSure">保存</el-button>
-          <el-button  style="margin-left: 15px;" @click="cancleAdd">取消</el-button>
+        <el-col :span=2>
+          <el-button type="primary" style="margin-left: 15px;margin-bottom: 15px" @click="handleAddSure">保存</el-button><br/>
+          <el-button type="primary"  style="margin-left: 15px;" @click="cancleAdd">取消</el-button>
         </el-col>
       </el-row>
     </div>
@@ -40,7 +40,7 @@ import { mapActions } from 'vuex'
 import EditDialog from '@/components/EditDialog'
 import EditInfosDialog from '@/components/EditInfosDialog'
 import { editListOrder, editOrder, delOrder, createOrder } from '@/api/index.js'
-import { orderSort } from '@/common/enum'
+import { orderSort, sortList } from '@/common/enum'
 import PreviewImage from '@/components/previewImage'
 
 export default {
@@ -144,7 +144,7 @@ export default {
       console.log(data, 'handleOptions')
       if (!data || !data.multipleSelection.length) {
         this.$message({
-          message: '请先选择',
+          message: '请先选择工单',
           type: 'warning'
         })
         return
@@ -194,7 +194,7 @@ export default {
     },
     // 创建方法
     handleAddSure () {
-      console.log('handleAddSure')
+      // console.log('handleAddSure')
       const params = {}
       if (this.addForm.addType === 'FH') {
         params.sendContent = this.addForm.content
@@ -202,6 +202,14 @@ export default {
         params.content = this.addForm.content
       }
       params.orderTag = this.addForm.addType
+      if (sortList.indexOf(this.addForm.addType) <= -1) {
+        console.log(this.addForm.addType)
+        this.$message({
+          message: '综合搜索无法创建工单！',
+          type: 'fail'
+        })
+        return
+      }
       createOrder(params).then(res => {
         console.log(res, 'createOrder')
         if (res.code === 0) {
@@ -318,10 +326,15 @@ export default {
   display: inline-block;
   width: auto;
   height: 100%;
-  padding: 0 10px;
+  padding: 0 0px;
   flex: none;
   //background: transparent;
   background-color: #f2f4f5;
   overflow: hidden;
+  text-align: center;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: 12px;
+  font-family:"Microsoft YaHei",Arial,Helvetica,sans-serif,"宋体";
 }
 </style>

@@ -6,7 +6,9 @@ export default {
   name: 'DHTab',
   data () {
     return {
+      colSpan5: 5,
       colSpan4: 4,
+      colSpan3: 3,
       colSpan2: 2,
       colSpan6: 6,
       pageNo: 0,
@@ -93,17 +95,17 @@ export default {
       console.log(data)
     },
     checkboxT (row, rowIndex) {
-      console.log(row, 'row====')
+      // console.log(row, 'row====')
       // return row.id !== this.user.id
       // checkboxList()
       return row.id
     },
     search () {
-      console.log(this.DHForm, 'this.DHForm')
-      console.log(this.$refs.DHForm, 'formName====')
-      this.DHForm.createTimeBegin = dayjs(this.createTime[0]).format('YYYY-MM-DD HH:mm:ss')
-      this.DHForm.createTimeEnd = dayjs(this.createTime[1]).format('YYYY-MM-DD HH:mm:ss')
-      console.log(this.DHForm.createTimeBegin, 'this.DHForm.createTimeBegin')
+      // console.log(this.DHForm, 'this.DHForm')
+      // console.log(this.$refs.DHForm, 'formName====')
+      this.DHForm.createTimeBegin = this.createTime[0] ? dayjs(this.createTime[0]).format('YYYY-MM-DD HH:mm:ss') : ''
+      this.DHForm.createTimeEnd = this.createTime[1] ? dayjs(this.createTime[1]).format('YYYY-MM-DD HH:mm:ss') : ''
+      // console.log(this.DHForm.createTimeBegin, 'this.DHForm.createTimeBegin')
       this.handleSearch()
     },
     handleOptions () {
@@ -127,15 +129,15 @@ export default {
       class="login-form"
     >
       <el-row>
-        <el-col :span="colSpan4">
+        <el-col :span="colSpan3">
           <el-form-item label="创建人" prop="createByStr">
             <el-select
               v-model="DHForm.createByStr"
               multiple
-              placeholder="选择创建人"
+              placeholder="创建人"
               clearable
               filterable
-              style="width: 140px"
+              style="width: 90px"
             >
               <el-option
                 v-for="item in $store.state.allStaf"
@@ -147,60 +149,49 @@ export default {
             </el-select>
           </el-form-item>
         </el-col>
-        <el-col :span="colSpan4">
+        <el-col :span="colSpan6">
           <el-form-item label="搜索框" prop="searchContent">
             <el-input
-              style="width: 140px"
+              style="width: 270px"
               v-model="DHForm.searchContent"
               @keyup.native.enter="search"
               autocomplete="off"
-              placeholder="工单号、发货文本、备注"
-              prefix-icon="el-icon-goods"
-            >
+              placeholder="工单、文本、金额、到货、备注、对账备注"
+              prefix-icon="el-icon-goods">
               <i
                 slot="suffix"
                 class="el-input__icon el-icon-view btn-eye"
               ></i> </el-input
           ></el-form-item>
         </el-col>
-        <el-col :span="colSpan6">
+        <el-col :span="colSpan5">
           <el-form-item label="日期">
             <el-date-picker
-              style="width: 240px"
+              style="width: 220px"
               v-model="createTime"
               type="datetimerange"
+              format="yyyy-MM-dd HH:mm:ss"
+              :default-time="['00:00:00', '23:59:59']"
               range-separator="至"
               start-placeholder="开始日期"
               end-placeholder="结束日期">
             </el-date-picker>
           </el-form-item>
-          <!-- <el-form-item label="日期">
-            <el-date-picker
-              style="width: 240px"
-              v-model="createTime"
-              type="daterange"
-              range-separator="至"
-              start-placeholder="开始日期"
-              end-placeholder="结束日期">
-            </el-date-picker>
-          </el-form-item> -->
         </el-col>
-        <el-col :span="colSpan4">
+        <el-col :span="colSpan3">
         <el-form-item label="状态" prop="statusStr">
           <el-select
-            style="width: 140px"
+            style="width: 80px"
             v-model="DHForm.statusStr"
             multiple
-            placeholder="选择状态"
+            placeholder="状态"
             clearable
-            filterable
-          >
+            filterable>
             <el-option
               v-for="item in this.$store.state.statusDictObj.DH"
               :key="item.key"
               :label="item.value"
-              :value="item.key"
-            >
+              :value="item.key" >
             </el-option>
           </el-select>
         </el-form-item>
@@ -208,10 +199,10 @@ export default {
         <el-col :span="colSpan4">
         <el-form-item label="钱票状态" prop="ticketStatusStr">
           <el-select
-            style="width: 130px"
+            style="width: 120px"
             v-model="DHForm.ticketStatusStr"
             multiple
-            placeholder="选择钱票状态"
+            placeholder="钱票状态"
             clearable
             filterable
           >
@@ -240,21 +231,18 @@ export default {
         </el-col>
       </el-row>
     </el-form>
-    <el-row>
-      <el-button type="primary" @click="handleAdd">创建</el-button>
-      <el-button type="primary" @click="handleOptions">批量操作</el-button>
-    </el-row>
+    <el-row><el-col :span=6 ><el-button type="primary" @click="handleOptions">批量操作</el-button></el-col><el-col :span=18 >
     <el-pagination
       style="margin:auto;padding-bottom:20px;"
       v-if='tableData.total'
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
       :current-page="tableData.currentPage"
-      :page-sizes="[10, 20, 30, 40]"
+      :page-sizes="[5,10, 20, 30, 40,50]"
       :page-size="10"
       layout="total, sizes, prev, pager, next, jumper"
       :total="tableData.total">
-    </el-pagination>
+    </el-pagination></el-col></el-row>
     <el-table
       height="150"
       ref="table"

@@ -9,9 +9,12 @@ export default {
   data () {
     return {
       multipleSelection: [],
+      colSpan5: 5,
       colSpan4: 4,
+      colSpan3: 3,
       colSpan2: 2,
       colSpan6: 6,
+      colSpan7: 7,
       pageNo: 0,
       pageSize: 10,
       tableData: {
@@ -99,17 +102,17 @@ export default {
       this.$emit('handleOptions', { multipleSelection: this.multipleSelection, callBack: this.handleSearch })
     },
     checkboxT (row, rowIndex) {
-      console.log(row, 'row====')
+      // console.log(row, 'row====')
       // return row.id !== this.user.id
       // checkboxList()
       return row.id
     },
     search () {
-      console.log(this.sendForm, 'this.sendForm')
-      console.log(this.$refs.sendForm, 'formName====')
-      this.DHForm.createTimeBegin = dayjs(this.createTime[0]).format('YYYY-MM-DD HH:mm:ss')
-      this.DHForm.createTimeEnd = dayjs(this.createTime[1]).format('YYYY-MM-DD HH:mm:ss')
-      console.log(this.DHForm.createTimeBegin, 'this.DHForm.createTimeBegin')
+      // console.log(this.sendForm, 'this.sendForm')
+      // console.log(this.$refs.sendForm, 'formName====')
+      this.sendForm.createTimeBegin = this.createTime[0] ? dayjs(this.createTime[0]).format('YYYY-MM-DD HH:mm:ss') : ''
+      this.sendForm.createTimeEnd = this.createTime[1] ? dayjs(this.createTime[1]).format('YYYY-MM-DD HH:mm:ss') : ''
+      // console.log(this.sendForm.createTimeBegin, 'this.sendForm.createTimeBegin')
       this.handleSearch()
     }
   },
@@ -126,15 +129,15 @@ export default {
       ref="sendForm"
     >
       <el-row>
-        <el-col :span="colSpan4">
+        <el-col :span="colSpan3">
           <el-form-item label="创建人" prop="createByStr">
             <el-select
               v-model="sendForm.createByStr"
               multiple
-              placeholder="选择创建人"
+              placeholder="创建人"
               clearable
               filterable
-              style="width: 140px"
+              style="width: 100px"
             >
               <el-option
                 v-for="item in $store.state.allStaf"
@@ -146,14 +149,14 @@ export default {
             </el-select>
           </el-form-item>
         </el-col>
-        <el-col :span="colSpan4">
+        <el-col :span="colSpan7">
           <el-form-item label="搜索框" prop="searchContent">
             <el-input
-              style="width: 140px"
+              style="width: 300px"
               v-model="sendForm.searchContent"
               @keyup.native.enter="search"
               autocomplete="off"
-              placeholder="工单号、发货文本、备注"
+              placeholder="工单号、文本、金额、备注、对账备注"
               prefix-icon="el-icon-goods"
             >
               <i
@@ -162,22 +165,23 @@ export default {
               ></i> </el-input
           ></el-form-item>
         </el-col>
-        <el-col :span="colSpan6">
+        <el-col :span="colSpan5">
           <el-form-item label="日期">
             <el-date-picker
-              style="width: 240px"
+              style="width: 230px"
               v-model="createTime"
               type="daterange"
+              :default-time="['00:00:00', '23:59:59']"
               range-separator="至"
               start-placeholder="开始日期"
               end-placeholder="结束日期">
             </el-date-picker>
           </el-form-item>
         </el-col>
-        <el-col :span="colSpan4">
+        <el-col :span="colSpan3">
         <el-form-item label="状态" prop="statusStr">
           <el-select
-            style="width: 140px"
+            style="width: 110px"
             v-model="sendForm.statusStr"
             multiple
             placeholder="选择状态"
@@ -232,21 +236,19 @@ export default {
         </el-col>
       </el-row>
     </el-form>
-    <el-row>
+    <el-row><el-col :span=6 ><el-button type="primary" @click="handleOptions">批量操作</el-button></el-col><el-col :span=18 >
       <!-- <el-button type="primary" @click="handleAdd">+创建</el-button> -->
-      <el-button type="primary" @click="handleOptions">批量操作</el-button>
-    </el-row>
     <el-pagination
       style="margin:auto;padding-bottom:20px;"
       v-if='tableData.total'
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
       :current-page="tableData.currentPage"
-      :page-sizes="[10, 20, 30, 40,50]"
+      :page-sizes="[5,10, 20, 30, 40,50]"
       :page-size="10"
       layout="total, sizes, prev, pager, next, jumper"
       :total="tableData.total">
-    </el-pagination>
+    </el-pagination></el-col></el-row>
     <el-table
       height="150"
       ref="table"
@@ -341,11 +343,6 @@ export default {
           </div>
         </template>
       </el-table-column>
-      <!-- <el-table-column
-        :show-overflow-tooltip="true"
-        prop="createTime"
-        label="日期"
-      /> -->
       <el-table-column
         :show-overflow-tooltip="true"
         prop="inAmount"
@@ -365,20 +362,11 @@ export default {
           <div >{{scope.row.remark}}</div>
         </template>
       </el-table-column>
-      <el-table-column
-        :show-overflow-tooltip="true"
-        prop="accountRemark"
-        label="对账备注"
-      >
-        <template slot-scope="scope">
-          <div >{{scope.row.accountRemark}}</div>
-        </template>
-      </el-table-column>
-      <!-- <el-table-column
+       <el-table-column
         :show-overflow-tooltip="true"
         prop="pics"
         label="图片"
-      /> -->
+      />
       <el-table-column
       fixed="right"
       label="操作"
@@ -389,15 +377,14 @@ export default {
             <el-button @click="$emit('handleAction',scope.row,'del', handleSearch)" type="text" size="small">删除</el-button>
           </div>
           <div v-if="scope.row.deleted===1">
-            <el-button type="text" size="small" @click="$emit('handleAction',scope.row,'edit', handleSearch)">生成新的</el-button>
+            <el-button type="text" size="small" @click="$emit('handleAction',scope.row,'edit', handleSearch)">复制</el-button>
           </div>
         </template>
       </el-table-column>
     </el-table>
   </div>
 </template>
-<style>
-
+<style lang="scss" scoped>
 .el-tabs {
       height: 100%;
     display: flex;
@@ -409,8 +396,11 @@ export default {
     .el-tabs__content {
       flex: 1;
     }
-</style>
-<style lang="scss" scoped>
+
+.el-form-item{
+  font-size: 12px !important;
+  font-family:"Microsoft YaHei",Arial,Helvetica,sans-serif,"宋体" !important;
+}
 .commonBody {
   height: 100%;
   display: flex;
@@ -423,20 +413,5 @@ export default {
 .statusDict1 {
   color: red;
 }
-// .commonBody{
-//   :global {
-//     .el-tabs {
-//       height: 100%;
-//     display: flex;
-//     flex-direction: column;
-//     }
-//     .el-tab-pane {
-//       height: 100%;
-//     }
-//     .el-tabs__content {
-//       flex: 1;
-//     }
-//   }
-// }
 
 </style>

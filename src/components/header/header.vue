@@ -84,13 +84,14 @@ export default {
   .btn-tool {
     border: none;
     background: transparent;
-    font-size: 18px;
+    font-size: 14px;
     padding: 5px 10px;
     cursor: pointer;
     outline: none;
     text-align: left;
   }
   .user-name {
-    margin-left: 20px;
+    margin-left: 10px;
   }
+
 </style>

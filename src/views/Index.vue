@@ -2,12 +2,12 @@
   <el-container class="index-box">
     <el-aside width="asideWidth">
       <div class="logo">
-        <img v-show="!isCollapse" src="./../assets/logo.png" alt="ELementUI" width="122" height="27">
+        <img v-show="!isCollapse" src="./../assets/logo.png" alt="ELementUI" style="padding-top: 0px;" width="122" height="122">
       </div>
 <!--      <menus :isCollapse="isCollapse"/>-->
     </el-aside>
     <el-container>
-      <el-header>
+      <el-header style="height: 30px;">
         <headers/>
       </el-header>
       <el-main>
@@ -18,29 +18,8 @@
 </template>
 
 <script>
-// import Menus from '@/components/menus/menus'
 import Headers from '@/components/header/header'
 
-// import VueTaber from '@/components/vue-tabs/vue-tabs.js'
-// import '@/components/vue-tabs/vue-tabs.css' // 导入默认style, 你可以复制出来进行定制修改
-// import tabs from '@/components/vue-tabs/tabs.js'
-// import Vue from 'vue/types/index'
-// import Vue from 'vue'
-// import App from '@/App' // 导入配置
-// const vueTaber = new VueTaber({
-//   tabs
-// })
-//
-// Vue.use(VueTaber)
-// // eslint-disable-next-line no-new
-// new Vue({
-//   el: '#app',
-//   taber: vueTaber,
-//   template: '<App/>',
-//   components: {
-//     App
-//   }
-// })
 // export default VueTaber
 export default {
 
@@ -71,7 +50,7 @@ export default {
       return this.$store.state.isCollapse
     },
     asideWidth () {
-      return this.$store.state.isCollapse ? 'auto' : '200px'
+      return this.$store.state.isCollapse ? 'auto' : '10px'
     }
   }
 }
@@ -85,6 +64,12 @@ export default {
   height: 100%;
   .el-container{
     height: 100%;
+    .el-header {
+      border-bottom: 1px solid #f6f6f6;
+      box-sizing: border-box;
+      background-color: #fff;
+      line-height: 30px;
+    }
     .el-main {
       height: 100%;
     }
@@ -98,17 +83,15 @@ export default {
       color: rgba(255,255,255,.8);
       text-align: center;
       height: 100px;
-      padding-top: 16px;
+      padding-top: 0px;
       font-size: 16px;
       box-sizing: border-box;
       border-bottom: 1px solid gray;
     }
   }
-  .el-header {
-    border-bottom: 1px solid #f6f6f6;
-    box-sizing: border-box;
-    background-color: #fff;
-    line-height: 60px;
+
+  .el-card__body, .el-main{
+    padding-top: 0px;
   }
 }
 </style>
