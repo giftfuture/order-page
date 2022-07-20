@@ -266,6 +266,7 @@ export default {
             <el-tag type="warning" v-if="item.key===3" style="margin-top:5px">{{item.value}}</el-tag>
             <el-tag type="danger" v-if="item.key===4" style="margin-top:5px">{{item.value}}</el-tag>
             <el-tag v-if="item.key===5">{{item.value}}</el-tag>
+            <el-tag v-if="item.key===6">{{item.value}}</el-tag>
           </div>
         </template>
       </el-table-column>

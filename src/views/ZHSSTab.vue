@@ -136,22 +136,22 @@ export default {
     defaultCheckStatus () {
       // 发货组状态默认全选
       this.ZHSSForm.sendStatus = []
-      this.$store.state.statusDictObj.FH.map((item) => {
+      this.$store.state.statusDictObj.FH && this.$store.state.statusDictObj.FH.map((item) => {
         this.ZHSSForm.sendStatus.push(item.key)
       })
       // 发货组钱票状态默认全选
       this.ZHSSForm.sendTicketStatus = []
-      this.$store.state.ticketStatusDictObj.FH.map((item) => {
+      this.$store.state.statusDictObj.FH && this.$store.state.ticketStatusDictObj.FH.map((item) => {
         this.ZHSSForm.sendTicketStatus.push(item.key)
       })
       // 订货组钱票状态默认全选
       this.ZHSSForm.dingStatus = []
-      this.$store.state.statusDictObj.DH.map((item) => {
+      this.$store.state.statusDictObj.DH && this.$store.state.statusDictObj.DH.map((item) => {
         this.ZHSSForm.dingStatus.push(item.key)
       })
       // 订货组钱票状态默认全选
       this.ZHSSForm.dingTicketStatus = []
-      this.$store.state.ticketStatusDictObj.DH.map((item) => {
+      this.$store.state.ticketStatusDictObj && Array.isArray(this.$store.state.ticketStatusDictObj.DH) && this.$store.state.ticketStatusDictObj.DH === 'array' && this.$store.state.ticketStatusDictObj.DH.map((item) => {
         this.ZHSSForm.dingTicketStatus.push(item.key)
       })
     }
@@ -432,6 +432,7 @@ export default {
             <el-tag type="warning" v-if="item.key===3" style="margin-top:5px">{{item.value}}</el-tag>
             <el-tag type="danger" v-if="item.key===4" style="margin-top:5px">{{item.value}}</el-tag>
             <el-tag v-if="item.key===5">{{item.value}}</el-tag>
+            <el-tag v-if="item.key===5">{{item.value}}</el-tag>
           </div>
         </template>
       </el-table-column>
@@ -469,6 +470,7 @@ export default {
             <el-tag type="warning" v-if="item.key===3" style="margin-top:5px">{{item.value}}</el-tag>
             <el-tag type="danger" v-if="item.key===4" style="margin-top:5px">{{item.value}}</el-tag>
             <el-tag v-if="item.key===5">{{item.value}}</el-tag>
+            <el-tag v-if="item.key===6">{{item.value}}</el-tag>
           </div>
         </template>
       </el-table-column>

@@ -44,8 +44,17 @@ export function editListOrder (data) {
   })
 }
 
-// 单个编辑订单
+// 编辑订单
 export function editOrder (data) {
+  return request({
+    url: '/order/editOne',
+    method: 'post',
+    data
+  })
+}
+
+// 单个编辑订单
+export function editOrderOne (data) {
   return request({
     url: '/order/editOne',
     method: 'post',

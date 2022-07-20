@@ -1,5 +1,5 @@
 <script>
-import { querySearch } from '@/api/index.js'
+import { querySearch, editOrderOne } from '@/api/index.js'
 import dayjs from 'dayjs'
 
 export default {
@@ -46,7 +46,26 @@ export default {
     }
   },
   methods: {
+    handleBlur (callback, data) {
+      console.log('回调参数' + callback)
+      if (!callback) {
+        console.log(data, 'handleBlur=====')
+        // 调保存接口
+        if (data.row.statusStr) {
+          this.doSaveEdit({ id: data.row.id, [data.type]: data.row.statusStr.join(',') })
+        }
+      }
+    },
+    doSaveEdit (data) {
+      editOrderOne(data).then(res => {
+        if (res.code === 0) {
+          this.$message.success('编辑成功')
+          this.handleSearch()
+        }
+      })
+    },
     getStatusDict (keys, type) {
+      console.log(keys, 'keys===')
       if (!keys && typeof keys !== 'string') return []
       const keyArr = keys.split(',')
       const data = this.$store.state[type].FH ? this.$store.state[type].FH.filter(item => {
@@ -277,31 +296,33 @@ export default {
         </template>
       </el-table-column>
       <el-table-column label="状态" align="center" prop="status">
-        <template slot-scope="scope" v-if="!scope.row.isShowInput">
-          <!-- <el-select
-            v-if="scope.row.isShowInput"
-            style="width: 140px"
-            v-model="scope.row.status"
+        <template slot-scope="scope" >
+          <el-select
+            v-if="!scope.row.status"
+            style="width: 100%"
+            v-model="scope.row.statusStr"
             multiple
             placeholder="选择状态"
             clearable
             filterable
-            @blur="handleBlur('status', scope.row)"
+            @visible-change="handleBlur($event, {type: 'status', row: scope.row})"
+            ref='statusRef'
           >
             <el-option
-              v-for="item in $store.state.statusDictObj.FH"
+              v-for="item in $store.state.statusDictObj.FH || []"
               :key="item.key"
               :label="item.value"
               :value="item.key"
             >
             </el-option>
-          </el-select> -->
-          <div v-for="item in getStatusDict(scope.row.status, 'statusDictObj')" :key="item.key">
+          </el-select>
+          <div v-else v-for="item in getStatusDict(scope.row.status, 'statusDictObj')" :key="item.key">
             <el-tag type="success" v-if="item.key===1" style="margin-top:5px">{{item.value}}</el-tag>
             <el-tag type="info" v-if="item.key===2" style="margin-top:5px">{{item.value}}</el-tag>
             <el-tag type="warning" v-if="item.key===3" style="margin-top:5px">{{item.value}}</el-tag>
             <el-tag type="danger" v-if="item.key===4" style="margin-top:5px">{{item.value}}</el-tag>
             <el-tag v-if="item.key===5">{{item.value}}</el-tag>
+            <el-tag v-if="item.key===6">{{item.value}}</el-tag>
           </div>
         </template>
       </el-table-column>
@@ -340,6 +361,7 @@ export default {
             <el-tag type="warning" v-if="item.key===3" style="margin-top:5px">{{item.value}}</el-tag>
             <el-tag type="danger" v-if="item.key===4" style="margin-top:5px">{{item.value}}</el-tag>
             <el-tag v-if="item.key===5">{{item.value}}</el-tag>
+            <el-tag v-if="item.key===6">{{item.value}}</el-tag>
           </div>
         </template>
       </el-table-column>
