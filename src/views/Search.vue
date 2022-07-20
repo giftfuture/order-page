@@ -360,6 +360,24 @@ export default {
         })
         console.log(params)
       }
+    },
+    calInAmount (data) {
+      console.log(data, 'handleOptions')
+      if (!data || !data.multipleSelection.length) {
+        this.$message({
+          message: '请先选择工单',
+          type: 'warning'
+        })
+        return
+      }
+      this.options = data.multipleSelection || []
+      this.callBack = data.callBack
+      this.showTypeObj = {
+        title: '批量操作',
+        isShow: true,
+        status: true,
+        ticketStatus: true
+      }
     }
   }
 }

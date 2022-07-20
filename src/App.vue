@@ -32,6 +32,14 @@ html,body {
 .el-button{
   padding: 10px 20px !important;
 }
+.delete{
+  width:20px;
+  height: 20px;
+  border-radius: 60%;
+  position: absolute;
+  top:-10px;
+  right:-10px;
+}
 /*.commonBody {
   width: 100%;
   height: 100%;

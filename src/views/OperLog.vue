@@ -1,11 +1,17 @@
 <template>
   <div>
-    <el-table border :data="transData">
-
+    <el-table border :data="transData" ><!--:cell-style="columnStyle" -->
       <el-table-column>
         <template slot-scope="scope">
           <el-form>
-            <el-row><el-col :span="colSpan5">{{scope.row[0]}}</el-col><el-col :span="colSpan5">{{scope.row[1]}}</el-col><el-col :span="colSpan5">{{scope.row[2]}}</el-col></el-row>
+            <div ></div>
+            <el-row><el-col :span="colSpan6">{{scope.row[0]}}</el-col>
+              <el-col :span="colSpan7"  :class="scope.row[0].indexOf('工单')>=0 ?'':'commonDelete'"  style="backgroundColor : #FFCCCC;" >{{scope.row[1]}}</el-col>
+              <el-col :span="0.5" >
+                <img v-show="!isCollapse" src="./../assets/right_arrow.jpg" width="22" height="12"/>
+                <span class="arrow-right"></span></el-col><!--→-->
+              <el-col :span="colSpan7" style="background-color: #CCFF99; ">{{scope.row[2]}}</el-col></el-row>
+
           </el-form>
         </template>
       </el-table-column>
@@ -17,12 +23,13 @@
 import { operLog } from '@/api/index'
 
 export default {
-  name: 'TransverseTable',
+  name: 'OperLogTable',
   data () {
     return {
-      colSpan15: 15,
+      colSpan7: 7,
       colSpan5: 5,
       colSpan4: 4,
+      colSpan1: 1,
       colSpan6: 6,
       orderNo: '',
       tableData: [],
@@ -33,7 +40,7 @@ export default {
   },
   methods: {
     loadLogs () {
-      const params = 1
+      const params = this.$route.query.id // this.$route.params.id
       operLog(params)
         .then((response) => {
           if (response.code === 0) {
@@ -44,6 +51,12 @@ export default {
               if (index === 0) {
                 this.originTitle.push('工单编号:' + row.orderNo)
                 this.transData.push(['工单编号:' + row.orderNo, '更新前', '更新后'])
+              }
+              this.originTitle.push('')
+              this.transData.push([row.staffName + '编辑了该工单数据 ', row.dateGap, row.createTime])
+              if (row.createTime) {
+                this.originTitle.push('最后修改时间')
+                this.transData.push(['最后修改时间', row.createTime, row.createTime])
               }
               if (row.preStatus || row.status) {
                 this.originTitle.push('状态')
@@ -77,8 +90,6 @@ export default {
                 this.originTitle.push('图片')
                 this.transData.push(['图片', row.preAttach, row.attach])
               }
-              this.originTitle.push('')
-              this.transData.push([' ', '', ''])
             })
             console.log(this.transData)
           } else {

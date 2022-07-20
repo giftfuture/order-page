@@ -6,6 +6,7 @@ export default {
   name: 'DHTab',
   data () {
     return {
+      sumInAmount: 0,
       colSpan5: 5,
       colSpan4: 4,
       colSpan3: 3,
@@ -89,6 +90,8 @@ export default {
       console.log(`当前页: ${val}`)
     },
     handleSelectionChange (val) {
+      this.sumInAmount = 0
+      val.map((item) => this.sumInAmount += item.inAmount)
       this.multipleSelection = val
     },
     handleNodeClick (data) {
@@ -230,7 +233,8 @@ export default {
         </el-col>
       </el-row>
     </el-form>
-    <el-row><el-col :span=6 ><el-button type="primary" @click="handleOptions">批量操作</el-button></el-col><el-col :span=18 >
+    <el-row><el-col :span=6 ><el-button type="primary" @click="handleOptions">批量操作</el-button></el-col>
+      <el-col><span>{{this.sumInAmount}}</span></el-col><el-col :span=17 >
     <el-pagination
       style="margin:auto;padding-bottom:20px;"
       v-if='tableData.total'
@@ -260,7 +264,9 @@ export default {
           <div >
             <div>创建人：{{scope.row.creator}}</div>
             <div>日期：{{scope.row.createTime}}</div>
-            <div>工单编号：<router-link to="/operlog" target="_blank" ><span :class="scope.row.deleted===1?'commonDelete':''">{{scope.row.orderNo}}</span></router-link></div>
+            <div>工单编号：<router-link :to="`/operlog?id=${scope.row.id}`" target="_blank" ><span :class="scope.row.deleted===1?'commonDelete':''">{{scope.row.orderNo}}</span></router-link>
+              <div style="padding-left: 20px;margin-left: 20px;" @click="$emit('handleAction',scope.row,'del', handleSearch)" class="el-icon-delete"></div>
+            </div>
             <div>对账备注：{{scope.row.accountRemark}}</div>
             <div>最后修改人：{{scope.row.updator}}</div>
             <div>最后修改时间：{{scope.row.updateTime}}</div>
@@ -345,7 +351,6 @@ export default {
       <template slot-scope="scope">
         <div v-if="scope.row.deleted!==1">
           <el-button type="text" size="small" @click="$emit('handleAction',scope.row,'edit', handleSearch)">编辑</el-button>
-          <el-button @click="$emit('handleAction',scope.row,'del', handleSearch)" type="text" size="small">删除</el-button>
         </div>
         <div v-if="scope.row.deleted===1">
           <el-button type="text" size="small" @click="$emit('handleAction',scope.row,'edit', handleSearch)">生成新的</el-button>
