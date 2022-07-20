@@ -126,8 +126,7 @@ export default {
       :inline="true"
       :model="DHForm"
       ref="DHForm"
-      class="login-form"
-    >
+      class="login-form">
       <el-row>
         <el-col :span="colSpan3">
           <el-form-item label="创建人" prop="createByStr">
@@ -261,7 +260,7 @@ export default {
           <div >
             <div>创建人：{{scope.row.creator}}</div>
             <div>日期：{{scope.row.createTime}}</div>
-            <div>工单编号：<span :class="scope.row.deleted===1?'commonDelete':''">{{scope.row.orderNo}}</span></div>
+            <div>工单编号：<router-link to="/operlog" target="_blank" ><span :class="scope.row.deleted===1?'commonDelete':''">{{scope.row.orderNo}}</span></router-link></div>
             <div>对账备注：{{scope.row.accountRemark}}</div>
             <div>最后修改人：{{scope.row.updator}}</div>
             <div>最后修改时间：{{scope.row.updateTime}}</div>

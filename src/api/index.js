@@ -47,7 +47,7 @@ export function editListOrder (data) {
 // 单个编辑订单
 export function editOrder (data) {
   return request({
-    url: '/order/edit',
+    url: '/order/editOne',
     method: 'post',
     data
   })
@@ -74,6 +74,21 @@ export function delOrder (id) {
 export function fetchAllSort () {
   return request({
     url: '/sort/fetchAll',
+    method: 'get'
+  })
+}
+// 文本转换
+export function exchangeFunc (data) {
+  return request({
+    url: '/data/exchange',
+    method: 'post',
+    data
+  })
+}
+// 操作日志
+export function operLog (data) {
+  return request({
+    url: '/log/' + data,
     method: 'get'
   })
 }

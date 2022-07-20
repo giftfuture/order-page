@@ -13,12 +13,29 @@
     </el-tabs>
     <div class="addInput">
       <el-row>
-        <el-col :span=21>
+        <el-col :span=10>
           <el-input ref="addInput" type="textarea" :rows="4"  v-focus autofocus v-if="addInput" v-model="addForm.content" placeholder="请输入工单文本" />
-        </el-col>
-        <el-col :span=2>
-          <el-button type="primary" style="margin-left: 15px;margin-bottom: 15px" @click="handleAddSure">保存</el-button><br/>
-          <el-button type="primary"  style="margin-left: 15px;" @click="cancleAdd">取消</el-button>
+        </el-col><el-col :span=1.5>
+        <el-button type="primary" style="margin-left: 5px;margin-right:5px;margin-top: 25px" @click="handleAddSure">保存</el-button>
+      </el-col>
+        <el-col :span=5>
+          <el-input ref="addInput" type="textarea" :rows="4"  v-focus autofocus v-if="addInput" v-model="exchangeText" placeholder="请输入转换文本" />
+      </el-col><el-col :span=2>
+        <el-select v-model="exchangeType"
+        size="small"
+        placeholder="转换类型"
+        clearable
+        filterable
+        style="width:100px;padding-bottom: 10px;margin-left: 7px;margin-right:7px;">
+        <el-option
+          v-for="item in this.$store.exchangeSort"
+          :key="item.key"
+          :label="item.value"
+          :value="item.key">
+        </el-option> </el-select><br/>
+        <el-button type="primary" size="small" style="margin-left: 25px;margin-right:25px;margin-bottom: 5px;"  @click="handleExchange">转换</el-button>
+      </el-col><el-col :span=5>
+          <el-input type="textarea" :rows="4" v-model="exchangResult" placeholder="转换结果" />
         </el-col>
       </el-row>
     </div>
@@ -39,13 +56,16 @@ import ZHSSTab from '@/views/ZHSSTab.vue'
 import { mapActions } from 'vuex'
 import EditDialog from '@/components/EditDialog'
 import EditInfosDialog from '@/components/EditInfosDialog'
-import { editListOrder, editOrder, delOrder, createOrder } from '@/api/index.js'
+import { editListOrder, editOrder, delOrder, createOrder, exchangeFunc } from '@/api/index.js'
 import { orderSort, sortList } from '@/common/enum'
 import PreviewImage from '@/components/previewImage'
 
 export default {
   data () {
     return {
+      exchangeType: '',
+      exchangeText: '',
+      exchangResult: '',
       imgViewerVisible: false,
       imgList: [],
       addInput: true,
@@ -124,8 +144,10 @@ export default {
       }
       this.handleLoadBySort(val)
     }
+
   },
   created () {
+    this.handleLoadBySort('SJJH')
     this.handleQueryAllStaf()
     this.handleLoadBySort(this.currentType)
   },
@@ -183,6 +205,36 @@ export default {
         })
         console.log(params)
       }
+    },
+    handleExchange () {
+      const params = {}
+      params.text = this.exchangeText
+      params.type = this.exchangeType
+      if (!params.text || params.text.trim().length === 0) {
+        this.$message({
+          message: '请输入有效文本！',
+          type: 'fail'
+        })
+        return
+      }
+      // console.log(this.$store.exchangeSort.keys())
+      // if (this.$store.exchangeSort.keys()(params.type) <= -1) {
+      //   this.$message({
+      //     message: '文本转换类型无效！',
+      //     type: 'fail'
+      //   })
+      //   return
+      // }
+      exchangeFunc(params).then(res => {
+        console.log(res, 'params')
+        if (res.code === 0) {
+          this.exchangResult = res.message
+          this.$message({
+            message: '文本类型转换成功！',
+            type: 'success'
+          })
+        }
+      })
     },
     // 新建
     handleAdd (addType, querySearchCallBack) {
@@ -313,13 +365,15 @@ export default {
 }
 
 </script>
-
 <style scoped lang="less">
 .addInput {
   position: absolute;
   bottom: 0;
   width: 100%;
   z-index: 1000;
+}
+.el-button{
+  padding: 10px 20px !important;
 }
 /*改变原来tabBox的flex布局*/
 .mpm-container .vux-tab .vux-tab-item {

@@ -5,6 +5,26 @@ import { queryAllStaf, loadBySort } from '@/api/index.js'
 Vue.use(Vuex)
 
 export default new Vuex.Store({
+  orderLogs: [
+    {
+      name: '名称',
+      value: 'tester'
+    },
+    {
+      name: '创建人',
+      value: '张三'
+    },
+    {
+      name: '描述',
+      value: '这是描述'
+    },
+    {
+      name: '耗时',
+      value: 1
+    }
+  ],
+
+  exchangeSort: [],
   state: {
     isCollapse: false,
     allStaf: [],
@@ -53,6 +73,10 @@ export default new Vuex.Store({
       loadBySort(params === 'ZH' ? '' : params).then(res => {
         console.log(res, 'res handleLoadBySort')
         if (res.code === 0) {
+          if (params === 'SJJH') {
+            this.exchangeSort = res.data.statusDict ? JSON.parse(res.data.statusDict) : []
+            return
+          }
           commit('SET_SORT', { data: res.data, type: params })
         }
       }).catch(err => {

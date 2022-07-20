@@ -1,194 +1,109 @@
 <template>
-  <div class="article-box">
-    <el-table
-      :data="articles"
-      style="width: 100%">
-      <el-table-column
-        type="selection"
-        width="55">
-      </el-table-column>
-      <el-table-column
-        prop="title"
-        label="标题"
-        width="480">
-      </el-table-column>
-      <el-table-column
-        prop="author"
-        label="作者"
-        width="280">
-      </el-table-column>
-      <el-table-column
-        sortable
-        prop="date"
-        label="日期"
-        width="280">
-      </el-table-column>
-      <el-table-column
-        label="状态">
+  <div>
+    <el-table border :data="transData">
+
+      <el-table-column>
         <template slot-scope="scope">
-          {{ scope.row.status ? '已发布' : '未发布' }}
-        </template>
-      </el-table-column>
-      <el-table-column label="操作" fixed="right" width="150">
-        <template slot-scope="scope">
-          <el-button
-            size="mini"
-            type="primary"
-            plain
-            @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
-          <el-button
-            size="mini"
-            type="danger"
-            @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+          <el-form>
+            <el-row><el-col :span="colSpan5">{{scope.row[0]}}</el-col><el-col :span="colSpan5">{{scope.row[1]}}</el-col><el-col :span="colSpan5">{{scope.row[2]}}</el-col></el-row>
+          </el-form>
         </template>
       </el-table-column>
     </el-table>
-    <el-pagination
-      background
-      :page-sizes="[10, 20, 30, 50]"
-      :page-size="20"
-      layout="total, sizes, prev, pager, next, jumper"
-      :total="400">
-    </el-pagination>
-    <el-dialog title="编辑" :visible.sync="articleFormVisible" top="10vh" @close="resetForm('articleForm')">
-      <el-form :model="article" ref="articleForm" :rules="rules">
-        <el-form-item label="标题" prop="title" label-width="50px">
-          <el-input v-model="article.title" autocomplete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="作者" label-width="50px">
-          <el-input v-model="article.author" autocomplete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="日期" label-width="50px">
-          <el-date-picker
-            v-model="article.date"
-            type="date"
-            value-format="yyyy-MM-dd"
-            placeholder="选择日期">
-          </el-date-picker>
-        </el-form-item>
-        <el-form-item label="状态" label-width="50px">
-          <el-switch v-model="article.status" active-color="#13ce66"
-            inactive-color="#ff4949"
-            :active-value="1"
-            :inactive-value="0"></el-switch>
-        </el-form-item>
-        <el-form-item>
-          <quill-editor ref="TextEditor"
-              v-model="article.content"
-              :options="editorOption">
-          </quill-editor>
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="articleFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="editArticle('articleForm')">确 定</el-button>
-      </div>
-    </el-dialog>
+
   </div>
 </template>
-
 <script>
-// 引入富文本编辑器所需样式
-import 'quill/dist/quill.core.css'
-import 'quill/dist/quill.snow.css'
-import 'quill/dist/quill.bubble.css'
+import { operLog } from '@/api/index'
 
-import { quillEditor } from 'vue-quill-editor'
 export default {
+  name: 'TransverseTable',
   data () {
     return {
-      articles: [],
-      article: {
-        id: '',
-        date: '',
-        title: '',
-        author: '',
-        content: '',
-        status: 0
-      },
-      articleFormVisible: false,
-      rowIndex: 9999,
-      editorOption: {
-        modules: {
-          toolbar: [
-            ['bold', 'italic', 'underline', 'strike', 'link'],
-            ['image', 'clean']
-          ]
-        },
-        placeholder: '请输入文章内容...',
-        theme: 'snow'
-      },
-      rules: {
-        title: [
-          { required: true, message: '请输入标题', trigger: 'blur' },
-          { min: 5, max: 25, message: '长度在 5 到 25 个字符', trigger: 'blur' }
-        ]
+      colSpan15: 15,
+      colSpan5: 5,
+      colSpan4: 4,
+      colSpan6: 6,
+      orderNo: '',
+      tableData: [],
+      originTitle: [], // '工单号', '状态', '文本', '钱票状态', '输入金额', '到货通知', '备注', '对账备注', '图片'
+      transTitle: ['', '更新前', '更新后'],
+      transData: []
+    }
+  },
+  methods: {
+    loadLogs () {
+      const params = 1
+      operLog(params)
+        .then((response) => {
+          if (response.code === 0) {
+            this.orderNo = response.data[0].orderNo
+            this.tableData = response.data ? response.data : []
+            // 数组按矩阵思路, 变成转置矩阵
+            this.tableData.map((row, index) => {
+              if (index === 0) {
+                this.originTitle.push('工单编号:' + row.orderNo)
+                this.transData.push(['工单编号:' + row.orderNo, '更新前', '更新后'])
+              }
+              if (row.preStatus || row.status) {
+                this.originTitle.push('状态')
+                this.transData.push(['状态', row.preStatus, row.status])
+              }
+              if (row.preContent || row.content) {
+                this.originTitle.push('文本')
+                this.transData.push(['文本', row.preContent, row.content])
+              }
+              if (row.preTicketStatus || row.ticketStatus) {
+                this.originTitle.push('钱票状态')
+                this.transData.push(['钱票状态', row.preTicketStatus, row.ticketStatus])
+              }
+              if (row.preInAmount || row.inAmount) {
+                this.originTitle.push('输入金额')
+                this.transData.push(['输入金额', row.preInAmount, row.inAmount])
+              }
+              if (row.preArriveNotice || row.arriveNotice) {
+                this.originTitle.push('到货通知')
+                this.transData.push(['到货通知', row.preArriveNotice, row.arriveNotice])
+              }
+              if (row.preRemark || row.remark) {
+                this.originTitle.push('备注')
+                this.transData.push(['备注', row.preRemark, row.remark])
+              }
+              if (row.preAccountRemark || row.accountRemark) {
+                this.originTitle.push('对账备注')
+                this.transData.push(['对账备注', row.preAccountRemark, row.accountRemark])
+              }
+              if (row.preAttach || row.attach) {
+                this.originTitle.push('图片')
+                this.transData.push(['图片', row.preAttach, row.attach])
+              }
+              this.originTitle.push('')
+              this.transData.push([' ', '', ''])
+            })
+            console.log(this.transData)
+          } else {
+            this.$message.error(response.data.message)
+          }
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+    },
+    // 自定义列背景色
+    columnStyle ({ row, column, rowIndex, columnIndex }) {
+      if (columnIndex === 0) {
+        // 修改每行第一个单元格的背景色
+        return 'background:#f3f6fc;'
+      } else {
+        return 'background:#ffffff;'
       }
     }
   },
-  components: {
-    quillEditor
-  },
-  mounted () {
-    this.getArticles()
-  },
-  methods: {
-    getArticles () {
-      this.loading = true
-      this.$http('/api/articles').then((res) => {
-        this.articles = res.data
-      }).catch((err) => {
-        console.error(err)
-      })
-    },
-    handleEdit (index, row) {
-      this.article = Object.assign({}, row)
-      this.articleFormVisible = true
-      this.rowIndex = index
-    },
-    editArticle (formName) {
-      this.$refs[formName].validate((valid) => {
-        if (valid) {
-          this.articles.splice(this.rowIndex, 1, this.article)
-          this.articleFormVisible = false
-          this.$message({
-            type: 'success',
-            message: '修改成功!'
-          })
-        }
-      })
-    },
-    handleDelete (index, row) {
-      this.$confirm(`确定删除新闻 【${row.title}】 吗?`, '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        this.articles.splice(index, 1)
-        this.$message({
-          type: 'success',
-          message: '删除成功!'
-        })
-      }).catch(() => {
-        console.log('取消删除')
-      })
-    },
-    resetForm (formName) {
-      this.$refs[formName].clearValidate()
-    }
+  created () {
+    this.loadLogs()
   }
 }
 </script>
+<style scoped>
 
-<style lang="scss" scoped>
-  .article-box {
-    width: 100%;
-    .el-pagination {
-      margin-top: 20px;
-    }
-    .quill-editor {
-      height: 300px;
-      margin-bottom: 20px;
-    }
-  }
 </style>

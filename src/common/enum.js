@@ -22,6 +22,7 @@ export const sortList = [
   'JH',
   'JG'
 ]
+
 export const orderSort = {
   'FH': {
     key: 'Fh',
