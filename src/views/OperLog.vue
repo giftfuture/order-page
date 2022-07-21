@@ -6,17 +6,16 @@
           <el-form>
             <div ></div>
             <el-row><el-col :span="colSpan6">{{scope.row[0]}}</el-col>
-              <el-col :span="colSpan7"  :class="scope.row[0].indexOf('工单')>=0 ?'':'commonDelete'"  style="backgroundColor : #FFCCCC;" >{{scope.row[1]}}</el-col>
+              <el-col :span="colSpan7"  :class="scope.row[0].indexOf('工单')>=0 ?'':'commonDelete'">
+                <span style="backgroundColor : #FFCCCC;">{{scope.row[1]}}</span></el-col>
               <el-col :span="0.5" >
                 <img v-show="!isCollapse" src="./../assets/right_arrow.jpg" width="22" height="12"/>
                 <span class="arrow-right"></span></el-col><!--→-->
-              <el-col :span="colSpan7" style="background-color: #CCFF99; ">{{scope.row[2]}}</el-col></el-row>
-
+              <el-col :span="colSpan7"><span style="background-color: #CCFF99; ">{{scope.row[2]}}</span></el-col></el-row>
           </el-form>
         </template>
       </el-table-column>
     </el-table>
-
   </div>
 </template>
 <script>

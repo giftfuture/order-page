@@ -8,7 +8,7 @@ export default {
   },
   data () {
     return {
-      sumInAmount: 0,
+      sumInAmount: '',
       multipleSelection: [],
       colSpan5: 5,
       colSpan4: 4,
@@ -259,8 +259,7 @@ export default {
       </el-row>
     </el-form>
     <el-row><el-col :span=6 ><el-button type="primary" @click="handleOptions">批量操作</el-button></el-col>
-      <el-col><span>{{this.sumInAmount}}</span></el-col>
-      <el-col :span=17 >
+      <el-col :span=18 >
       <!-- <el-button type="primary" @click="handleAdd">+创建</el-button> -->
     <el-pagination
       style="margin:auto;padding-bottom:20px;"
@@ -273,6 +272,7 @@ export default {
       layout="total, sizes, prev, pager, next, jumper"
       :total="tableData.total">
     </el-pagination></el-col></el-row>
+    <el-row><el-col :span="24" style="align: middle;"><div style="align: middle;" v-if="this.sumInAmount">输入金额合计：{{this.sumInAmount}}</div></el-col></el-row>
     <el-table
       height="150"
       ref="table"

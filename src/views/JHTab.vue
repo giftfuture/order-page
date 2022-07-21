@@ -206,23 +206,7 @@ export default {
         </el-form-item>
         </el-col>
         <el-col :span="colSpan4">
-        <!-- <el-form-item label="钱票状态" prop="ticketStatusStr">
-          <el-select
-            style="width: 130px"
-            v-model="JHForm.ticketStatusStr"
-            multiple
-            placeholder="选择钱票状态"
-            clearable
-            filterable
-          >
-            <el-option
-              v-for="item in this.$store.state.ticketStatusDictObj.JH"
-              :key="item.key"
-              :label="item.value"
-              :value="item.key"
-            >
-            </el-option> </el-select
-        ></el-form-item> -->
+
         </el-col>
         <el-col :span="colSpan2">
         <!-- <el-form-item v-show="showMsg" style="margin-bottom: 0">
@@ -244,7 +228,7 @@ export default {
       </el-row>
     </el-form>
     <el-row><el-col :span=6 ><el-button type="primary" @click="handleOptions">批量操作</el-button></el-col>
-      <el-col><span>{{this.sumInAmount}}</span></el-col><el-col :span=17 >
+    <el-col :span=18 >
     <el-pagination
       style="margin:auto;padding-bottom:20px;"
       v-if='tableData.total'
@@ -256,6 +240,7 @@ export default {
       layout="total, sizes, prev, pager, next, jumper"
       :total="tableData.total">
     </el-pagination></el-col></el-row>
+    <el-row><el-col :span="24" style="align: middle;"><div style="align: middle;" v-if="this.sumInAmount">输入金额合计：{{this.sumInAmount}}</div></el-col></el-row>
     <el-table
       height="150"
       ref="table"
