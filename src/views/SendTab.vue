@@ -47,13 +47,17 @@ export default {
     }
   },
   methods: {
+    handleEdit (row) {
+      row.showEdit = true
+      // console.log(e, 'handleEdit')
+    },
     handleBlur (callback, data) {
       console.log('回调参数' + callback)
       if (!callback) {
         console.log(data, 'handleBlur=====')
         // 调保存接口
-        if (data.row.statusStr) {
-          this.doSaveEdit({ id: data.row.id, [data.type]: data.row.statusStr.join(',') })
+        if (data.row.statusEdit) {
+          this.doSaveEdit({ id: data.row.id, [data.type]: data.row.statusEdit.join(',') })
         }
       }
     },
@@ -93,7 +97,13 @@ export default {
         .then((response) => {
           console.log(response, '====')
           if (response.code === 0) {
-            this.tableData.data = response.data.content ? response.data.content : []
+            if (response.data.content && response.data.content.length) {
+              this.tableData.data = response.data.content.map(item => {
+                item.showEdit = !item.status
+                item.statusEdit = item.status ? item.status.split(',').map(item => parseInt(item)) : []
+                return item
+              })
+            }
             this.tableData.total = response.data && (response.data.totalElements || 0)
           } else {
             this.$message.error(response.data.message)
@@ -304,9 +314,9 @@ export default {
       <el-table-column label="状态" align="center" prop="status">
         <template slot-scope="scope" >
           <el-select
-            v-if="!scope.row.status"
+            v-if="scope.row.showEdit"
             style="width: 100%"
-            v-model="scope.row.statusStr"
+            v-model="scope.row.statusEdit"
             multiple
             placeholder="选择状态"
             clearable
@@ -322,7 +332,7 @@ export default {
             >
             </el-option>
           </el-select>
-          <div v-else v-for="item in getStatusDict(scope.row.status, 'statusDictObj')" :key="item.key">
+          <div v-else v-for="item in getStatusDict(scope.row.status, 'statusDictObj')" :key="item.key" style="cursor: pointer" @click="handleEdit(scope.row)">
             <el-tag type="success" v-if="item.key===1" style="margin-top:5px">{{item.value}}</el-tag>
             <el-tag type="info" v-if="item.key===2" style="margin-top:5px">{{item.value}}</el-tag>
             <el-tag type="warning" v-if="item.key===3" style="margin-top:5px">{{item.value}}</el-tag>
