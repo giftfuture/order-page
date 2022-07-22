@@ -1,13 +1,44 @@
 <script>
 import { querySearch, editOrderOne } from '@/api/index.js'
 import dayjs from 'dayjs'
+import { quillEditor } from 'vue-quill-editor'
+import 'quill/dist/quill.core.css'
+import 'quill/dist/quill.snow.css'
+import 'quill/dist/quill.bubble.css'
+import Quill from 'quill'
+import ImageResize from 'quill-image-resize-module' // 引用
+import { ImageDrop } from 'quill-image-drop-module'
+Quill.register('modules/imageDrop', ImageDrop)
+Quill.register('modules/imageResize', ImageResize) // 注册
+
+// 工具栏配置
+const toolbarOptions = [
+  ['bold', 'italic', 'underline', 'strike'], // 加粗 斜体 下划线 删除线 -----['bold', 'italic', 'underline', 'strike']
+  ['blockquote', 'code-block'], // 引用  代码块-----['blockquote', 'code-block']
+  [{ header: 1 }, { header: 2 }], // 1、2 级标题-----[{ header: 1 }, { header: 2 }]
+  [{ list: 'ordered' }, { list: 'bullet' }], // 有序、无序列表-----[{ list: 'ordered' }, { list: 'bullet' }]
+  [{ script: 'sub' }, { script: 'super' }], // 上标/下标-----[{ script: 'sub' }, { script: 'super' }]
+  [{ indent: '-1' }, { indent: '+1' }], // 缩进-----[{ indent: '-1' }, { indent: '+1' }]
+  [{ direction: 'rtl' }], // 文本方向-----[{'direction': 'rtl'}]
+  [{ size: ['small', false, 'large', 'huge'] }], // 字体大小-----[{ size: ['small', false, 'large', 'huge'] }]
+  [{ header: [1, 2, 3, 4, 5, 6, false] }], // 标题-----[{ header: [1, 2, 3, 4, 5, 6, false] }]
+  [{ color: [] }, { background: [] }], // 字体颜色、字体背景颜色-----[{ color: [] }, { background: [] }]
+  [{ font: [] }], // 字体种类-----[{ font: [] }]
+  [{ align: [] }], // 对齐方式-----[{ align: [] }]
+  ['clean'], // 清除文本格式-----['clean']
+  ['image', 'video'] // 链接、图片、视频-----['link', 'image', 'video']
+]
 
 export default {
   name: 'sendTab',
   components: {
+    quillEditor
   },
   data () {
     return {
+      content: '请输入文本内容',
+      colors: ['color:#67c23a;background-color:#f0f9eb', 'color:#909399;background-color:#f4f4f5', 'color:#e6a23c;background-color:#fdf6ec', 'color:#f56c6c;background-color:#fef0f0', 'color:#409EFF;background-color:#ecf5ff'],
+      sendContent: '',
       sumInAmount: '',
       multipleSelection: [],
       colSpan5: 5,
@@ -33,7 +64,26 @@ export default {
         ticketStatusStr: ''
       },
       loading: false,
-      showMsg: false
+      showMsg: false,
+      editorOption: {
+        theme: 'snow',
+        placeholder: '请输入正文',
+        modules: {
+          imageDrop: true,
+          imageResize: {
+            displayStyles: {
+              backgroundColor: 'black',
+              border: 'none',
+              color: 'white'
+            },
+            modules: ['Resize', 'DisplaySize', 'Toolbar']
+          },
+          //  富文本编辑器配置
+          toolbar: {
+            container: toolbarOptions
+          }
+        }
+      }
     }
   },
   watch: {
@@ -51,6 +101,10 @@ export default {
       row.showEdit = true
       // console.log(e, 'handleEdit')
     },
+    handleTicketStatusEdit (row) {
+      row.showTicketEdit = true
+      // console.log(e, 'handleEdit')
+    },
     handleBlur (callback, data) {
       console.log('回调参数' + callback)
       if (!callback) {
@@ -58,6 +112,24 @@ export default {
         // 调保存接口
         if (data.row.statusEdit) {
           this.doSaveEdit({ id: data.row.id, [data.type]: data.row.statusEdit.join(',') })
+        }
+      }
+    },
+    handleTextBlur (callback, data) {
+      console.log('回调参数' + callback)
+      if (callback) {
+        console.log(data, 'handleBlur=====')
+        // 调保存接口
+        this.doSaveEdit({ id: data.row.id, [data.type]: data.row.text })
+      }
+    },
+    handleTicketStatusBlur (callback, data) {
+      console.log('回调参数' + callback)
+      if (!callback) {
+        console.log(data, 'handleBlur=====')
+        // 调保存接口
+        if (data.row.ticketStatusEdit) {
+          this.doSaveEdit({ id: data.row.id, [data.type]: data.row.ticketStatusEdit.join(',') })
         }
       }
     },
@@ -100,7 +172,9 @@ export default {
             if (response.data.content && response.data.content.length) {
               this.tableData.data = response.data.content.map(item => {
                 item.showEdit = !item.status
+                item.showTicketEdit = !item.ticketStatus
                 item.statusEdit = item.status ? item.status.split(',').map(item => parseInt(item)) : []
+                item.ticketStatusEdit = item.ticketStatus ? item.ticketStatus.split(',').map(item => parseInt(item)) : []
                 return item
               })
             }
@@ -146,6 +220,9 @@ export default {
       this.sendForm.createTimeEnd = this.createTime[1] ? dayjs(this.createTime[1]).format('YYYY-MM-DD HH:mm:ss') : ''
       // console.log(this.sendForm.createTimeBegin, 'this.sendForm.createTimeBegin')
       this.handleSearch()
+    },
+    chooseColor (key) {
+      return this.colors[key]
     }
   },
   created () {
@@ -169,7 +246,7 @@ export default {
               placeholder="创建人"
               clearable
               filterable
-              style="width: 100px"
+              style="width: 100px;"
             >
               <el-option
                 v-for="item in $store.state.allStaf"
@@ -244,10 +321,8 @@ export default {
               v-for="item in $store.state.ticketStatusDictObj.FH"
               :key="item.key"
               :label="item.value"
-              :value="item.key"
-            >
-            </el-option> </el-select
-        ></el-form-item>
+              :value="item.key"/>
+            </el-select></el-form-item>
         </el-col>
         <el-col :span="colSpan2">
         <!-- <el-form-item v-show="showMsg" style="margin-bottom: 0">
@@ -312,7 +387,7 @@ export default {
         </template>
       </el-table-column>
       <el-table-column label="状态" align="center" prop="status">
-        <template slot-scope="scope" >
+        <template slot-scope="scope">
           <el-select
             v-if="scope.row.showEdit"
             style="width: 100%"
@@ -329,8 +404,8 @@ export default {
               :key="item.key"
               :label="item.value"
               :value="item.key"
-            >
-            </el-option>
+              :style=" chooseColor(item.key%5-1)"
+            />
           </el-select>
           <div v-else v-for="item in getStatusDict(scope.row.status, 'statusDictObj')" :key="item.key" style="cursor: pointer" @click="handleEdit(scope.row)">
             <el-tag type="success" v-if="item.key===1" style="margin-top:5px">{{item.value}}</el-tag>
@@ -338,7 +413,7 @@ export default {
             <el-tag type="warning" v-if="item.key===3" style="margin-top:5px">{{item.value}}</el-tag>
             <el-tag type="danger" v-if="item.key===4" style="margin-top:5px">{{item.value}}</el-tag>
             <el-tag v-if="item.key===5">{{item.value}}</el-tag>
-            <el-tag v-if="item.key===6">{{item.value}}</el-tag>
+            <el-tag type="success" v-if="item.key===6">{{item.value}}</el-tag>
           </div>
         </template>
       </el-table-column>
@@ -347,37 +422,48 @@ export default {
         prop="sendContent"
         label="发货"
       >
-      <template slot-scope="scope">
-        <!-- <el-input v-if="scope.row.isShowInput" v-model="scope.row.sendContent" placeholder="请输入发货文本" @blur="handleBlur('sendContent', scope.row)"/> -->
-        <div :class="scope.row.deleted===1?'commonDelete':''">{{scope.row.sendContent}}</div>
-      </template>
+        <template slot-scope="scope">
+          <quill-editor
+            ref="sendContent"
+            class="editor" :class="scope.row.deleted === 1?'commonDelete':''"
+            v-model="scope.row.sendContent"
+            :options="editorOption"
+            placeholder="请输入发货文本"
+            @blur="handleTextBlur($event,{type: 'sendContent', row:{'id':scope.row.id,'text':scope.row.sendContent} })"
+          />
+        </template>
+<!--      <template slot-scope="scope">
+        <div class="content">
+          <vue-html5-editor :auto-height="true" :class="scope.row.deleted === 1?'commonDelete':''" v-model="scope.row.sendContent"  placeholder="请输入发货文本" @blur="handleTextBlur($event,{type: 'sendContent', row:{'id':scope.row.id,'text':scope.row.sendContent} })"></vue-html5-editor>-->
+<!--         <el-input :class="scope.row.deleted === 1?'commonDelete':''" v-model="scope.row.sendContent"  placeholder="请输入发货文本" @blur="handleTextBlur($event,{type: 'sendContent', row:{'id':scope.row.id,'text':scope.row.sendContent} })"/>-->
+<!--        </div></template>-->
       </el-table-column>
-      <el-table-column label="钱票状态" align="center" prop="ticketStatus">
-        <template slot-scope="scope" v-if="!scope.row.isShowInput">
-          <!-- <el-select
-            v-if="scope.row.isShowInput"
-            style="width: 130px"
-            v-model="scope.row.ticketStatus"
+      <el-table-column label="钱票状态" align="center" prop="ticketStatusCol">
+        <template slot-scope="scope">
+          <el-select
+            v-if="scope.row.showTicketEdit"
+            style="width: 100%"
+            v-model="scope.row.ticketStatusEdit"
             multiple
-            placeholder="选择钱票状态"
+            placeholder="钱票状态"
             clearable
             filterable
+            @visible-change="handleTicketStatusBlur($event, {type: 'ticketStatus', row: scope.row})"
+            ref='ticketStatusRef'
           >
             <el-option
-              v-for="item in $store.state.ticketStatusDictObj.FH"
+              v-for="item in $store.state.ticketStatusDictObj.FH || []"
               :key="item.key"
               :label="item.value"
               :value="item.key"
-            >
-            </el-option> </el-select
-          > -->
-          <div v-for="item in getStatusDict(scope.row.ticketStatus, 'ticketStatusDictObj')" :key="item.key">
+              :style=" chooseColor(item.key%5-1)"
+            />
+          </el-select>
+          <div v-for="item in getStatusDict(scope.row.ticketStatus, 'ticketStatusDictObj')" :key="item.key" style="cursor: pointer" @click="handleTicketStatusEdit(scope.row)">
             <el-tag type="success" v-if="item.key===1" style="margin-top:5px">{{item.value}}</el-tag>
             <el-tag type="info" v-if="item.key===2" style="margin-top:5px">{{item.value}}</el-tag>
             <el-tag type="warning" v-if="item.key===3" style="margin-top:5px">{{item.value}}</el-tag>
             <el-tag type="danger" v-if="item.key===4" style="margin-top:5px">{{item.value}}</el-tag>
-            <el-tag v-if="item.key===5">{{item.value}}</el-tag>
-            <el-tag v-if="item.key===6">{{item.value}}</el-tag>
           </div>
         </template>
       </el-table-column>
@@ -387,8 +473,7 @@ export default {
         label="输入金额"
       >
         <template slot-scope="scope">
-          <!-- <el-input v-if="scope.row.isShowInput" v-model="scope.row.inAmount" placeholder="请输入金额" @blur="handleBlur('inAmount', scope.row)"/> -->
-          <div >{{scope.row.inAmout}}</div>
+           <el-input v-model="scope.row.inAmount" placeholder="请输入金额" type="number"  @blur="handleTextBlur($event,{type: 'inAmount', row:{'id':scope.row.id,'text':scope.row.inAmount} })"/>
         </template>
       </el-table-column>
       <el-table-column
@@ -397,7 +482,7 @@ export default {
         label="备注"
       >
         <template slot-scope="scope">
-          <div >{{scope.row.remark}}</div>
+          <el-input type="textarea" :rows="6" v-model="scope.row.remark" placeholder="请输入备注"   @blur="handleTextBlur($event,{type: 'remark', row:{'id':scope.row.id,'text':scope.row.remark} })"/>
         </template>
       </el-table-column>
        <el-table-column
@@ -449,6 +534,81 @@ export default {
 }
 .statusDict1 {
   color: red;
+}
+.editor {
+  line-height: normal !important;
+  height: 100px;
+}
+.ql-snow .ql-tooltip[data-mode="link"]::before {
+  content: "请输入链接地址:";
+}
+.ql-snow .ql-tooltip.ql-editing a.ql-action::after {
+  border-right: 0px;
+  content: "保存";
+  padding-right: 0px;
+}
+
+.ql-snow .ql-tooltip[data-mode="video"]::before {
+  content: "请输入视频地址:";
+}
+
+.ql-snow .ql-picker.ql-size .ql-picker-label::before,
+.ql-snow .ql-picker.ql-size .ql-picker-item::before {
+  content: "14px";
+}
+.ql-snow .ql-picker.ql-size .ql-picker-label[data-value="small"]::before,
+.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="small"]::before {
+  content: "10px";
+}
+.ql-snow .ql-picker.ql-size .ql-picker-label[data-value="large"]::before,
+.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="large"]::before {
+  content: "18px";
+}
+.ql-snow .ql-picker.ql-size .ql-picker-label[data-value="huge"]::before,
+.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="huge"]::before {
+  content: "32px";
+}
+
+.ql-snow .ql-picker.ql-header .ql-picker-label::before,
+.ql-snow .ql-picker.ql-header .ql-picker-item::before {
+  content: "文本";
+}
+.ql-snow .ql-picker.ql-header .ql-picker-label[data-value="1"]::before,
+.ql-snow .ql-picker.ql-header .ql-picker-item[data-value="1"]::before {
+  content: "标题1";
+}
+.ql-snow .ql-picker.ql-header .ql-picker-label[data-value="2"]::before,
+.ql-snow .ql-picker.ql-header .ql-picker-item[data-value="2"]::before {
+  content: "标题2";
+}
+.ql-snow .ql-picker.ql-header .ql-picker-label[data-value="3"]::before,
+.ql-snow .ql-picker.ql-header .ql-picker-item[data-value="3"]::before {
+  content: "标题3";
+}
+.ql-snow .ql-picker.ql-header .ql-picker-label[data-value="4"]::before,
+.ql-snow .ql-picker.ql-header .ql-picker-item[data-value="4"]::before {
+  content: "标题4";
+}
+.ql-snow .ql-picker.ql-header .ql-picker-label[data-value="5"]::before,
+.ql-snow .ql-picker.ql-header .ql-picker-item[data-value="5"]::before {
+  content: "标题5";
+}
+.ql-snow .ql-picker.ql-header .ql-picker-label[data-value="6"]::before,
+.ql-snow .ql-picker.ql-header .ql-picker-item[data-value="6"]::before {
+  content: "标题6";
+}
+
+.ql-snow .ql-picker.ql-font .ql-picker-label::before,
+.ql-snow .ql-picker.ql-font .ql-picker-item::before {
+  content: "标准字体";
+}
+.ql-snow .ql-picker.ql-font .ql-picker-label[data-value="serif"]::before,
+.ql-snow .ql-picker.ql-font .ql-picker-item[data-value="serif"]::before {
+  content: "衬线字体";
+}
+.ql-snow .ql-picker.ql-font .ql-picker-label[data-value="monospace"]::before,
+.ql-snow .ql-picker.ql-font .ql-picker-item[data-value="monospace"]::before {
+  content: "等宽字体";
 }
 
 </style>

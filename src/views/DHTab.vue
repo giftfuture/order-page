@@ -1,11 +1,12 @@
 <script>
-import { querySearch } from '@/api/index.js'
+import { editOrderOne, querySearch } from '@/api/index.js'
 import dayjs from 'dayjs'
 
 export default {
   name: 'DHTab',
   data () {
     return {
+      colors: ['color:#67c23a;background-color:#f0f9eb', 'color:#909399;background-color:#f4f4f5', 'color:#e6a23c;background-color:#fdf6ec', 'color:#f56c6c;background-color:#fef0f0', 'color:#409EFF;background-color:#ecf5ff'],
       showHistory: false,
       historyList: [],
       pastHistory: '',
@@ -47,141 +48,195 @@ export default {
       this.handleSearch()
     }
   },
-  methods: {
-    getStatusDict (keys, type) {
-      if (!keys && typeof keys !== 'string') return []
-      const keyArr = keys.split(',')
-      const data = this.$store.state[type].DH ? this.$store.state[type].DH.filter(item => {
-        const key = String(item.key)
-        if (keyArr.indexOf(key) > -1) return item
-      }) : []
-      return data
-    },
-    handleSearch () {
-      const orderInfoVO = { 'orderTag': 'DH' }
-      Object.keys(this.DHForm).forEach(key => {
-        if (Array.isArray(this.DHForm[key])) {
-          orderInfoVO[key] = this.DHForm[key].join(',')
-        } else {
-          orderInfoVO[key] = this.DHForm[key]
-        }
-      })
-      const params = {
-        orderInfoVO,
-        'pageRequest': { 'page': this.pageNo, 'size': this.pageSize }
-      }
-      querySearch(params)
-        .then((response) => {
-          console.log(response, '====')
-          if (response.code === 0) {
-            this.tableData.data = response.data.content ? response.data.content : []
-            this.tableData.total = response.data && (response.data.totalElements || 0)
-          } else {
-            this.$message.error(response.data.message)
-          }
-        })
-        .catch((error) => {
-          console.log(error)
-        })
-      return params
-    },
-    handleSizeChange (val) {
-      console.log(`每页 ${val} 条`)
-      this.pageSize = val
-    },
-    handleCurrentChange (val) {
-      this.pageNo = val - 1
-      console.log(`当前页: ${val}`)
-    },
-    handleSelectionChange (val) {
-      this.sumInAmount = 0
-      val.map((item) => this.sumInAmount += item.inAmount)
-      this.multipleSelection = val
-    },
-    handleNodeClick (data) {
-      console.log(data)
-    },
-    checkboxT (row, rowIndex) {
-      // console.log(row, 'row====')
-      // return row.id !== this.user.id
-      // checkboxList()
-      return row.id
-    },
-    search () {
-      this.pastHistory = false // 每次点击搜索后历史记录就隐藏
-      if (this.$refs.searchContent.value !== '') { // 判断输入框的值
-        // 每次搜索的值push到新数组里
-        this.newArr.push(this.$refs.searchContent.value)
-        this.newArr = this.unique(this.newArr) // 调用unique方法去重
-        this.list = []
-        for (let i = this.newArr.length; i > 0; i--) { // 数组倒序  最新输入的排在最上面
-          this.list.push(this.newArr[i - 1])
-        }
-        if (this.list.length > 10) { // 最多保存10条
-          this.list = this.list.slice(0, 10)
-        }
-        localStorage.setItem('historyList', JSON.stringify(this.list)) // 存localStorage
-        console.log(localStorage.getItem('historyList'))
-      }
-      // console.log(this.DHForm, 'this.DHForm')
-      // console.log(this.$refs.DHForm, 'formName====')
-      this.DHForm.createTimeBegin = this.createTime[0] ? dayjs(this.createTime[0]).format('YYYY-MM-DD HH:mm:ss') : ''
-      this.DHForm.createTimeEnd = this.createTime[1] ? dayjs(this.createTime[1]).format('YYYY-MM-DD HH:mm:ss') : ''
-      // console.log(this.DHForm.createTimeBegin, 'this.DHForm.createTimeBegin')
-      this.handleSearch()
-    },
-    handleOptions () {
-      this.$emit('handleOptions', { multipleSelection: this.multipleSelection, callBack: this.handleSearch })
-    },
-    handleAdd () {
-      this.$emit('handleAdd', 'DH', this.handleSearch)
-    },
-    // 去重方法封装
-    unique (arr) {
-      return arr.filter(function (item, index, arr) {
-        return arr.indexOf(item, 0) === index
-      })
-    },
-    // 点击文本框输入
-    searchFocus () {
-      console.log(localStorage.getItem('historyList'))
-      if (localStorage.getItem('historyList')) { // historyList有值才执行接下来的操作
-        let arrlist = JSON.parse(localStorage.getItem('historyList'))
-        this.historyList = arrlist
-        console.log(this.historyList)
-        if (this.historyList.length > 0) {
-          this.pastHistory = true // 有值显示历史记录
-        }
-      } else {
-        this.pastHistory = false
-      }
-    },
-    // 点击历史记录直接搜索
-    clickHistory (item, index) {
-      this.pastHistory = false
-      // this.DHForm.searchContent = item
-      this.$refs.searchContent.value = item
-      // 接口前处理
-      // this.filterData.productTitle = this.inputText
-      // this.productList = []
-      // this.getProductList() // 调用搜索接口
-      let listIndex = index
-
-      this.historyList.splice(0, 0, this.historyList[listIndex]) // 每次点击记录被点击的展示在最前面
-      this.historyList = this.unique(this.historyList) // 去重
-      localStorage.setItem('historyList', JSON.stringify(this.historyList)) // 新数组储存
-    },
-    // 点击删除记录
-    deleteHis (index) {
-      if (isNaN(index) || index >= this.historyList.length) {
-        return false
-      }
-      this.historyList.splice(index, 1)
-      localStorage.setItem('historyList', JSON.stringify(this.historyList)) // 保存删除后的新数组
-      if (this.historyList.length === 0) {
-        this.pastHistory = false
+  methods: { handleEdit (row) {
+    row.showEdit = true
+    // console.log(e, 'handleEdit')
+  },
+  handleTicketStatusEdit (row) {
+    row.showTicketEdit = true
+    // console.log(e, 'handleEdit')
+  },
+  handleBlur (callback, data) {
+    console.log('回调参数' + callback)
+    if (!callback) {
+      console.log(data, 'handleBlur=====')
+      // 调保存接口
+      if (data.row.statusEdit) {
+        this.doSaveEdit({ id: data.row.id, [data.type]: data.row.statusEdit.join(',') })
       }
     }
+  },
+  handleTextBlur (callback, data) {
+    console.log('回调参数' + callback)
+    if (callback) {
+      console.log(data, 'handleBlur=====')
+      // 调保存接口
+      this.doSaveEdit({ id: data.row.id, [data.type]: data.row.text })
+    }
+  },
+  handleTicketStatusBlur (callback, data) {
+    console.log('回调参数' + callback)
+    if (!callback) {
+      console.log(data, 'handleBlur=====')
+      // 调保存接口
+      if (data.row.ticketStatusEdit) {
+        this.doSaveEdit({ id: data.row.id, [data.type]: data.row.ticketStatusEdit.join(',') })
+      }
+    }
+  },
+  doSaveEdit (data) {
+    editOrderOne(data).then(res => {
+      if (res.code === 0) {
+        this.$message.success('编辑成功')
+        this.handleSearch()
+      }
+    })
+  },
+  getStatusDict (keys, type) {
+    if (!keys && typeof keys !== 'string') return []
+    const keyArr = keys.split(',')
+    const data = this.$store.state[type].DH ? this.$store.state[type].DH.filter(item => {
+      const key = String(item.key)
+      if (keyArr.indexOf(key) > -1) return item
+    }) : []
+    return data
+  },
+  handleSearch () {
+    const orderInfoVO = { 'orderTag': 'DH' }
+    Object.keys(this.DHForm).forEach(key => {
+      if (Array.isArray(this.DHForm[key])) {
+        orderInfoVO[key] = this.DHForm[key].join(',')
+      } else {
+        orderInfoVO[key] = this.DHForm[key]
+      }
+    })
+    const params = {
+      orderInfoVO,
+      'pageRequest': { 'page': this.pageNo, 'size': this.pageSize }
+    }
+    querySearch(params)
+      .then((response) => {
+        console.log(response, '====')
+        if (response.code === 0) {
+          if (response.data.content && response.data.content.length) {
+            this.tableData.data = response.data.content.map(item => {
+              item.showEdit = !item.status
+              item.showTicketEdit = !item.ticketStatus
+              item.statusEdit = item.status ? item.status.split(',').map(item => parseInt(item)) : []
+              item.ticketStatusEdit = item.ticketStatus ? item.ticketStatus.split(',').map(item => parseInt(item)) : []
+              return item
+            })
+          }
+          this.tableData.total = response.data && (response.data.totalElements || 0)
+        } else {
+          this.$message.error(response.data.message)
+        }
+      })
+      .catch((error) => {
+        console.log(error)
+      })
+    return params
+  },
+  handleSizeChange (val) {
+    console.log(`每页 ${val} 条`)
+    this.pageSize = val
+  },
+  handleCurrentChange (val) {
+    this.pageNo = val - 1
+    console.log(`当前页: ${val}`)
+  },
+  handleSelectionChange (val) {
+    this.sumInAmount = 0
+    val.map((item) => this.sumInAmount += item.inAmount)
+    this.multipleSelection = val
+  },
+  handleNodeClick (data) {
+    console.log(data)
+  },
+  checkboxT (row, rowIndex) {
+    // console.log(row, 'row====')
+    // return row.id !== this.user.id
+    // checkboxList()
+    return row.id
+  },
+  search () {
+    this.pastHistory = false // 每次点击搜索后历史记录就隐藏
+    if (this.$refs.searchContent.value !== '') { // 判断输入框的值
+      // 每次搜索的值push到新数组里
+      this.newArr.push(this.$refs.searchContent.value)
+      this.newArr = this.unique(this.newArr) // 调用unique方法去重
+      this.list = []
+      for (let i = this.newArr.length; i > 0; i--) { // 数组倒序  最新输入的排在最上面
+        this.list.push(this.newArr[i - 1])
+      }
+      if (this.list.length > 10) { // 最多保存10条
+        this.list = this.list.slice(0, 10)
+      }
+      localStorage.setItem('historyList', JSON.stringify(this.list)) // 存localStorage
+      console.log(localStorage.getItem('historyList'))
+    }
+    // console.log(this.DHForm, 'this.DHForm')
+    // console.log(this.$refs.DHForm, 'formName====')
+    this.DHForm.createTimeBegin = this.createTime[0] ? dayjs(this.createTime[0]).format('YYYY-MM-DD HH:mm:ss') : ''
+    this.DHForm.createTimeEnd = this.createTime[1] ? dayjs(this.createTime[1]).format('YYYY-MM-DD HH:mm:ss') : ''
+    // console.log(this.DHForm.createTimeBegin, 'this.DHForm.createTimeBegin')
+    this.handleSearch()
+  },
+  handleOptions () {
+    this.$emit('handleOptions', { multipleSelection: this.multipleSelection, callBack: this.handleSearch })
+  },
+  handleAdd () {
+    this.$emit('handleAdd', 'DH', this.handleSearch)
+  },
+  // 去重方法封装
+  unique (arr) {
+    return arr.filter(function (item, index, arr) {
+      return arr.indexOf(item, 0) === index
+    })
+  },
+  // 点击文本框输入
+  searchFocus () {
+    console.log(localStorage.getItem('historyList'))
+    if (localStorage.getItem('historyList')) { // historyList有值才执行接下来的操作
+      let arrlist = JSON.parse(localStorage.getItem('historyList'))
+      this.historyList = arrlist
+      console.log(this.historyList)
+      if (this.historyList.length > 0) {
+        this.pastHistory = true // 有值显示历史记录
+      }
+    } else {
+      this.pastHistory = false
+    }
+  },
+  // 点击历史记录直接搜索
+  clickHistory (item, index) {
+    this.pastHistory = false
+    // this.DHForm.searchContent = item
+    this.$refs.searchContent.value = item
+    // 接口前处理
+    // this.filterData.productTitle = this.inputText
+    // this.productList = []
+    // this.getProductList() // 调用搜索接口
+    let listIndex = index
+
+    this.historyList.splice(0, 0, this.historyList[listIndex]) // 每次点击记录被点击的展示在最前面
+    this.historyList = this.unique(this.historyList) // 去重
+    localStorage.setItem('historyList', JSON.stringify(this.historyList)) // 新数组储存
+  },
+  // 点击删除记录
+  deleteHis (index) {
+    if (isNaN(index) || index >= this.historyList.length) {
+      return false
+    }
+    this.historyList.splice(index, 1)
+    localStorage.setItem('historyList', JSON.stringify(this.historyList)) // 保存删除后的新数组
+    if (this.historyList.length === 0) {
+      this.pastHistory = false
+    }
+  },
+  chooseColor (key) {
+    return this.colors[key]
+  }
   },
   created () {
     this.handleSearch()
@@ -233,7 +288,7 @@ export default {
                 class="el-input__icon el-icon-view btn-eye"
               ></i> </el-input
           ></el-form-item>
-          <div class="history" ref="history" v-if="pastHistory"  @click.stop="pastHistory=true"  >     <!-- @click.stop="pastHistory=true" showHistory  @click="handleDivClick" @click = "this.$refs.history.style.display = 'block'"历史记录默认不显示,有搜索记录才显示  style="display: inline;"-->
+          <div class="history" ref="history" v-if="pastHistory" >     <!-- showHistory  @click="handleDivClick" @click = "this.$refs.history.style.display = 'block'"历史记录默认不显示,有搜索记录才显示  style="display: inline;"-->
             <ul><li>
             <div class="hisText">历史记录</div>
             </li>
@@ -354,14 +409,32 @@ export default {
         </template>
       </el-table-column>
       <el-table-column label="状态" align="center" prop="status">
-        <template slot-scope="scope">
-          <div v-for="item in getStatusDict(scope.row.status, 'statusDictObj')" :key="item.key">
+        <template slot-scope="scope" >
+          <el-select
+            v-if="scope.row.showEdit"
+            style="width: 100%"
+            v-model="scope.row.statusEdit"
+            multiple
+            placeholder="选择状态"
+            clearable
+            filterable
+            @visible-change="handleBlur($event, {type: 'status', row: scope.row})"
+            ref='statusRef'
+          >
+            <el-option
+              v-for="item in $store.state.statusDictObj.DH || []"
+              :key="item.key"
+              :label="item.value"
+              :value="item.key"
+              :style=" chooseColor(item.key%5-1)"/>
+          </el-select>
+          <div v-else v-for="item in getStatusDict(scope.row.status, 'statusDictObj')" :key="item.key" style="cursor: pointer" @click="handleEdit(scope.row)">
             <el-tag type="success" v-if="item.key===1" style="margin-top:5px">{{item.value}}</el-tag>
             <el-tag type="info" v-if="item.key===2" style="margin-top:5px">{{item.value}}</el-tag>
             <el-tag type="warning" v-if="item.key===3" style="margin-top:5px">{{item.value}}</el-tag>
             <el-tag type="danger" v-if="item.key===4" style="margin-top:5px">{{item.value}}</el-tag>
             <el-tag v-if="item.key===5">{{item.value}}</el-tag>
-            <el-tag v-if="item.key===6">{{item.value}}</el-tag>
+            <el-tag type="success" v-if="item.key===6">{{item.value}}</el-tag>
           </div>
         </template>
       </el-table-column>
@@ -371,18 +444,34 @@ export default {
         label="订货"
       >
       <template slot-scope="scope">
-        <div :class="scope.row.deleted===1?'commonDelete':''">{{scope.row.content}}</div>
+        <el-input type="textarea" :rows="6" :class="scope.row.deleted === 1?'commonDelete':''" v-model="scope.row.content"  placeholder="请输入订货文本" @blur="handleTextBlur($event,{type: 'content', row:{'id':scope.row.id,'text':scope.row.content} })"/>
       </template>
       </el-table-column>
-      <el-table-column label="钱票状态" align="center" prop="ticketStatus">
+      <el-table-column label="钱票状态" align="center" prop="ticketStatusCol">
         <template slot-scope="scope">
-          <div v-for="item in getStatusDict(scope.row.ticketStatus, 'ticketStatusDictObj')" :key="item.key">
+          <el-select
+            v-if="scope.row.showTicketEdit"
+            style="width: 100%"
+            v-model="scope.row.ticketStatusEdit"
+            multiple
+            placeholder="钱票状态"
+            clearable
+            filterable
+            @visible-change="handleTicketStatusBlur($event, {type: 'ticketStatus', row: scope.row})"
+            ref='ticketStatusRef'
+          >
+            <el-option
+              v-for="item in $store.state.ticketStatusDictObj.DH || []"
+              :key="item.key"
+              :label="item.value"
+              :value="item.key"
+              :style=" chooseColor(item.key%5-1)"/>
+          </el-select>
+          <div v-for="item in getStatusDict(scope.row.ticketStatus, 'ticketStatusDictObj')" :key="item.key" style="cursor: pointer" @click="handleTicketStatusEdit(scope.row)">
             <el-tag type="success" v-if="item.key===1" style="margin-top:5px">{{item.value}}</el-tag>
             <el-tag type="info" v-if="item.key===2" style="margin-top:5px">{{item.value}}</el-tag>
             <el-tag type="warning" v-if="item.key===3" style="margin-top:5px">{{item.value}}</el-tag>
             <el-tag type="danger" v-if="item.key===4" style="margin-top:5px">{{item.value}}</el-tag>
-            <el-tag v-if="item.key===5">{{item.value}}</el-tag>
-            <el-tag v-if="item.key===6">{{item.value}}</el-tag>
           </div>
         </template>
       </el-table-column>
@@ -390,19 +479,25 @@ export default {
         :show-overflow-tooltip="true"
         prop="inAmount"
         label="输入金额"
-      />
+      >  <template slot-scope="scope">
+        <el-input v-model="scope.row.inAmount" placeholder="请输入金额" type="number"  @blur="handleTextBlur($event,{type: 'inAmount', row:{'id':scope.row.id,'text':scope.row.inAmount} })"/>
+      </template></el-table-column>
       <el-table-column
         :show-overflow-tooltip="true"
         prop="arriveNotice"
         label="到货通知"
-      />
+      >
+        <template slot-scope="scope">
+          <el-input type="textarea" :rows="6" v-model="scope.row.arriveNotice" placeholder="请输入到货通知"   @blur="handleTextBlur($event,{type: 'arriveNotice', row:{'id':scope.row.id,'text':scope.row.arriveNotice} })"/>
+        </template>
+      </el-table-column>
       <el-table-column
         :show-overflow-tooltip="true"
         prop="remark"
         label="备注"
       >
         <template slot-scope="scope">
-          <div >{{scope.row.remark}}</div>
+          <el-input type="textarea" :rows="6" v-model="scope.row.remark" placeholder="请输入备注"   @blur="handleTextBlur($event,{type: 'remark', row:{'id':scope.row.id,'text':scope.row.remark} })"/>
         </template>
       </el-table-column>
       <el-table-column
@@ -411,7 +506,7 @@ export default {
         label="对账备注"
       >
         <template slot-scope="scope">
-          <div >{{scope.row.accountRemark}}</div>
+          <el-input type="textarea" :rows="6" v-model="scope.row.accountRemark" placeholder="请输入对账备注"   @blur="handleTextBlur($event,{type: 'accountRemark', row:{'id':scope.row.id,'text':scope.row.accountRemark} })"/>
         </template>
       </el-table-column>
       <el-table-column

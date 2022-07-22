@@ -1,5 +1,5 @@
 <script>
-import { querySearch } from '@/api/index.js'
+import { editOrderOne, querySearch } from '@/api/index.js'
 import dayjs from 'dayjs'
 
 export default {
@@ -8,6 +8,7 @@ export default {
   },
   data () {
     return {
+      colors: ['color:#67c23a;background-color:#f0f9eb', 'color:#909399;background-color:#f4f4f5', 'color:#e6a23c;background-color:#fdf6ec', 'color:#f56c6c;background-color:#fef0f0', 'color:#409EFF;background-color:#ecf5ff'],
       sumInAmount: '',
       colSpan7: 7,
       colSpan5: 5,
@@ -47,6 +48,36 @@ export default {
     }
   },
   methods: {
+    handleEdit (row) {
+      row.showEdit = true
+      // console.log(e, 'handleEdit')
+    },
+    handleBlur (callback, data) {
+      console.log('回调参数' + callback)
+      if (!callback) {
+        console.log(data, 'handleBlur=====')
+        // 调保存接口
+        if (data.row.statusEdit) {
+          this.doSaveEdit({ id: data.row.id, [data.type]: data.row.statusEdit.join(',') })
+        }
+      }
+    },
+    handleTextBlur (callback, data) {
+      console.log('回调参数' + callback)
+      if (callback) {
+        console.log(data, 'handleBlur=====')
+        // 调保存接口
+        this.doSaveEdit({ id: data.row.id, [data.type]: data.row.text })
+      }
+    },
+    doSaveEdit (data) {
+      editOrderOne(data).then(res => {
+        if (res.code === 0) {
+          this.$message.success('编辑成功')
+          this.handleSearch()
+        }
+      })
+    },
     getStatusDict (keys, type) {
       if (!keys && typeof keys !== 'string') return []
       const keyArr = keys.split(',')
@@ -73,7 +104,13 @@ export default {
         .then((response) => {
           console.log(response, '====')
           if (response.code === 0) {
-            this.tableData.data = response.data.content ? response.data.content : []
+            if (response.data.content && response.data.content.length) {
+              this.tableData.data = response.data.content.map(item => {
+                item.showEdit = !item.status
+                item.statusEdit = item.status ? item.status.split(',').map(item => parseInt(item)) : []
+                return item
+              })
+            }
             this.tableData.total = response.data && (response.data.totalElements || 0)
           } else {
             this.$message.error(response.data.message)
@@ -119,6 +156,9 @@ export default {
     },
     handleAdd () {
       this.$emit('handleAdd', 'DK', this.handleSearch)
+    },
+    chooseColor (key) {
+      return this.colors[key]
     }
   },
 
@@ -264,14 +304,32 @@ export default {
         </template>
       </el-table-column>
       <el-table-column label="状态" align="center" prop="status">
-        <template slot-scope="scope">
-          <div v-for="item in getStatusDict(scope.row.status, 'statusDictObj')" :key="item.key">
+        <template slot-scope="scope" >
+          <el-select
+            v-if="scope.row.showEdit"
+            style="width: 100%"
+            v-model="scope.row.statusEdit"
+            multiple
+            placeholder="选择状态"
+            clearable
+            filterable
+            @visible-change="handleBlur($event, {type: 'status', row: scope.row})"
+            ref='statusRef'
+          >
+            <el-option
+              v-for="item in $store.state.statusDictObj.DK || []"
+              :key="item.key"
+              :label="item.value"
+              :value="item.key"
+              :style=" chooseColor(item.key%5-1)"/>
+          </el-select>
+          <div v-else v-for="item in getStatusDict(scope.row.status, 'statusDictObj')" :key="item.key" style="cursor: pointer" @click="handleEdit(scope.row)">
             <el-tag type="success" v-if="item.key===1" style="margin-top:5px">{{item.value}}</el-tag>
             <el-tag type="info" v-if="item.key===2" style="margin-top:5px">{{item.value}}</el-tag>
             <el-tag type="warning" v-if="item.key===3" style="margin-top:5px">{{item.value}}</el-tag>
             <el-tag type="danger" v-if="item.key===4" style="margin-top:5px">{{item.value}}</el-tag>
             <el-tag v-if="item.key===5">{{item.value}}</el-tag>
-            <el-tag v-if="item.key===6">{{item.value}}</el-tag>
+            <el-tag type="success" v-if="item.key===6">{{item.value}}</el-tag>
           </div>
         </template>
       </el-table-column>
@@ -281,21 +339,23 @@ export default {
         label="打款"
       >
       <template slot-scope="scope">
-        <div :class="scope.row.deleted===1?'commonDelete':''">{{scope.row.content}}</div>
+        <el-input type="textarea" :rows="6" :class="scope.row.deleted === 1?'commonDelete':''" v-model="scope.row.content"  placeholder="请输入打款文本" @blur="handleTextBlur($event,{type: 'content', row:{'id':scope.row.id,'text':scope.row.content} })"/>
       </template>
       </el-table-column>
       <el-table-column
         :show-overflow-tooltip="true"
         prop="inAmount"
         label="输入金额"
-      />
+      ><template slot-scope="scope">
+        <el-input v-model="scope.row.inAmount" placeholder="请输入金额" type="number"  @blur="handleTextBlur($event,{type: 'inAmount', row:{'id':scope.row.id,'text':scope.row.inAmount} })"/>
+      </template></el-table-column>
       <el-table-column
         :show-overflow-tooltip="true"
         prop="remark"
         label="备注"
       >
         <template slot-scope="scope">
-          <div >{{scope.row.remark}}</div>
+          <el-input type="textarea" :rows="6" v-model="scope.row.remark" placeholder="请输入备注"   @blur="handleTextBlur($event,{type: 'remark', row:{'id':scope.row.id,'text':scope.row.remark} })"/>
         </template>
       </el-table-column>
       <el-table-column
@@ -304,7 +364,7 @@ export default {
         label="对账备注"
       >
         <template slot-scope="scope">
-          <div >{{scope.row.accountRemark}}</div>
+          <el-input type="textarea" :rows="6" v-model="scope.row.accountRemark" placeholder="请输入对账备注"   @blur="handleTextBlur($event,{type: 'accountRemark', row:{'id':scope.row.id,'text':scope.row.accountRemark} })"/>
         </template>
       </el-table-column>
       <el-table-column

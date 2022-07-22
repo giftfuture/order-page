@@ -9,9 +9,9 @@ import Cookies from 'js-cookie'
 export const baseUrl = (env) => {
   switch (env) {
     case 'production':
-      return 'http://172.16.3.91:8888'
+      return 'http://127.0.0.1:8888'
     default:
-      return 'http://172.16.3.91:8888'
+      return 'http://127.0.0.1:8888'
   }
 }
 // 创建axios实例

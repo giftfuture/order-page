@@ -8,6 +8,7 @@ import Utils from './common/utils'
 import 'element-ui/lib/theme-chalk/reset.css'
 import 'element-ui/lib/theme-chalk/index.css'
 import './mock.js'
+import 'font-awesome/css/font-awesome.css'
 
 /// /////////////////////////////////////////////////////
 // 引用axios，并设置基础URL为后端服务api地址
