@@ -1,8 +1,9 @@
 import request from '@/utils/request'
 
-export function getDicts (data) {
+// 获取所有的Role
+export function getAll (data) {
   return request({
-    url: '/dict/list',
+    url: '/tab/list',
     method: 'post',
     data
   })
@@ -10,31 +11,32 @@ export function getDicts (data) {
 
 export function add (data) {
   return request({
-    url: '/dict/add',
+    url: '/tab/add',
     method: 'post',
     data
   })
 }
+
 export function get (id) {
   return request({
-    url: '/dict/' + id,
+    url: '/sort/' + id,
     method: 'get'
   })
 }
 
 export function del (id) {
   return request({
-    url: '/dict/del?id=' + id,
+    url: '/tab/del?id=' + id,
     method: 'delete'
   })
 }
 
 export function edit (data) {
   return request({
-    url: '/dict/edit',
+    url: '/tab/edit',
     method: 'put',
     data
   })
 }
 
-export default { add, edit, get, del, getDicts }
+export default { add, edit, del, get, getAll }

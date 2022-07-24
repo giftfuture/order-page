@@ -101,9 +101,9 @@
   </div>
 </template>
 <script>
-import CRUD, { crud } from '@crud/crud'
+import CRUD, { crud } from '@/components/Crud/crud'
 
-function sortWithRef(src, ref) {
+function sortWithRef (src, ref) {
   const result = Object.assign([], ref)
   let cursor = -1
   src.forEach(e => {
@@ -134,7 +134,7 @@ export default {
       default: () => { return [] }
     }
   },
-  data() {
+  data () {
     return {
       tableColumns: [],
       allColumnsSelected: true,
@@ -145,7 +145,7 @@ export default {
     }
   },
   watch: {
-    'crud.props.table'() {
+    'crud.props.table' () {
       this.updateTableColumns()
       this.tableColumns.forEach(column => {
         if (this.hiddenColumns.indexOf(column.property) !== -1) {
@@ -154,15 +154,15 @@ export default {
         }
       })
     },
-    'crud.props.table.store.states.columns'() {
+    'crud.props.table.store.states.columns' () {
       this.updateTableColumns()
     }
   },
-  created() {
+  created () {
     this.crud.updateProp('searchToggle', true)
   },
   methods: {
-    updateTableColumns() {
+    updateTableColumns () {
       const table = this.crud.getTable()
       if (!table) {
         this.tableColumns = []
@@ -189,7 +189,7 @@ export default {
       })
       this.tableColumns = columns
     },
-    toDelete(datas) {
+    toDelete (datas) {
       this.$confirm(`确认删除选中的${datas.length}条数据?`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -200,7 +200,7 @@ export default {
       }).catch(() => {
       })
     },
-    handleCheckAllChange(val) {
+    handleCheckAllChange (val) {
       if (val === false) {
         this.allColumnsSelected = true
         return
@@ -214,7 +214,7 @@ export default {
       this.allColumnsSelected = val
       this.allColumnsSelectedIndeterminate = false
     },
-    handleCheckedTableColumnsChange(item) {
+    handleCheckedTableColumnsChange (item) {
       let totalCount = 0
       let selectedCount = 0
       this.tableColumns.forEach(column => {
@@ -223,7 +223,7 @@ export default {
       })
       if (selectedCount === 0) {
         this.crud.notify('请至少选择一列', CRUD.NOTIFICATION_TYPE.WARNING)
-        this.$nextTick(function() {
+        this.$nextTick(function () {
           item.visible = true
         })
         return
@@ -232,7 +232,7 @@ export default {
       this.allColumnsSelectedIndeterminate = selectedCount !== totalCount && selectedCount !== 0
       this.updateColumnVisible(item)
     },
-    updateColumnVisible(item) {
+    updateColumnVisible (item) {
       const table = this.crud.props.table
       const vm = table.$children.find(e => e.prop === item.property)
       const columnConfig = vm.columnConfig
@@ -245,7 +245,7 @@ export default {
       }
       this.ignoreNextTableColumnsChange = true
     },
-    toggleSearch() {
+    toggleSearch () {
       this.crud.props.searchToggle = !this.crud.props.searchToggle
     }
   }

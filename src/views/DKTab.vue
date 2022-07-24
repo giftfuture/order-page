@@ -131,7 +131,7 @@ export default {
     },
     handleSelectionChange (val) {
       this.sumInAmount = 0
-      val.map((item) => this.sumInAmount += item.inAmount)
+      val.map((item) => { this.sumInAmount += item.inAmount })
       this.multipleSelection = val
     },
     handleNodeClick (data) {
@@ -358,7 +358,7 @@ export default {
           <el-input type="textarea" :rows="6" v-model="scope.row.remark" placeholder="请输入备注"   @blur="handleTextBlur($event,{type: 'remark', row:{'id':scope.row.id,'text':scope.row.remark} })"/>
         </template>
       </el-table-column>
-      <el-table-column
+<!--      <el-table-column
         :show-overflow-tooltip="true"
         prop="accountRemark"
         label="对账备注"
@@ -366,7 +366,7 @@ export default {
         <template slot-scope="scope">
           <el-input type="textarea" :rows="6" v-model="scope.row.accountRemark" placeholder="请输入对账备注"   @blur="handleTextBlur($event,{type: 'accountRemark', row:{'id':scope.row.id,'text':scope.row.accountRemark} })"/>
         </template>
-      </el-table-column>
+      </el-table-column>-->
       <el-table-column
         :show-overflow-tooltip="true"
         prop="pics"
@@ -377,7 +377,7 @@ export default {
           <span  v-else>无图片</span>
         </template>
       </el-table-column>
-      <el-table-column
+<!--      <el-table-column
       fixed="right"
       label="操作"
       width="100">
@@ -389,23 +389,11 @@ export default {
             <el-button type="text" size="small" @click="$emit('handleAction',scope.row,'edit', handleSearch)">生成新的</el-button>
           </div>
         </template>
-      </el-table-column>
+      </el-table-column>-->
     </el-table>
   </div>
 </template>
 <style>
-
-.el-tabs {
-      height: 100%;
-    display: flex;
-    flex-direction: column;
-    }
-    .el-tab-pane {
-      height: 100%;
-    }
-    .el-tabs__content {
-      flex: 1;
-    }
 </style>
 <style lang="scss" scoped>
 .commonBody {
@@ -420,20 +408,5 @@ export default {
 .statusDict1 {
   color: red;
 }
-// .commonBody{
-//   :global {
-//     .el-tabs {
-//       height: 100%;
-//     display: flex;
-//     flex-direction: column;
-//     }
-//     .el-tab-pane {
-//       height: 100%;
-//     }
-//     .el-tabs__content {
-//       flex: 1;
-//     }
-//   }
-// }
 
 </style>

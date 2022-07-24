@@ -50,6 +50,15 @@
             >
             </el-option> </el-select
         ></el-form-item>
+        <el-table-column
+          :show-overflow-tooltip="true"
+          prop="accountRemark"
+          label="对账备注"
+        >
+          <template slot-scope="scope">
+            <el-input type="textarea" :rows="6" v-model="scope.row.accountRemark" placeholder="请输入对账备注"   @blur="handleTextBlur($event,{type: 'accountRemark', row:{'id':scope.row.id,'text':scope.row.accountRemark} })"/>
+          </template>
+        </el-table-column>
       </el-row>
     </el-form>
     <span slot="footer" class="dialog-footer">

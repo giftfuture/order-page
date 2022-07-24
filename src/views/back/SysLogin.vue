@@ -20,9 +20,9 @@
           <i slot="suffix" class="el-input__icon el-icon-view btn-eye" @click="changeType"></i>
         </el-input>
       </el-form-item>
-      <el-form-item v-show="showMsg" style="margin-bottom:0;">
+<!--      <el-form-item v-show="showMsg" style="margin-bottom:0;">
         <span class="text-danger">提示：用户名或密码错误，请重试！</span>
-      </el-form-item>
+      </el-form-item>-->
       <el-form-item>
         <el-button type="primary" @click="login('sysLoginForm')" class="login-btn" v-loading="loading">登 录</el-button>
       </el-form-item>
@@ -31,6 +31,8 @@
 </template>
 
 <script>
+import { syslogin } from '@/api'
+
 export default {
   data () {
     return {
@@ -56,20 +58,22 @@ export default {
       this.$refs[formName].validate((valid) => {
         if (valid) {
           this.loading = true
-          this.$http.post('/sysback/login', this.sysLoginForm).then((res) => {
-            console.log(res)
-            if (res.data.code === 0) {
-              // 延迟两秒，演示登录按钮加载效果
-              setTimeout(() => {
+          // console.log(this.sysLoginForm)
+          syslogin(this.sysLoginForm)
+            .then((res) => {
+              console.log(res)
+              if (res.code === 0) {
+                // 延迟两秒，演示登录按钮加载效果
+                setTimeout(() => {
+                  this.loading = false
+                  sessionStorage.setItem('sys_usr', JSON.stringify(this.sysLoginForm))
+                  this.$router.replace({ path: '/sys/' })
+                }, 2000)
+              } else {
                 this.loading = false
-                sessionStorage.setItem('sys_usr', JSON.stringify(this.sysLoginForm))
-                this.$router.replace({ path: '/sysback/' })
-              }, 2000)
-            } else {
-              this.loading = false
-              this.showMsg = true
-            }
-          })
+                this.showMsg = true
+              }
+            })
         } else {
           console.log('login failed')
           return false

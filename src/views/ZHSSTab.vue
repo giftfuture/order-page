@@ -1,5 +1,5 @@
 <script>
-import { overallSearch, fetchAllSort } from '@/api/index.js'
+import { overallSearch, fetchAllSort, editOrderOne } from '@/api/index.js'
 import { statusDict, ticketStatusDict } from '@/common/enum'
 import dayjs from 'dayjs'
 
@@ -9,6 +9,7 @@ export default {
   },
   data () {
     return {
+      colors: ['color:#67c23a;background-color:#f0f9eb', 'color:#909399;background-color:#f4f4f5', 'color:#e6a23c;background-color:#fdf6ec', 'color:#f56c6c;background-color:#fef0f0', 'color:#409EFF;background-color:#ecf5ff'],
       sumInAmount: '',
       orderSortSelect: [],
       colSpan7: 7,
@@ -56,6 +57,50 @@ export default {
     }
   },
   methods: {
+    handleEdit (row) {
+      row.showEdit = true
+      // console.log(e, 'handleEdit')
+    },
+    handleTicketStatusEdit (row) {
+      row.showTicketEdit = true
+      // console.log(e, 'handleEdit')
+    },
+    handleBlur (callback, data) {
+      console.log('回调参数' + callback)
+      if (!callback) {
+        console.log(data, 'handleBlur=====')
+        // 调保存接口
+        if (data.row.statusEdit) {
+          this.doSaveEdit({ id: data.row.id, [data.type]: data.row.statusEdit.join(',') })
+        }
+      }
+    },
+    handleTextBlur (callback, data) {
+      console.log('回调参数' + callback)
+      if (callback) {
+        console.log(data, 'handleBlur=====')
+        // 调保存接口
+        this.doSaveEdit({ id: data.row.id, [data.type]: data.row.text })
+      }
+    },
+    handleTicketStatusBlur (callback, data) {
+      console.log('回调参数' + callback)
+      if (!callback) {
+        console.log(data, 'handleBlur=====')
+        // 调保存接口
+        if (data.row.ticketStatusEdit) {
+          this.doSaveEdit({ id: data.row.id, [data.type]: data.row.ticketStatusEdit.join(',') })
+        }
+      }
+    },
+    doSaveEdit (data) {
+      editOrderOne(data).then(res => {
+        if (res.code === 0) {
+          this.$message.success('编辑成功')
+          this.handleSearch()
+        }
+      })
+    },
     // getOrderSort (keys) {
     //   const keyArr = keys ? keys.split(',') : []
     //   const data = keyArr.map(key => {
@@ -89,7 +134,15 @@ export default {
         .then((response) => {
           console.log(response, '====')
           if (response.code === 0) {
-            this.tableData.data = response.data.content ? response.data.content : []
+            if (response.data.content && response.data.content.length) {
+              this.tableData.data = response.data.content.map(item => {
+                item.showEdit = !item.status
+                item.showTicketEdit = !item.ticketStatus
+                item.statusEdit = item.status ? item.status.split(',').map(item => parseInt(item)) : []
+                item.ticketStatusEdit = item.ticketStatus ? item.ticketStatus.split(',').map(item => parseInt(item)) : []
+                return item
+              })
+            }
             this.tableData.total = response.data && (response.data.totalElements || 0)
           } else {
             this.$message.error(response.data.message)
@@ -110,7 +163,7 @@ export default {
     },
     handleSelectionChange (val) {
       this.sumInAmount = 0
-      val.map((item) => this.sumInAmount += item.inAmount)
+      val.map((item) => { this.sumInAmount += item.inAmount })
       this.multipleSelection = val
     },
     handleNodeClick (data) {
@@ -157,6 +210,9 @@ export default {
       this.$store.state.ticketStatusDictObj && Array.isArray(this.$store.state.ticketStatusDictObj.DH) && this.$store.state.ticketStatusDictObj.DH === 'array' && this.$store.state.ticketStatusDictObj.DH.map((item) => {
         this.ZHSSForm.dingTicketStatus.push(item.key)
       })
+    },
+    chooseColor (key) {
+      return this.colors[key]
     }
 
   },
@@ -267,14 +323,12 @@ export default {
               filterable
               size="small"
               value-key="sortTag"
-              style="width: 110px"
-            >
+              style="width: 110px">
               <el-option
                 v-for="item in orderSortSelect"
                 :key="item.sortTag"
                 :label="item.sortName"
-                :value="item.sortTag"
-              >
+                :value="item.sortTag" >
               </el-option>
             </el-select>
           </el-form-item>
@@ -288,14 +342,12 @@ export default {
               placeholder="发货组状态"
               clearable
               filterable
-              style="width:135px"
-            >
+              style="width:135px">
               <el-option
                 v-for="item in this.$store.state.statusDictObj.FH"
                 :key="item.key"
                 :label="item.value"
-                :value="item.key"
-              >
+                :value="item.key">
               </el-option>
             </el-select>
           </el-form-item>
@@ -423,11 +475,18 @@ export default {
         <div :class="scope.row.deleted===1 && scope.row.orderTag !=='FH'?'commonDelete':''">{{scope.row.content}}</div>
       </template>
       </el-table-column>
-      <el-table-column
+<!--      <el-table-column
         :show-overflow-tooltip="true"
         prop="inAmount"
         label="打款输入金额"
-      />
+      />-->
+      <el-table-column
+        :show-overflow-tooltip="true"
+        prop="inAmount"
+        label="输入金额"
+      >  <template slot-scope="scope">
+        <el-input v-model="scope.row.inAmount" placeholder="请输入金额" type="number"  @blur="handleTextBlur($event,{type: 'inAmount', row:{'id':scope.row.id,'text':scope.row.inAmount} })"/>
+      </template></el-table-column>
       <el-table-column label="发货组状态" align="center" prop="status">
         <template slot-scope="scope">
           <div v-for="item in getStatusDict(scope.row.status, 'statusDictObj', 'ZH')" :key="item.key">
@@ -504,7 +563,7 @@ export default {
         prop="pics"
         label="图片"
       />
-      <el-table-column
+<!--      <el-table-column
       fixed="right"
       label="操作"
       width="100">
@@ -516,23 +575,12 @@ export default {
             <el-button type="text" size="small" @click="$emit('handleAction',scope.row,'edit', handleSearch)">生成新的</el-button>
           </div>
         </template>
-      </el-table-column>
+      </el-table-column>-->
     </el-table>
   </div>
 </template>
 <style>
 
-.el-tabs {
-      height: 100%;
-    display: flex;
-    flex-direction: column;
-    }
-    .el-tab-pane {
-      height: 100%;
-    }
-    .el-tabs__content {
-      flex: 1;
-    }
 </style>
 <style lang="scss" scoped>
 .commonBody {

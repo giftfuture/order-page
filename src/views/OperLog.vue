@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div  class="commonBody">
     <el-table border :data="transData" ><!--:cell-style="columnStyle" -->
       <el-table-column>
         <template slot-scope="scope">

@@ -42,9 +42,9 @@ export default {
   <div class="header-box">
     <el-row type="flex" justify="space-between">
       <el-col :span="6">
-        <button class="btn-tool" title="折叠" @click="collapse" >
+<!--        <button class="btn-tool" title="折叠" @click="collapse" >
             <i class="el-icon-d-arrow-left"></i>
-        </button>
+        </button>-->
         <button class="btn-tool" title="刷新" @click="refresh">
             <i class="el-icon-refresh"></i>
         </button>

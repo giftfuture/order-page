@@ -31,6 +31,8 @@
 </template>
 
 <script>
+import { staflogin } from '@/api'
+
 export default {
   data () {
     return {
@@ -56,13 +58,13 @@ export default {
       this.$refs[formName].validate((valid) => {
         if (valid) {
           this.loading = true
-          this.$http.post('/login', this.loginForm).then((res) => {
-            if (res.data.code === 0) {
+          staflogin(this.loginForm).then((res) => {
+            if (res.code === 0) {
               // 延迟两秒，演示登录按钮加载效果
               setTimeout(() => {
                 this.loading = false
                 sessionStorage.setItem('staff', JSON.stringify(this.loginForm))
-                this.$router.replace({ path: '/search' })
+                this.$router.replace({ path: '/' })
               }, 2000)
             } else {
               this.loading = false

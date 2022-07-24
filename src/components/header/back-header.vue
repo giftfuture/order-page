@@ -18,9 +18,9 @@
       <el-col :span="6" align="right">
         <span>{{ Utils.todayDate() }}</span>
         <el-dropdown trigger="click" class="user-name" @command="handleCommand">
-          <span class="el-dropdown-link">
-            {{ loginName }}<i class="el-icon-caret-bottom el-icon--right"></i>
-          </span>
+<!--          <span class="el-dropdown-link">
+            {{ loginName }}<i class="el-icon-caret-bottom el-icon&#45;&#45;right"></i>
+          </span>-->
           <el-dropdown-menu slot="dropdown">
             <el-dropdown-item command="profile" disabled>个人资料</el-dropdown-item>
             <el-dropdown-item command="updatepwd" disabled>修改密码</el-dropdown-item>
@@ -66,14 +66,14 @@ export default {
     handleCommand (command) {
       switch (command) {
         case 'logout':
-          this.$router.replace({ path: '/sysback/login' })
+          this.$router.replace({ path: '/syslogin' })
           break
       }
     }
   },
   computed: {
     username () {
-      let { username } = JSON.parse(sessionStorage.getItem('user'))
+      let { username } = JSON.parse(sessionStorage.getItem('sys_usr'))
       return username.toUpperCase()
     }
   }

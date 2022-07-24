@@ -7,26 +7,42 @@
     text-color="rgba(255,255,255,.8)"
     active-text-color="#ffd04b"
     :collapse="isCollapse">
-    <el-menu-item index="/sysIndex">
+    <el-menu-item index="/sys">
       <i class="el-icon-location"></i>
       <span slot="title">主页</span>
     </el-menu-item>
-    <el-menu-item index="/sysback/users">
+    <el-menu-item index="/sys/staff">
       <i class="el-icon-menu"></i>
       <span slot="title">用户</span>
+    </el-menu-item>
+    <el-menu-item index="/sys/role">
+      <i class="el-icon-menu"></i>
+      <span slot="title">角色</span>
+    </el-menu-item>
+    <el-menu-item index="/sys/ordersort">
+      <i class="el-icon-menu"></i>
+      <span slot="title">工单组</span>
+    </el-menu-item>
+    <el-menu-item index="/sys/dict">
+      <i class="el-icon-menu"></i>
+      <span slot="title">工单字典</span>
+    </el-menu-item>
+    <el-menu-item index="/sys/tab">
+      <i class="el-icon-menu"></i>
+      <span slot="title">选项卡</span>
     </el-menu-item>
 <!--    <el-menu-item index="/articles">
       <i class="el-icon-document"></i>
       <span slot="title">文章</span>
     </el-menu-item>-->
-    <el-submenu index="4">
+<!--    <el-submenu index="4">
       <template slot="title">
         <i class="el-icon-setting"></i>
         <span>设置</span>
       </template>
       <el-menu-item index="/profile">基本资料 (空)</el-menu-item>
       <el-menu-item index="/password">修改密码 (空)</el-menu-item>
-    </el-submenu>
+    </el-submenu>-->
 <!--    <el-menu-item index="/echarts">
       <i class="el-icon-share"></i>
       <span slot="title">图表</span>

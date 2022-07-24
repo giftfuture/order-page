@@ -101,3 +101,29 @@ export function operLog (data) {
     method: 'get'
   })
 }
+
+// 管理端登录
+export function syslogin (data) {
+  return request({
+    url: '/sysback/login',
+    method: 'post',
+    data
+  })
+}
+// 员工登录
+export function staflogin (data) {
+  return request({
+    url: '/login',
+    method: 'post',
+    data
+  })
+}
+
+// 更新密码
+export function updatePwd (data) {
+  return request({
+    url: '/updatePwd',
+    method: 'post',
+    data
+  })
+}

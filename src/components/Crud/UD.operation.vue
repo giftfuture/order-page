@@ -12,7 +12,7 @@
   </div>
 </template>
 <script>
-import CRUD, { crud } from '@crud/crud'
+import CRUD, { crud } from '@/components/Crud/crud'
 export default {
   mixins: [crud()],
   props: {
@@ -37,33 +37,33 @@ export default {
       default: '确定删除本条数据吗？'
     }
   },
-  data() {
+  data () {
     return {
       pop: false
     }
   },
   methods: {
-    doCancel() {
+    doCancel () {
       this.pop = false
       this.crud.cancelDelete(this.data)
     },
-    toDelete() {
+    toDelete () {
       this.pop = true
     },
-    [CRUD.HOOK.afterDelete](crud, data) {
+    [CRUD.HOOK.afterDelete] (crud, data) {
       if (data === this.data) {
         this.pop = false
       }
     },
-    onPopoverShow() {
+    onPopoverShow () {
       setTimeout(() => {
         document.addEventListener('click', this.handleDocumentClick)
       }, 0)
     },
-    onPopoverHide() {
+    onPopoverHide () {
       document.removeEventListener('click', this.handleDocumentClick)
     },
-    handleDocumentClick(event) {
+    handleDocumentClick (event) {
       this.pop = false
     }
   }

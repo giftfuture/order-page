@@ -14,23 +14,23 @@
   <div class="user-box commonBody mpm-container" style="position: relative; overflow:hidden; -webkit-overflow-scrolling:touch;">
       <el-form
         :inline="true"
-        :model="staffForm"
+        :model="roleForm"
         ref="staffForm"
         class="login-form"
       >
-        <el-form-item label="登录名" prop="loginName"> <el-input
-          v-model="staffForm.loginName"
+        <el-form-item label="角色名" prop="roleName"> <el-input
+          v-model="roleForm.loginName"
           clearable
           size="small"
-          placeholder="输入登录名"
+          placeholder="输入角色名"
           style="width: 200px;"
           class="filter-item"
         /></el-form-item>
-        <el-form-item label="员工姓名" prop="staffName"> <el-input
-          v-model="staffForm.staffName"
+        <el-form-item label="角色代码" prop="roleKey"> <el-input
+          v-model="roleForm.roleKey"
           clearable
           size="small"
-          placeholder="输入员工姓名"
+          placeholder="输入角色代码"
           style="width: 200px;"
           class="filter-item"
         /></el-form-item>
@@ -49,7 +49,6 @@
       <el-col :span="24">
         <div class="tool-box">
           <el-button type="primary" icon="el-icon-circle-plus-outline" size="small" @click="handleAdd">新增</el-button>
-          <el-button type="danger" icon="el-icon-delete" size="small" @click="mulDelete">批量删除</el-button>
         </div>
       </el-col>
     </el-row>
@@ -58,16 +57,14 @@
       @selection-change="selectChange"
       style="width: 100%">
       <el-table-column :selectable="checkboxT" type="selection" width="55" />
-      <el-table-column :show-overflow-tooltip="true" label="员工编号" prop="staffNo"><template slot-scope="scope">{{scope.row.staffNo}}</template></el-table-column>
-      <el-table-column :show-overflow-tooltip="true" prop="loginName" label="登录名" ><template slot-scope="scope">{{scope.row.loginName}}</template></el-table-column>
-      <el-table-column :show-overflow-tooltip="true" prop="staffName" label="姓名" ><template slot-scope="scope">{{scope.row.staffName}}</template></el-table-column>
-      <el-table-column prop="gender" label="性别" ><template slot-scope="scope">{{scope.row.gender?"男":"女"}}</template></el-table-column>
-      <el-table-column :show-overflow-tooltip="true" prop="phone" width="100" label="电话">    <template slot-scope="scope">{{scope.row.phone}}</template></el-table-column>
-      <el-table-column :show-overflow-tooltip="true" width="135" prop="email" label="邮箱" >    <template slot-scope="scope">{{scope.row.email}}</template></el-table-column>
+      <el-table-column :show-overflow-tooltip="true" label="角色ID" prop="staffNo"><template slot-scope="scope">{{scope.row.roleId}}</template></el-table-column>
+      <el-table-column :show-overflow-tooltip="true" prop="roleName" label="角色名" ><template slot-scope="scope">{{scope.row.roleName}}</template></el-table-column>
+      <el-table-column :show-overflow-tooltip="true" prop="roleKey" label="角色代码" ><template slot-scope="scope">{{scope.row.roleKey}}</template></el-table-column>
+      <el-table-column :show-overflow-tooltip="true" prop="remark" width="100" label="备注">    <template slot-scope="scope">{{scope.row.remark}}</template></el-table-column>
       <el-table-column
         label="状态">
         <template slot-scope="scope">
-          {{ scope.row.status ? '离职':'在职'}}
+          {{ scope.row.deleted ? '删除':'启用'}}
         </template>
       </el-table-column>
       <el-table-column :show-overflow-tooltip="true" prop="createTime" width="135" label="创建日期" >    <template slot-scope="scope">{{scope.row.createTime}}</template></el-table-column>
@@ -96,41 +93,21 @@
       :page-size="10"
       layout="total, sizes, prev, pager, next, jumper"
       :total="tableData.total"></el-pagination>
-    <el-dialog :title="dialogTitle" width="600px" :visible.sync="userFormVisible" @close="resetForm('userForm')">
-      <el-form :model="user" :rules="rules" ref="userForm">
-        <el-form-item label="编号" prop="staffNo" label-width="80px">
-          <el-input v-model="user.staffNo" autocomplete="off"></el-input>
+    <el-dialog :title="dialogTitle" width="600px" :visible.sync="roleFormVisible" @close="resetForm('roleEditForm')">
+      <el-form :model="role" :rules="rules" ref="roleEditForm">
+        <el-form-item label="角色名" prop="roleName" label-width="80px">
+          <el-input v-model="role.roleName" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item label="登录名" prop="loginName" label-width="80px">
-          <el-input v-model="user.loginName" autocomplete="off"></el-input>
+        <el-form-item label="角色代码" prop="staffName" label-width="80px">
+          <el-input v-model="role.roleKey" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item label="姓名" prop="staffName" label-width="80px">
-          <el-input v-model="user.staffName" autocomplete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="手机" prop="phone" label-width="80px">
-          <el-input v-model="user.phone" autocomplete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="邮箱" prop="email" label-width="80px">
-          <el-input v-model="user.email" autocomplete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="出生年月" label-width="80px">
-          <el-date-picker
-            v-model="user.birth"
-            type="date"
-            value-format="yyyy-MM-dd"
-            placeholder="选择日期">
-          </el-date-picker>
-        </el-form-item>
-        <el-form-item label="状态" label-width="80px">
-          <el-switch v-model="user.status" active-color="#13ce66"
-            inactive-color="#ff4949"
-            :active-value="0"
-            :inactive-value="1"></el-switch>
+        <el-form-item label="备注" prop="remark" label-width="80px">
+          <el-input v-model="role.remark" autocomplete="off"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="userFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="submitUser('userForm')">确 定</el-button>
+        <el-button @click="roleFormVisible = false">取 消</el-button>
+        <el-button type="primary" @click="submitUser('roleEditForm')">确 定</el-button>
       </div>
     </el-dialog>
   </div>
@@ -142,9 +119,8 @@
 <script>
 import Menus from '@/components/menus/back-menus.vue'
 import Headers from '@/components/header/back-header.vue'
-import { listStaff } from '@/api/back/user.js'
+import { getAll } from '@/api/back/role.js'
 
-// import dayjs from 'dayjs'
 export default {
   components: {
     Menus, Headers
@@ -156,9 +132,10 @@ export default {
   },
   data () {
     return {
-      staffForm: {
-        loginName: '',
-        staffName: ''
+      roleForm: {
+        roleName: '',
+        roleKey: '',
+        remark: ''
       },
       pageNo: 0,
       pageSize: 10,
@@ -168,27 +145,24 @@ export default {
         data: []
       },
       isRouterAlive: true,
-      user: {
-        id: '',
-        birth: '',
-        loginName: '',
-        staffName: '',
-        phone: '',
-        email: '',
-        status: 0
+      role: {
+        roleId: '',
+        roleName: '',
+        roleKey: '',
+        remark: ''
       },
-      userBackup: Object.assign({}, this.user),
+      roleBackup: Object.assign({}, this.role),
       multipleSelection: [],
-      userFormVisible: false,
+      roleFormVisible: false,
       dialogTitle: '',
       rowIndex: 9999,
       rules: {
-        loginName: [
-          { required: true, message: '请输入真实姓名', trigger: 'blur' },
+        roleName: [
+          { required: true, message: '请输入角色名', trigger: 'blur' },
           { min: 1, max: 20, message: '长度在 1 到 20 个字符', trigger: 'blur' }
         ],
-        staffName: [
-          { required: true, message: '请输入真实姓名', trigger: 'blur' },
+        roleKey: [
+          { required: true, message: '请输入角色代码', trigger: 'blur' },
           { min: 2, max: 5, message: '长度在 2 到 5 个字符', trigger: 'blur' }
         ]
       },
@@ -220,19 +194,19 @@ export default {
       })
     },
     handleSearch () {
-      const staffParams = { }
-      Object.keys(this.staffForm).forEach(key => {
-        if (Array.isArray(this.staffForm[key])) {
-          staffParams[key] = this.staffForm[key].join(',')
+      const roleParams = { }
+      Object.keys(this.roleForm).forEach(key => {
+        if (Array.isArray(this.roleForm[key])) {
+          roleParams[key] = this.roleForm[key].join(',')
         } else {
-          staffParams[key] = this.staffForm[key]
+          roleParams[key] = this.roleForm[key]
         }
       })
       const params = {
-        staffParams,
+        roleParams,
         'pageRequest': { 'page': this.pageNo, 'size': this.pageSize }
       }
-      listStaff(params)
+      getAll(params)
         .then((response) => {
           console.log(response, '====')
           if (response.code === 0) {
@@ -269,24 +243,24 @@ export default {
     },
     handleEdit (index, row) {
       this.dialogTitle = '编辑'
-      this.user = Object.assign({}, row)
-      this.userFormVisible = true
+      this.role = Object.assign({}, row)
+      this.roleFormVisible = true
       this.rowIndex = index
     },
     submitUser (formName) {
       // 表单验证
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          let id = this.user.id
+          let id = this.role.id
           if (id) {
             // id非空-修改
             // this.users.splice(this.rowIndex, 1, this.user)
           } else {
             // id为空-新增
-            this.user.id = this.users.length + 1
+            this.role.id = this.tableData.length + 1
             // this.users.unshift(this.user)
           }
-          this.userFormVisible = false
+          this.roleFormVisible = false
           this.$message({
             type: 'success',
             message: id ? '修改成功！' : '新增成功！'
@@ -336,8 +310,8 @@ export default {
     },
     handleAdd () {
       this.dialogTitle = '新增'
-      this.user = Object.assign({}, this.userBackup)
-      this.userFormVisible = true
+      this.role = Object.assign({}, this.roleBackup)
+      this.roleFormVisible = true
       this.$emit('handleAdd', 'DK', this.handleSearch)
     },
     isCollapse () {

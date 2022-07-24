@@ -7,7 +7,7 @@
     text-color="rgba(255,255,255,.8)"
     active-text-color="#ffd04b"
     :collapse="isCollapse">
-    <el-menu-item index="/index">
+    <el-menu-item index="/">
       <i class="el-icon-location"></i>
       <span slot="title">主页</span>
     </el-menu-item>
@@ -15,10 +15,10 @@
       <i class="el-icon-menu"></i>
       <span slot="title">用户</span>
     </el-menu-item>-->
-    <el-menu-item index="/operlog">
+<!--    <el-menu-item index="/operlog">
       <i class="el-icon-document"></i>
       <span slot="title">操作历史</span>
-    </el-menu-item>
+    </el-menu-item>-->
 <!--    <el-submenu index="4">
       <template slot="title">
         <i class="el-icon-setting"></i>

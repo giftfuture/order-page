@@ -1,57 +1,42 @@
 import request from '@/utils/request'
 
 // 获取所有的Role
-export function getAll() {
+export function getAll (data) {
   return request({
-    url: 'api/roles/all',
-    method: 'get'
-  })
-}
-
-export function add(data) {
-  return request({
-    url: 'api/roles',
+    url: '/role/list',
     method: 'post',
     data
   })
 }
 
-export function get(id) {
+export function add (data) {
   return request({
-    url: 'api/roles/' + id,
+    url: '/role/add',
+    method: 'post',
+    data
+  })
+}
+
+export function get (id) {
+  return request({
+    url: '/role/' + id,
     method: 'get'
   })
 }
 
-export function getLevel() {
+export function del (id) {
   return request({
-    url: 'api/roles/level',
-    method: 'get'
+    url: '/role/del?id=' + id,
+    method: 'delete'
   })
 }
 
-export function del(ids) {
+export function edit (data) {
   return request({
-    url: 'api/roles',
-    method: 'delete',
-    data: ids
-  })
-}
-
-export function edit(data) {
-  return request({
-    url: 'api/roles',
+    url: '/role/edit',
     method: 'put',
     data
   })
 }
 
-export function editMenu(data) {
-  return request({
-    url: 'api/roles/menu',
-    method: 'put',
-    data
-  })
-}
-
-export default { add, edit, del, get, editMenu, getLevel }
+export default { add, edit, del, get, getAll }

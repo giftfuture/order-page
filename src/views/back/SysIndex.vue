@@ -2,7 +2,7 @@
   <el-container class="index-box">
     <el-aside width="asideWidth">
       <div class="logo">
-        <img v-show="!isCollapse" src="../../assets/logo.png" alt="ELementUI" width="122" height="27">
+        <img v-show="!isCollapse" src="./../../assets/logo.png" alt="ELementUI" width="122" height="122">
       </div>
       <menus :isCollapse="isCollapse"/>
     </el-aside>
@@ -11,15 +11,15 @@
         <headers/>
       </el-header>
       <el-main>
-        <router-view v-if="isRouterAlive"/>
+     <router-view v-if="isRouterAlive"/>
       </el-main>
     </el-container>
   </el-container>
 </template>
 
 <script>
-import Menus from '@/components/menus/back-menus'
-import Headers from '@/components/header/back-header'
+import Menus from '@/components/menus/back-menus.vue'
+import Headers from '@/components/header/back-header.vue'
 export default {
   provide () {
     return {
